@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../api';
 import { LeaveRequest } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
-import { Calendar, Plus, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
+import { Calendar, Plus, CheckCircle2, AlertCircle, Clock, ShieldCheck, Info } from 'lucide-react';
 
 export const LeaveRequestsView: React.FC = () => {
+  const { showToast } = useToast();
   const [requests, setRequests] = useState<LeaveRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -17,6 +19,8 @@ export const LeaveRequestsView: React.FC = () => {
   const [reason, setReason] = useState('');
   const [modalFeedback, setModalFeedback] = useState<{ success?: boolean; message?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const todayIsoDate = useMemo(() => new Date().toISOString().split('T')[0], []);
 
   const fetchLeaves = useCallback(async () => {
     setIsLoading(true);
@@ -37,26 +41,43 @@ export const LeaveRequestsView: React.FC = () => {
   }, [fetchLeaves]);
 
   const handleOpenModal = () => {
-    const today = new Date().toISOString().split('T')[0];
-    setStartDate(today);
-    setEndDate(today);
+    setStartDate(todayIsoDate);
+    setEndDate(todayIsoDate);
     setLeaveType('casual');
     setReason('');
     setModalFeedback({});
     setIsModalOpen(true);
   };
 
+  const handleStartDateChange = (val: string) => {
+    setStartDate(val);
+    if (endDate && val > endDate) {
+      setEndDate(val);
+    }
+  };
+
   const calculateDays = () => {
     if (!startDate || !endDate) return 1;
     const s = new Date(startDate);
     const e = new Date(endDate);
+    if (e < s) return 0;
     const diff = Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     return Math.max(1, diff);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startDate || !endDate || !reason.trim()) return;
+    if (!startDate || !endDate || !reason.trim()) {
+      setModalFeedback({ success: false, message: 'Please provide start date, end date, and reason.' });
+      return;
+    }
+
+    if (startDate > endDate) {
+      setModalFeedback({ success: false, message: 'Start date cannot be after end date.' });
+      showToast('Start date cannot be after end date', 'warning');
+      return;
+    }
+
     setIsSubmitting(true);
     setModalFeedback({});
 
@@ -69,16 +90,19 @@ export const LeaveRequestsView: React.FC = () => {
       });
 
       setModalFeedback({ success: true, message: res.message });
+      showToast('Leave application submitted for approval', 'success');
       await fetchLeaves();
       setTimeout(() => {
         setIsModalOpen(false);
       }, 1200);
     } catch (err: any) {
       setModalFeedback({ success: false, message: err.message || 'Error submitting leave request.' });
+      showToast(err.message || 'Error submitting leave request', 'error');
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="space-y-6">
@@ -243,7 +267,7 @@ export const LeaveRequestsView: React.FC = () => {
                 type="date"
                 required
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => handleStartDateChange(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
               />
             </div>
@@ -252,12 +276,14 @@ export const LeaveRequestsView: React.FC = () => {
               <input
                 type="date"
                 required
+                min={startDate}
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
               />
             </div>
           </div>
+
 
           <div className="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
             <span>Total Duration:</span>

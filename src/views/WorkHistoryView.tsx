@@ -33,14 +33,18 @@ export const WorkHistoryView: React.FC = () => {
   }, [fetchHistory]);
 
   const filtered = updates.filter((u) => {
-    if (!searchQuery) return true;
-    const q = searchQuery.toLowerCase();
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
     return (
-      u.project_details.toLowerCase().includes(q) ||
-      u.tasks_completed.toLowerCase().includes(q) ||
-      (u.accomplishments && u.accomplishments.toLowerCase().includes(q))
+      u.work_date.includes(q) ||
+      (u.project_details && u.project_details.toLowerCase().includes(q)) ||
+      (u.tasks_completed && u.tasks_completed.toLowerCase().includes(q)) ||
+      (u.accomplishments && u.accomplishments.toLowerCase().includes(q)) ||
+      (u.blockers && u.blockers.toLowerCase().includes(q)) ||
+      (u.review_comment && u.review_comment.toLowerCase().includes(q))
     );
   });
+
 
   return (
     <div className="space-y-6">

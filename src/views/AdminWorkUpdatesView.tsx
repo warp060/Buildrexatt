@@ -24,7 +24,10 @@ import {
   Bot,
 } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export const AdminWorkUpdatesView: React.FC = () => {
+  const { showToast } = useToast();
   const [updates, setUpdates] = useState<WorkUpdate[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,9 +117,11 @@ export const AdminWorkUpdatesView: React.FC = () => {
         if (res.feedback.recommended_status) {
           setReviewStatus(res.feedback.recommended_status);
         }
+        showToast('AI Coaching suggestions generated', 'success');
       }
     } catch (err: any) {
       console.error(err);
+      showToast(err.message || 'Failed to generate feedback', 'error');
     } finally {
       setIsGeneratingFeedback(false);
     }
@@ -130,9 +135,11 @@ export const AdminWorkUpdatesView: React.FC = () => {
       if (res.success && res.digest) {
         setExecutiveDigest(res.digest);
         setIsDigestModalOpen(true);
+        showToast('Executive daily digest generated', 'success');
       }
     } catch (err: any) {
       console.error(err);
+      showToast(err.message || 'Failed to generate digest', 'error');
     } finally {
       setIsGeneratingDigest(false);
     }
@@ -141,26 +148,39 @@ export const AdminWorkUpdatesView: React.FC = () => {
   const handleSaveReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUpdate) return;
+
+    if (reviewStatus === 'needs_revision' && !reviewComment.trim()) {
+      setReviewFeedback({
+        success: false,
+        message: 'Please provide constructive feedback explaining what needs revision.',
+      });
+      showToast('Feedback note is required when requesting revisions', 'warning');
+      return;
+    }
+
     setIsSubmittingReview(true);
     setReviewFeedback({});
 
     try {
       const res = await api.reviewWorkUpdate(selectedUpdate.id, {
         status: reviewStatus,
-        review_comment: reviewComment,
+        review_comment: reviewComment.trim(),
       });
 
       setReviewFeedback({ success: true, message: res.message });
+      showToast(res.message, 'success');
       await fetchUpdates();
       setTimeout(() => {
         setIsReviewModalOpen(false);
       }, 1200);
     } catch (err: any) {
       setReviewFeedback({ success: false, message: err.message || 'Failed to submit review.' });
+      showToast(err.message || 'Failed to submit review', 'error');
     } finally {
       setIsSubmittingReview(false);
     }
   };
+
 
   const copyDigestToClipboard = () => {
     if (!executiveDigest) return;

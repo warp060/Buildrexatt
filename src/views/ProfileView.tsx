@@ -3,8 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import { User, Lock, Phone, Mail, Building, Calendar, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export const ProfileView: React.FC = () => {
   const { user, refreshUser } = useAuth();
+  const { showToast } = useToast();
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
@@ -19,14 +22,22 @@ export const ProfileView: React.FC = () => {
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name.trim()) {
+      setProfileMsg({ success: false, message: 'Name cannot be empty.' });
+      showToast('Name cannot be empty', 'warning');
+      return;
+    }
+
     setIsUpdatingProfile(true);
     setProfileMsg({});
     try {
-      const res = await api.updateProfile({ name, phone });
+      const res = await api.updateProfile({ name: name.trim(), phone: phone.trim() });
       setProfileMsg({ success: true, message: res.message });
+      showToast(res.message, 'success');
       await refreshUser();
     } catch (err: any) {
       setProfileMsg({ success: false, message: err.message || 'Failed to update profile.' });
+      showToast(err.message || 'Failed to update profile', 'error');
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -34,12 +45,19 @@ export const ProfileView: React.FC = () => {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentPassword) {
+      setPassMsg({ success: false, message: 'Current password is required.' });
+      showToast('Current password is required', 'warning');
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setPassMsg({ success: false, message: 'New password and confirmation do not match.' });
+      showToast('Passwords do not match', 'warning');
       return;
     }
     if (newPassword.length < 6) {
       setPassMsg({ success: false, message: 'New password must be at least 6 characters.' });
+      showToast('Password must be at least 6 characters', 'warning');
       return;
     }
 
@@ -48,15 +66,18 @@ export const ProfileView: React.FC = () => {
     try {
       const res = await api.changePassword({ current_password: currentPassword, new_password: newPassword });
       setPassMsg({ success: true, message: res.message });
+      showToast(res.message, 'success');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err: any) {
       setPassMsg({ success: false, message: err.message || 'Failed to change password.' });
+      showToast(err.message || 'Password update failed', 'error');
     } finally {
       setIsChangingPass(false);
     }
   };
+
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

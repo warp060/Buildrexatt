@@ -4,7 +4,10 @@ import { AttendanceRecord, WorkUpdate, Department } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Download, Printer, Filter, Calendar, BarChart3, FileSpreadsheet } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export const AdminReportsView: React.FC = () => {
+  const { showToast } = useToast();
   const [reportType, setReportType] = useState<'attendance' | 'work_updates'>('attendance');
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -76,7 +79,7 @@ export const AdminReportsView: React.FC = () => {
     fetchReports();
   }, [fetchReports]);
 
-  // Export to CSV
+  // Export to CSV with UTF-8 BOM for perfect Excel / Numbers compatibility
   const handleExportCSV = () => {
     let headers: string[] = [];
     let rows: string[][] = [];
@@ -84,46 +87,50 @@ export const AdminReportsView: React.FC = () => {
     if (reportType === 'attendance') {
       headers = ['Employee Name', 'Code', 'Role', 'Department', 'Date', 'Check In', 'Check Out', 'Total Hours', 'Status', 'Notes'];
       rows = attendanceRecords.map((r) => [
-        `"${r.user_name || ''}"`,
-        `"${r.employee_code || ''}"`,
-        `"${r.role || ''}"`,
-        `"${r.department_name || ''}"`,
+        `"${(r.user_name || '').replace(/"/g, '""')}"`,
+        `"${(r.employee_code || '').replace(/"/g, '""')}"`,
+        `"${(r.role || '').replace(/"/g, '""')}"`,
+        `"${(r.department_name || '').replace(/"/g, '""')}"`,
         `"${r.work_date}"`,
         `"${r.check_in}"`,
         `"${r.check_out || 'Active'}"`,
         `"${(r.total_minutes / 60).toFixed(2)}"`,
         `"${r.status}"`,
-        `"${r.notes || ''}"`,
+        `"${(r.notes || '').replace(/"/g, '""')}"`,
       ]);
     } else {
       headers = ['Member Name', 'Code', 'Role', 'Department', 'Date', 'Project Focus', 'Tasks Completed', 'Hours', 'Status', 'Reviewer Notes'];
       rows = workRecords.map((r) => [
-        `"${r.user_name || ''}"`,
-        `"${r.employee_code || ''}"`,
-        `"${r.role || ''}"`,
-        `"${r.department_name || ''}"`,
+        `"${(r.user_name || '').replace(/"/g, '""')}"`,
+        `"${(r.employee_code || '').replace(/"/g, '""')}"`,
+        `"${(r.role || '').replace(/"/g, '""')}"`,
+        `"${(r.department_name || '').replace(/"/g, '""')}"`,
         `"${r.work_date}"`,
-        `"${r.project_details.replace(/"/g, '""')}"`,
-        `"${r.tasks_completed.replace(/"/g, '""')}"`,
+        `"${(r.project_details || '').replace(/"/g, '""')}"`,
+        `"${(r.tasks_completed || '').replace(/"/g, '""')}"`,
         `"${r.hours_spent}"`,
         `"${r.status}"`,
         `"${(r.review_comment || '').replace(/"/g, '""')}"`,
       ]);
     }
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', url);
     link.setAttribute('download', `BUILDREX_${reportType}_report_${startDate}_to_${endDate}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast(`Report downloaded: ${rows.length} records exported`, 'success');
   };
 
   const handlePrint = () => {
     window.print();
   };
+
 
   return (
     <div className="space-y-6">

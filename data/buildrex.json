@@ -137,13 +137,13 @@
       "user_id": "user-int-1",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14T11:51:22.811Z",
-      "check_out": null,
-      "total_minutes": 0,
+      "check_out": "2026-10-14T12:25:24.127Z",
+      "total_minutes": 34,
       "status": "late",
       "notes": "Late arrival (checked in after grace window)",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-14T11:51:22.811Z",
-      "updated_at": "2026-10-14T11:51:22.811Z"
+      "updated_at": "2026-10-14T12:25:24.127Z"
     },
     {
       "id": "att-1791856747973-q6eia",
@@ -1211,6 +1211,176 @@
     }
   ],
   "audit_logs": [
+    {
+      "id": "audit-1791981252381-wj83o",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-int-1",
+      "details": {
+        "email": "intern.dev@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:34:12.381Z"
+    },
+    {
+      "id": "audit-1791981247253-syhpa",
+      "actor_id": "user-emp-1",
+      "actor_name": "Sarah Chen",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-emp-1",
+      "details": {
+        "email": "sarah.chen@buildrex.com",
+        "role": "employee"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:34:07.253Z"
+    },
+    {
+      "id": "audit-1791981246025-dr8jq",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-int-1",
+      "details": {
+        "email": "intern.dev@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:34:06.025Z"
+    },
+    {
+      "id": "audit-1791981244035-zr180",
+      "actor_id": "user-emp-1",
+      "actor_name": "Sarah Chen",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-emp-1",
+      "details": {
+        "email": "sarah.chen@buildrex.com",
+        "role": "employee"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:34:04.035Z"
+    },
+    {
+      "id": "audit-1791981219924-nrrzx",
+      "actor_id": "user-admin-1",
+      "actor_name": "Alex Vance",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-1",
+      "details": {
+        "email": "admin@buildrex.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:33:39.924Z"
+    },
+    {
+      "id": "audit-1791981209263-si7z0",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-int-1",
+      "details": {
+        "email": "intern.dev@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:33:29.263Z"
+    },
+    {
+      "id": "audit-1791981206137-f7ife",
+      "actor_id": "user-admin-1",
+      "actor_name": "Alex Vance",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-1",
+      "details": {
+        "email": "admin@buildrex.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:33:26.137Z"
+    },
+    {
+      "id": "audit-1791980750613-3tp60",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-int-1",
+      "details": {
+        "email": "intern.dev@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:25:50.613Z"
+    },
+    {
+      "id": "audit-1791980748940-3qnfd",
+      "actor_id": "user-emp-1",
+      "actor_name": "Sarah Chen",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-emp-1",
+      "details": {
+        "email": "sarah.chen@buildrex.com",
+        "role": "employee"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:25:48.940Z"
+    },
+    {
+      "id": "audit-1791980732747-q1s92",
+      "actor_id": "user-admin-1",
+      "actor_name": "Alex Vance",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-1",
+      "details": {
+        "email": "admin@buildrex.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:25:32.747Z"
+    },
+    {
+      "id": "audit-1791980724136-e4wn0",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "ATTENDANCE_CHECK_OUT",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1791978682812-bvv44",
+      "details": {
+        "work_date": "2026-10-14",
+        "check_out": "2026-10-14T12:25:24.127Z",
+        "total_minutes": 34,
+        "status": "late"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:25:24.136Z"
+    },
+    {
+      "id": "audit-1791980721421-i0fap",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-int-1",
+      "details": {
+        "email": "intern.dev@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14T12:25:21.421Z"
+    },
     {
       "id": "audit-1791979030581-c28sq",
       "actor_id": "user-admin-1",

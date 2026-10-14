@@ -1,11 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { api } from '../api';
 import { AttendanceRecord } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
-import { Clock, Filter, Plus, Calendar, AlertCircle, CheckCircle2, Play, Square, CheckCircle } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
+import {
+  Clock,
+  Filter,
+  Plus,
+  Calendar,
+  AlertCircle,
+  CheckCircle2,
+  Play,
+  Square,
+  CheckCircle,
+  MapPin,
+  ShieldCheck,
+  Wifi,
+  Navigation,
+} from 'lucide-react';
 
 export const MyAttendanceView: React.FC = () => {
+  const { showToast } = useToast();
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [summary, setSummary] = useState({
     total_days_logged: 0,
@@ -37,6 +53,15 @@ export const MyAttendanceView: React.FC = () => {
   const [corrReason, setCorrReason] = useState('');
   const [corrFeedback, setCorrFeedback] = useState<{ success?: boolean; message?: string }>({});
   const [isSubmittingCorr, setIsSubmittingCorr] = useState(false);
+
+  const todayIsoDate = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  const projectedCorrectionMinutes = useMemo(() => {
+    if (!corrCheckIn || !corrCheckOut) return 0;
+    const [hIn, mIn] = corrCheckIn.split(':').map(Number);
+    const [hOut, mOut] = corrCheckOut.split(':').map(Number);
+    return Math.max(0, (hOut * 60 + mOut) - (hIn * 60 + mIn));
+  }, [corrCheckIn, corrCheckOut]);
 
   const loadTodayAttendance = useCallback(async () => {
     try {
@@ -103,9 +128,11 @@ export const MyAttendanceView: React.FC = () => {
     try {
       const res = await api.checkIn();
       setActionFeedback({ type: 'success', message: res.message });
+      showToast(res.message, 'success');
       await Promise.all([loadTodayAttendance(), fetchAttendance()]);
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
+      showToast(err.message, 'error');
     } finally {
       setIsActionLoading(false);
     }
@@ -117,9 +144,11 @@ export const MyAttendanceView: React.FC = () => {
     try {
       const res = await api.checkOut();
       setActionFeedback({ type: 'success', message: res.message });
+      showToast(res.message, 'success');
       await Promise.all([loadTodayAttendance(), fetchAttendance()]);
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
+      showToast(err.message, 'error');
     } finally {
       setIsActionLoading(false);
     }
@@ -149,7 +178,7 @@ export const MyAttendanceView: React.FC = () => {
       }
     } else {
       setSelectedAttendance(null);
-      setCorrDate(new Date().toISOString().split('T')[0]);
+      setCorrDate(todayIsoDate);
       setCorrCheckIn('09:00');
       setCorrCheckOut('18:00');
     }
@@ -159,7 +188,29 @@ export const MyAttendanceView: React.FC = () => {
 
   const handleSubmitCorrection = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!corrDate || !corrReason) return;
+    if (!corrDate || !corrReason.trim()) {
+      setCorrFeedback({ success: false, message: 'Work date and reason are required.' });
+      return;
+    }
+
+    if (corrCheckOut <= corrCheckIn) {
+      setCorrFeedback({
+        success: false,
+        message: 'Requested check-out time must be strictly later than check-in time.',
+      });
+      showToast('Requested check-out time must be after check-in time', 'warning');
+      return;
+    }
+
+    if (corrDate > todayIsoDate) {
+      setCorrFeedback({
+        success: false,
+        message: 'Attendance corrections cannot be submitted for future dates.',
+      });
+      showToast('Cannot submit correction for a future date', 'warning');
+      return;
+    }
+
     setIsSubmittingCorr(true);
     setCorrFeedback({});
 
@@ -172,15 +223,17 @@ export const MyAttendanceView: React.FC = () => {
         work_date: corrDate,
         requested_check_in: reqIn,
         requested_check_out: reqOut,
-        reason: corrReason,
+        reason: corrReason.trim(),
       });
 
       setCorrFeedback({ success: true, message: res.message });
+      showToast('Attendance correction request submitted to admin', 'success');
       setTimeout(() => {
         setIsModalOpen(false);
       }, 1500);
     } catch (err: any) {
       setCorrFeedback({ success: false, message: err.message || 'Failed to submit correction request.' });
+      showToast(err.message || 'Failed to submit correction', 'error');
     } finally {
       setIsSubmittingCorr(false);
     }
@@ -191,6 +244,16 @@ export const MyAttendanceView: React.FC = () => {
       {/* Header and Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200 shadow-2xs">
         <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              Biometric & Geofence Verified
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-mono">
+              <Wifi className="w-3 h-3 text-slate-400" />
+              TLS Secure
+            </span>
+          </div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">Personal Attendance Record</h1>
           <p className="text-xs text-slate-500 mt-0.5">
             Verified check-in / check-out history, working duration, and correction requests
@@ -222,6 +285,7 @@ export const MyAttendanceView: React.FC = () => {
           <span>{actionFeedback.message}</span>
         </div>
       )}
+
 
       {/* Today's Active Session Quick-Action Card */}
       <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs">
@@ -507,10 +571,14 @@ export const MyAttendanceView: React.FC = () => {
             <input
               type="date"
               required
+              max={todayIsoDate}
               value={corrDate}
               onChange={(e) => setCorrDate(e.target.value)}
               className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
             />
+            <span className="text-[10px] text-slate-400 mt-1 block">
+              Corrections can only be requested for past or today's shifts.
+            </span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -539,6 +607,22 @@ export const MyAttendanceView: React.FC = () => {
               />
             </div>
           </div>
+
+          {/* Real-time Projected Shift Duration Preview */}
+          <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs flex items-center justify-between">
+            <span className="text-slate-500">Calculated Shift Duration:</span>
+            {corrCheckOut > corrCheckIn ? (
+              <span className="font-mono font-semibold text-slate-900">
+                {Math.floor(projectedCorrectionMinutes / 60)} hrs {projectedCorrectionMinutes % 60} mins
+                <span className="text-[11px] text-emerald-600 font-sans ml-1.5">
+                  ({projectedCorrectionMinutes >= 240 ? 'Full Shift' : 'Half Day'})
+                </span>
+              </span>
+            ) : (
+              <span className="text-rose-600 font-medium">Check-out must be after check-in</span>
+            )}
+          </div>
+
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">

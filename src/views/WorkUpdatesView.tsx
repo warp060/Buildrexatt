@@ -3,6 +3,7 @@ import { api } from '../api';
 import { WorkUpdate, PolishedReportResult, AiStatus } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
+import { useToast } from '../context/ToastContext';
 import {
   FileCheck2,
   Save,
@@ -21,6 +22,7 @@ import {
 } from 'lucide-react';
 
 export const WorkUpdatesView: React.FC = () => {
+  const { showToast } = useToast();
   const [workDate, setWorkDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [projectDetails, setProjectDetails] = useState('');
   const [tasksCompleted, setTasksCompleted] = useState('');
@@ -82,6 +84,7 @@ export const WorkUpdatesView: React.FC = () => {
         success: false,
         message: 'Please write some project notes or tasks completed first before polishing with AI.',
       });
+      showToast('Add project details or tasks first to polish with AI', 'warning');
       return;
     }
 
@@ -100,9 +103,11 @@ export const WorkUpdatesView: React.FC = () => {
       if (res.success && res.data) {
         setPolishedResult(res.data);
         setIsPolishModalOpen(true);
+        showToast('AI polished your daily deliverables', 'success');
       }
     } catch (err: any) {
       setFeedback({ success: false, message: err.message || 'Failed to polish work report with AI.' });
+      showToast(err.message || 'AI Polish failed', 'error');
     } finally {
       setIsPolishing(false);
     }
@@ -120,6 +125,7 @@ export const WorkUpdatesView: React.FC = () => {
       success: true,
       message: '✨ AI enhancements successfully applied to your daily report form!',
     });
+    showToast('AI enhancements applied to form!', 'success');
   };
 
   const handleSaveApiKey = async (e: React.FormEvent) => {
@@ -132,11 +138,13 @@ export const WorkUpdatesView: React.FC = () => {
       if (res.success) {
         setAiStatus(res.status);
         setKeySaveMessage('✅ API Key configured! Live Gemini 2.5 Flash is now active.');
+        showToast('Gemini API key configured successfully', 'success');
         setCustomApiKey('');
         setTimeout(() => setShowKeyDrawer(false), 2000);
       }
     } catch (err: any) {
       setKeySaveMessage(`❌ ${err.message || 'Failed to save API key'}`);
+      showToast(err.message || 'Failed to save key', 'error');
     } finally {
       setIsSavingKey(false);
     }
@@ -149,8 +157,19 @@ export const WorkUpdatesView: React.FC = () => {
           success: false,
           message: 'Please complete both the Project Focus and Tasks Completed fields before submitting.',
         });
+        showToast('Project Focus and Tasks Completed are required', 'warning');
         return;
       }
+    }
+
+    const numericHours = Number(hoursSpent);
+    if (isNaN(numericHours) || numericHours < 0.5 || numericHours > 24) {
+      setFeedback({
+        success: false,
+        message: 'Hours spent must be between 0.5 and 24 hours.',
+      });
+      showToast('Hours spent must be between 0.5 and 24 hours', 'warning');
+      return;
     }
 
     setIsLoading(true);
@@ -164,18 +183,21 @@ export const WorkUpdatesView: React.FC = () => {
         accomplishments,
         blockers,
         next_day_plan: nextDayPlan,
-        hours_spent: Number(hoursSpent),
+        hours_spent: numericHours,
         status,
       });
 
       setExistingRecord(res.work_update);
       setFeedback({ success: true, message: res.message });
+      showToast(res.message, 'success');
     } catch (err: any) {
       setFeedback({ success: false, message: err.message || 'Error saving work update.' });
+      showToast(err.message || 'Error saving report', 'error');
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">

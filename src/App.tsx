@@ -141,10 +141,15 @@ const MainWorkspace: React.FC = () => {
   );
 };
 
+import { ToastProvider } from './context/ToastContext';
+
 export default function App() {
   return (
-    <AuthProvider>
-      <MainWorkspace />
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <MainWorkspace />
+      </AuthProvider>
+    </ToastProvider>
   );
 }
+

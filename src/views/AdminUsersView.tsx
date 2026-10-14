@@ -5,7 +5,10 @@ import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { Search, UserPlus, Edit2, Key, CheckCircle2, AlertCircle, Shield, GraduationCap, Briefcase } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export const AdminUsersView: React.FC = () => {
+  const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -108,33 +111,49 @@ export const AdminUsersView: React.FC = () => {
 
   const handleSubmitUser = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formName.trim() || !formPosition.trim()) {
+      setFormFeedback({ success: false, message: 'Name and Position are required.' });
+      showToast('Name and Position are required', 'warning');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!isEditMode && (!formEmail || !emailRegex.test(formEmail))) {
+      setFormFeedback({ success: false, message: 'Please enter a valid work email address.' });
+      showToast('Please enter a valid work email address', 'warning');
+      return;
+    }
+
     setIsSubmitting(true);
     setFormFeedback({});
 
     try {
       if (isEditMode && selectedUserId) {
         const res = await api.updateUser(selectedUserId, {
-          name: formName,
+          name: formName.trim(),
           role: formRole,
           department_id: formDeptId || null,
-          position: formPosition,
-          phone: formPhone,
+          position: formPosition.trim(),
+          phone: formPhone.trim(),
           status: formStatus,
           joining_date: formJoiningDate,
         });
         setFormFeedback({ success: true, message: res.message });
+        showToast(res.message, 'success');
       } else {
         const res = await api.createUser({
-          name: formName,
-          email: formEmail,
-          employee_code: formCode || undefined,
+          name: formName.trim(),
+          email: formEmail.trim().toLowerCase(),
+          employee_code: formCode.trim() || undefined,
           role: formRole,
           department_id: formDeptId || null,
-          position: formPosition,
-          phone: formPhone,
+          position: formPosition.trim(),
+          phone: formPhone.trim(),
           joining_date: formJoiningDate,
         });
         setFormFeedback({ success: true, message: res.message });
+        showToast(res.message, 'success');
       }
 
       await fetchUsers();
@@ -143,6 +162,7 @@ export const AdminUsersView: React.FC = () => {
       }, 1200);
     } catch (err: any) {
       setFormFeedback({ success: false, message: err.message || 'Operation failed.' });
+      showToast(err.message || 'Operation failed', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -151,21 +171,31 @@ export const AdminUsersView: React.FC = () => {
   const handleExecuteResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetUser) return;
+
+    if (!tempPassword || tempPassword.length < 6) {
+      setResetFeedback({ success: false, message: 'Temporary password must be at least 6 characters.' });
+      showToast('Password must be at least 6 characters', 'warning');
+      return;
+    }
+
     setIsResetting(true);
     setResetFeedback({});
 
     try {
       const res = await api.adminResetUserPassword(resetUser.id, tempPassword);
       setResetFeedback({ success: true, message: res.message });
+      showToast(res.message, 'success');
       setTimeout(() => {
         setIsResetModalOpen(false);
       }, 1500);
     } catch (err: any) {
       setResetFeedback({ success: false, message: err.message || 'Failed to reset password.' });
+      showToast(err.message || 'Failed to reset password', 'error');
     } finally {
       setIsResetting(false);
     }
   };
+
 
   return (
     <div className="space-y-6">

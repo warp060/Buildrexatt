@@ -5,7 +5,10 @@ import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { Search, Filter, Edit, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export const AdminAttendanceView: React.FC = () => {
+  const { showToast } = useToast();
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,6 +77,13 @@ export const AdminAttendanceView: React.FC = () => {
   const handleSaveAdjustment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedRecord) return;
+
+    if (editCheckOut && editCheckOut <= editCheckIn) {
+      setEditFeedback({ success: false, message: 'Check-out time must be strictly later than check-in time.' });
+      showToast('Check-out time must be after check-in time', 'warning');
+      return;
+    }
+
     setIsUpdating(true);
     setEditFeedback({});
 
@@ -86,20 +96,23 @@ export const AdminAttendanceView: React.FC = () => {
         check_in: newIn,
         check_out: newOut,
         status: editStatus,
-        notes: editNotes,
+        notes: editNotes.trim(),
       });
 
       setEditFeedback({ success: true, message: res.message });
+      showToast(res.message, 'success');
       await fetchRecords();
       setTimeout(() => {
         setIsEditModalOpen(false);
       }, 1200);
     } catch (err: any) {
       setEditFeedback({ success: false, message: err.message || 'Failed to update record.' });
+      showToast(err.message || 'Failed to update record', 'error');
     } finally {
       setIsUpdating(false);
     }
   };
+
 
   return (
     <div className="space-y-6">

@@ -17,12 +17,15 @@ import {
   ExternalLink,
 } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 interface EmployeeDashboardProps {
   onNavigateTab: (tabId: string) => void;
 }
 
 export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigateTab }) => {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [todayAttendance, setTodayAttendance] = useState<{
     record: AttendanceRecord | null;
     status_summary: 'Not Started' | 'Checked In' | 'Checked Out';
@@ -119,9 +122,11 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
     try {
       const res = await api.checkIn();
       setActionFeedback({ type: 'success', message: res.message });
+      showToast(res.message, 'success');
       await loadDashboardData();
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
+      showToast(err.message, 'error');
     } finally {
       setIsActionLoading(false);
     }
@@ -133,13 +138,16 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
     try {
       const res = await api.checkOut();
       setActionFeedback({ type: 'success', message: res.message });
+      showToast(res.message, 'success');
       await loadDashboardData();
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
+      showToast(err.message, 'error');
     } finally {
       setIsActionLoading(false);
     }
   };
+
 
   const formatTimer = (totalSec: number) => {
     const hours = Math.floor(totalSec / 3600);

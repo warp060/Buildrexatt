@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import {
   Bell,
   Menu,
@@ -21,9 +22,26 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSectionTitle }) => {
   const { user, logout, quickDemoLogin, notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useAuth();
+  const { showToast } = useToast();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [currentTime, setCurrentTime] = useState<string>('');
+
+  const notifRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const updateTime = () => {
@@ -46,6 +64,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
     if (role === 'admin') return 'Administrator';
     if (role === 'intern') return 'Intern';
     return 'Employee';
+  };
+
+  const handleQuickDemoSwitch = async (role: UserRole) => {
+    await quickDemoLogin(role);
+    showToast(`Switched active workspace session to ${getRoleLabel(role)}`, 'info');
   };
 
   const getRoleBadge = (role?: UserRole) => {
@@ -71,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-slate-200">
+    <header className="sticky top-0 z-30 glass-navbar border-b border-slate-200">
       <div className="flex items-center justify-between gap-4 md:gap-8 px-4 sm:px-6 h-16">
         {/* Zone 1: Mobile Toggle + Wordmark */}
         <div className="flex items-center gap-3 shrink-0">
@@ -100,7 +123,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
 
         {/* Zone 2: Live Clock & Breadcrumb Status */}
         <div className="hidden lg:flex items-center gap-4 text-xs text-slate-500">
-          <div className="flex items-center gap-1.5 font-mono tabular-nums text-slate-600 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200">
+          <div className="flex items-center gap-1.5 font-mono tabular-nums text-slate-600 bg-white/90 px-2.5 py-1 rounded-md border border-slate-200 shadow-2xs">
             <Clock className="w-3.5 h-3.5 text-slate-400" />
             <span>{currentTime}</span>
             <span className="text-slate-400">·</span>
@@ -111,10 +134,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
         {/* Zone 3: Actions (Persona Switcher, Notifications, Profile) */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           {/* Quick Demo Switcher */}
-          <div className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-medium border border-slate-200">
+          <div className="hidden md:flex items-center gap-1 bg-slate-100/90 p-1 rounded-lg text-xs font-medium border border-slate-200">
             <span className="text-slate-400 text-[10px] uppercase px-1.5 font-semibold">Demo:</span>
             <button
-              onClick={() => quickDemoLogin('admin')}
+              onClick={() => handleQuickDemoSwitch('admin')}
               className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${
                 user?.role === 'admin'
                   ? 'bg-white text-slate-900 font-semibold shadow-xs'
@@ -124,7 +147,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
               Admin
             </button>
             <button
-              onClick={() => quickDemoLogin('employee')}
+              onClick={() => handleQuickDemoSwitch('employee')}
               className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${
                 user?.role === 'employee'
                   ? 'bg-white text-slate-900 font-semibold shadow-xs'
@@ -134,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
               Employee
             </button>
             <button
-              onClick={() => quickDemoLogin('intern')}
+              onClick={() => handleQuickDemoSwitch('intern')}
               className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${
                 user?.role === 'intern'
                   ? 'bg-white text-slate-900 font-semibold shadow-xs'
@@ -146,7 +169,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
           </div>
 
           {/* Notifications Dropdown */}
-          <div className="relative">
+          <div className="relative" ref={notifRef}>
+
             <button
               onClick={() => {
                 setShowNotifications(!showNotifications);
@@ -212,8 +236,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
           </div>
 
           {/* User Profile & Menu */}
-          <div className="relative">
+          <div className="relative" ref={profileRef}>
             <button
+
               onClick={() => {
                 setShowProfileMenu(!showProfileMenu);
                 setShowNotifications(false);

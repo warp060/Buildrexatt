@@ -3,6 +3,7 @@ import { api } from '../api';
 import { LeaveRequest, AttendanceCorrection } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
+import { useToast } from '../context/ToastContext';
 import {
   CalendarDays,
   Clock,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export const AdminApprovalsView: React.FC = () => {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState<'leave' | 'corrections'>('leave');
 
   // Leave data
@@ -26,6 +28,10 @@ export const AdminApprovalsView: React.FC = () => {
   const [corrStatusFilter, setCorrStatusFilter] = useState('pending');
   const [isLoadingCorrections, setIsLoadingCorrections] = useState(true);
 
+  // Accurate independent pending counts
+  const [pendingLeavesCount, setPendingLeavesCount] = useState(0);
+  const [pendingCorrCount, setPendingCorrCount] = useState(0);
+
   // Review Dialog State
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewType, setReviewType] = useState<'leave' | 'correction'>('leave');
@@ -34,6 +40,19 @@ export const AdminApprovalsView: React.FC = () => {
   const [reviewComment, setReviewComment] = useState('');
   const [feedback, setFeedback] = useState<{ success?: boolean; message?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const fetchPendingCounts = useCallback(async () => {
+    try {
+      const [lRes, cRes] = await Promise.all([
+        api.getAdminLeaveRequests({ status: 'pending' }),
+        api.getAdminCorrections({ status: 'pending' }),
+      ]);
+      if (lRes.success) setPendingLeavesCount(lRes.records.length);
+      if (cRes.success) setPendingCorrCount(cRes.records.length);
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const fetchLeaves = useCallback(async () => {
     setIsLoadingLeaves(true);
@@ -71,6 +90,10 @@ export const AdminApprovalsView: React.FC = () => {
     fetchCorrections();
   }, [fetchCorrections]);
 
+  useEffect(() => {
+    fetchPendingCounts();
+  }, [fetchPendingCounts]);
+
   const handleOpenReview = (type: 'leave' | 'correction', item: any, dec: 'approved' | 'rejected') => {
     setReviewType(type);
     setSelectedItem(item);
@@ -83,6 +106,13 @@ export const AdminApprovalsView: React.FC = () => {
   const handleExecuteReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem) return;
+
+    if (decision === 'rejected' && !reviewComment.trim()) {
+      setFeedback({ success: false, message: 'Please provide a reason or note when rejecting a request.' });
+      showToast('Rejection reason is required', 'warning');
+      return;
+    }
+
     setIsSubmitting(true);
     setFeedback({});
 
@@ -90,24 +120,29 @@ export const AdminApprovalsView: React.FC = () => {
       if (reviewType === 'leave') {
         const res = await api.reviewLeaveRequest(selectedItem.id, {
           status: decision,
-          review_comment: reviewComment,
+          review_comment: reviewComment.trim(),
         });
         setFeedback({ success: true, message: res.message });
+        showToast(res.message, 'success');
         await fetchLeaves();
       } else {
         const res = await api.reviewCorrectionRequest(selectedItem.id, {
           status: decision,
-          review_comment: reviewComment,
+          review_comment: reviewComment.trim(),
         });
         setFeedback({ success: true, message: res.message });
+        showToast(res.message, 'success');
         await fetchCorrections();
       }
+
+      await fetchPendingCounts();
 
       setTimeout(() => {
         setIsReviewModalOpen(false);
       }, 1200);
     } catch (err: any) {
       setFeedback({ success: false, message: err.message || 'Approval action failed.' });
+      showToast(err.message || 'Action failed', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -135,7 +170,12 @@ export const AdminApprovalsView: React.FC = () => {
             }`}
           >
             <CalendarDays className="w-3.5 h-3.5" />
-            Leave Requests ({leaveList.filter((l) => l.status === 'pending').length} pending)
+            <span>Leave Requests</span>
+            {pendingLeavesCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">
+                {pendingLeavesCount}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab('corrections')}
@@ -146,9 +186,15 @@ export const AdminApprovalsView: React.FC = () => {
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            Attendance Corrections ({correctionsList.filter((c) => c.status === 'pending').length} pending)
+            <span>Attendance Corrections</span>
+            {pendingCorrCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-indigo-500 text-white text-[10px] flex items-center justify-center font-bold">
+                {pendingCorrCount}
+              </span>
+            )}
           </button>
         </div>
+
 
         {/* Status Filter */}
         <div className="flex items-center gap-2 text-xs">

@@ -22,7 +22,10 @@ import {
   Terminal,
 } from 'lucide-react';
 
+import { useToast } from '../context/ToastContext';
+
 export const AdminSettingsView: React.FC = () => {
+  const { showToast } = useToast();
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,9 +104,11 @@ export const AdminSettingsView: React.FC = () => {
     try {
       const res = await api.testDatabaseConnection();
       setDbFeedback({ success: res.success, message: res.message });
+      showToast(res.message, res.success ? 'success' : 'error');
       await fetchDbStatus();
     } catch (err: any) {
       setDbFeedback({ success: false, message: err.message || 'TiDB connection test failed.' });
+      showToast(err.message || 'TiDB connection failed', 'error');
     } finally {
       setIsTestingDb(false);
     }
@@ -115,9 +120,11 @@ export const AdminSettingsView: React.FC = () => {
     try {
       const res = await api.runDatabaseMigration();
       setDbFeedback({ success: res.success, message: res.message });
+      showToast(res.message, res.success ? 'success' : 'error');
       await fetchDbStatus();
     } catch (err: any) {
       setDbFeedback({ success: false, message: err.message || 'Database migration failed.' });
+      showToast(err.message || 'Migration failed', 'error');
     } finally {
       setIsMigratingDb(false);
     }
@@ -129,9 +136,11 @@ export const AdminSettingsView: React.FC = () => {
     try {
       const res = await api.syncDatabase();
       setDbFeedback({ success: res.success, message: res.message });
+      showToast(res.message, res.success ? 'success' : 'error');
       await fetchDbStatus();
     } catch (err: any) {
       setDbFeedback({ success: false, message: err.message || 'Database synchronization failed.' });
+      showToast(err.message || 'Sync failed', 'error');
     } finally {
       setIsSyncingDb(false);
     }
@@ -139,11 +148,24 @@ export const AdminSettingsView: React.FC = () => {
 
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (startTime >= endTime) {
+      setSettingsFeedback({ success: false, message: 'Work start time must be strictly earlier than work end time.' });
+      showToast('Work start time must be earlier than end time', 'warning');
+      return;
+    }
+
+    if (Number(gracePeriod) < 0 || Number(gracePeriod) > 180) {
+      setSettingsFeedback({ success: false, message: 'Grace period must be between 0 and 180 minutes.' });
+      showToast('Grace period must be between 0 and 180 minutes', 'warning');
+      return;
+    }
+
     setIsSavingSettings(true);
     setSettingsFeedback({});
     try {
       const res = await api.updateCompanySettings({
-        company_name: companyName,
+        company_name: companyName.trim(),
         work_start_time: startTime,
         work_end_time: endTime,
         grace_period_minutes: Number(gracePeriod),
@@ -153,9 +175,11 @@ export const AdminSettingsView: React.FC = () => {
       });
 
       setSettingsFeedback({ success: true, message: res.message });
+      showToast(res.message, 'success');
       setSettings(res.settings);
     } catch (err: any) {
       setSettingsFeedback({ success: false, message: err.message || 'Failed to update company settings.' });
+      showToast(err.message || 'Failed to update settings', 'error');
     } finally {
       setIsSavingSettings(false);
     }
@@ -163,28 +187,38 @@ export const AdminSettingsView: React.FC = () => {
 
   const handleCreateDept = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!deptName || !deptCode) return;
+    if (!deptName.trim() || !deptCode.trim()) {
+      setDeptFeedback({ success: false, message: 'Department name and code are required.' });
+      showToast('Department name and code are required', 'warning');
+      return;
+    }
     setIsSavingDept(true);
     setDeptFeedback({});
 
     try {
       const res = await api.createDepartment({
-        name: deptName,
-        code: deptCode,
-        description: deptDesc,
+        name: deptName.trim(),
+        code: deptCode.trim().toUpperCase(),
+        description: deptDesc.trim(),
       });
 
       setDeptFeedback({ success: true, message: `Department ${res.department.name} created.` });
+      showToast(`Department ${res.department.name} created successfully`, 'success');
+      setDeptName('');
+      setDeptCode('');
+      setDeptDesc('');
       await fetchSettingsAndDepts();
       setTimeout(() => {
         setIsDeptModalOpen(false);
       }, 1200);
     } catch (err: any) {
       setDeptFeedback({ success: false, message: err.message || 'Failed to create department.' });
+      showToast(err.message || 'Failed to create department', 'error');
     } finally {
       setIsSavingDept(false);
     }
   };
+
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
