@@ -1,0 +1,6 @@
+{
+  "name": "BUILDREX — Smart Attendance & Work Management System",
+  "description": "Enterprise attendance tracking, daily work reporting, and team management platform for BUILDREX interns and employees.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
