@@ -1,19 +1,98 @@
 @import "tailwindcss";
 
 @layer base {
-  :root {
-    --color-navy: #0B1F3A;
-    --color-navy-hover: #132D50;
-    --color-navy-light: #EBF2FA;
-    --color-border: #E2E8F0;
+  :root, [data-theme="indigo"] {
+    --brand-primary: #0F172A;
+    --brand-primary-dark: #0A0F1D;
+    --brand-accent: #6366F1;
+    --brand-accent-hover: #4F46E5;
+    --brand-accent-light: #EEF2FF;
+    --brand-accent-text: #4338CA;
+    --brand-gradient: linear-gradient(135deg, #0B132B 0%, #1E1B4B 55%, #312E81 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    --brand-glow: rgba(99, 102, 241, 0.35);
+    --brand-glow-subtle: rgba(99, 102, 241, 0.12);
+    --bg-ambient-1: rgba(99, 102, 241, 0.06);
+    --bg-ambient-2: rgba(139, 92, 246, 0.05);
+    --theme-pill: #6366F1;
+  }
+
+  [data-theme="violet"] {
+    --brand-primary: #150A26;
+    --brand-primary-dark: #0E061A;
+    --brand-accent: #8B5CF6;
+    --brand-accent-hover: #7C3AED;
+    --brand-accent-light: #F5F3FF;
+    --brand-accent-text: #6D28D9;
+    --brand-gradient: linear-gradient(135deg, #150A26 0%, #2E1065 55%, #581C87 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #8B5CF6 0%, #D946EF 100%);
+    --brand-glow: rgba(139, 92, 246, 0.35);
+    --brand-glow-subtle: rgba(139, 92, 246, 0.12);
+    --bg-ambient-1: rgba(139, 92, 246, 0.06);
+    --bg-ambient-2: rgba(217, 70, 239, 0.05);
+    --theme-pill: #8B5CF6;
+  }
+
+  [data-theme="emerald"] {
+    --brand-primary: #06231C;
+    --brand-primary-dark: #031712;
+    --brand-accent: #10B981;
+    --brand-accent-hover: #059669;
+    --brand-accent-light: #ECFDF5;
+    --brand-accent-text: #047857;
+    --brand-gradient: linear-gradient(135deg, #06231C 0%, #064E3B 55%, #047857 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
+    --brand-glow: rgba(16, 185, 129, 0.35);
+    --brand-glow-subtle: rgba(16, 185, 129, 0.12);
+    --bg-ambient-1: rgba(16, 185, 129, 0.06);
+    --bg-ambient-2: rgba(6, 182, 212, 0.05);
+    --theme-pill: #10B981;
+  }
+
+  [data-theme="sunset"] {
+    --brand-primary: #240915;
+    --brand-primary-dark: #18050D;
+    --brand-accent: #F43F5E;
+    --brand-accent-hover: #E11D48;
+    --brand-accent-light: #FFF1F2;
+    --brand-accent-text: #BE123C;
+    --brand-gradient: linear-gradient(135deg, #240915 0%, #4C0519 55%, #881337 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #F43F5E 0%, #F59E0B 100%);
+    --brand-glow: rgba(244, 63, 94, 0.35);
+    --brand-glow-subtle: rgba(244, 63, 94, 0.12);
+    --bg-ambient-1: rgba(244, 63, 94, 0.06);
+    --bg-ambient-2: rgba(245, 158, 11, 0.05);
+    --theme-pill: #F43F5E;
+  }
+
+  [data-theme="ocean"] {
+    --brand-primary: #071A2C;
+    --brand-primary-dark: #03101C;
+    --brand-accent: #06B6D4;
+    --brand-accent-hover: #0891B2;
+    --brand-accent-light: #ECFEFF;
+    --brand-accent-text: #0E7490;
+    --brand-gradient: linear-gradient(135deg, #071A2C 0%, #082F49 55%, #0C4A6E 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
+    --brand-glow: rgba(6, 182, 212, 0.35);
+    --brand-glow-subtle: rgba(6, 182, 212, 0.12);
+    --bg-ambient-1: rgba(6, 182, 212, 0.06);
+    --bg-ambient-2: rgba(59, 130, 246, 0.05);
+    --theme-pill: #06B6D4;
   }
 
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #0F172A;
     background-color: #F8FAFC;
+    background-image: 
+      radial-gradient(at 0% 0%, var(--bg-ambient-1) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, var(--bg-ambient-2) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, var(--bg-ambient-1) 0px, transparent 60%);
+    background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
   }
 
   /* Monospace font for tabular numbers, codes, and timestamps */
@@ -25,48 +104,125 @@
 
 /* Custom scrollbars for data tables and logs */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #CBD5E1;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94A3B8;
 }
 
+/* Hide scrollbar for clean horizontal tab lists */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Glassmorphism & Surface Utilities */
 .glass-navbar {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.85);
 }
 
-/* Live Pulse Ring Animation for Active Attendance Status */
+/* Premium Card System */
+.card-premium {
+  background: #FFFFFF;
+  border-radius: 1rem;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 
+    0 1px 3px 0 rgba(15, 23, 42, 0.03),
+    0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-premium-interactive {
+  background: #FFFFFF;
+  border-radius: 1rem;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 
+    0 1px 3px 0 rgba(15, 23, 42, 0.03),
+    0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-premium-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(203, 213, 225, 0.9);
+  box-shadow: 
+    0 4px 6px -1px rgba(15, 23, 42, 0.05),
+    0 12px 24px -4px rgba(15, 23, 42, 0.08);
+}
+
+/* Theme Button Utilities */
+.btn-theme-primary {
+  background: var(--brand-gradient);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px -2px var(--brand-glow);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-theme-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px -2px var(--brand-glow);
+  transform: translateY(-1px);
+}
+
+.btn-theme-primary:active {
+  transform: scale(0.98);
+}
+
+/* Brand Accent Text & Badges */
+.text-brand-accent {
+  color: var(--brand-accent);
+}
+
+.bg-brand-accent-light {
+  background-color: var(--brand-accent-light);
+}
+
+.border-brand-accent {
+  border-color: var(--brand-accent);
+}
+
+.bg-brand-primary {
+  background-color: var(--brand-primary);
+}
+
+.bg-brand-gradient {
+  background-image: var(--brand-gradient);
+}
+
+/* Live Biometric Pulse Animation */
 @keyframes pulse-ring {
   0% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
   }
-
   70% {
     transform: scale(1);
     box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
   }
-
   100% {
     transform: scale(0.95);
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
@@ -75,6 +231,11 @@
 
 .pulse-dot {
   animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+/* Digital Biometric Clock Glow */
+.digital-glow {
+  text-shadow: 0 0 24px var(--brand-glow);
 }
 
 /* Shimmer Loading Skeleton */
@@ -97,24 +258,36 @@
   bottom: 0;
   left: 0;
   transform: translateX(-100%);
-  background-image: linear-gradient(90deg,
-      rgba(255, 255, 255, 0) 0,
-      rgba(255, 255, 255, 0.3) 20%,
-      rgba(255, 255, 255, 0.6) 60%,
-      rgba(255, 255, 255, 0));
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.4) 20%,
+    rgba(255, 255, 255, 0.7) 60%,
+    rgba(255, 255, 255, 0)
+  );
   animation: shimmer 1.8s infinite;
   content: '';
 }
 
+/* Mobile App Floating Dock */
+.mobile-app-dock {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.15);
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
 /* Clean Print Media Stylesheet */
 @media print {
-
   header,
   aside,
   .no-print,
   button,
   select,
   input,
+  .mobile-app-dock,
   .quick-actions {
     display: none !important;
   }
@@ -141,5 +314,47 @@
     border: 1px solid #CBD5E1 !important;
     padding: 6px 8px !important;
     font-size: 10pt !important;
+  }
+}
+
+/* Dynamic Brand Fallback Overrides for Unified Multi-Color Component Theming */
+[class*="bg-[#0B1F3A]"], [class*="bg-[#0B1528]"] {
+  background: var(--brand-gradient) !important;
+  color: #FFFFFF !important;
+}
+
+[class*="hover:bg-[#142C4E]"]:hover, [class*="hover:bg-[#122242]"]:hover {
+  filter: brightness(1.15) !important;
+}
+
+[class*="text-[#0B1F3A]"] {
+  color: var(--brand-accent-text) !important;
+}
+
+[class*="border-[#0B1F3A]"] {
+  border-color: var(--brand-accent) !important;
+}
+
+[class*="focus:ring-[#0B1F3A]"], [class*="focus:border-[#0B1F3A]"] {
+  --tw-ring-color: var(--brand-accent) !important;
+  border-color: var(--brand-accent) !important;
+}
+
+/* Card & Surface Polish for Existing Standard Cards */
+.bg-white.rounded-xl.border.border-slate-200 {
+  border-radius: 1rem;
+  border-color: rgba(226, 232, 240, 0.85);
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+}
+
+/* Responsive Table Enhancements */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  table th, table td {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
   }
 }

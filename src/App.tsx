@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { LoginView } from './views/LoginView';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
+import { MobileDock } from './components/MobileDock';
 
 // Employee & Intern Views
 import { EmployeeDashboard } from './views/EmployeeDashboard';
@@ -24,8 +27,8 @@ import { AdminAuditLogsView } from './views/AdminAuditLogsView';
 
 const SECTION_TITLES: Record<string, string> = {
   // Employee
-  dashboard: 'Personal Workspace',
-  'my-attendance': 'Biometric Attendance',
+  dashboard: 'Executive Hub',
+  'my-attendance': 'Biometric Clock',
   'work-updates': 'Daily Work Report',
   'work-history': 'Work Update Archives',
   'leave-requests': 'Leave & Approvals',
@@ -33,12 +36,12 @@ const SECTION_TITLES: Record<string, string> = {
 
   // Admin
   'admin-dashboard': 'Executive Overview',
-  'admin-attendance': 'Attendance Management',
-  'admin-work-updates': 'Daily Work Reviews',
+  'admin-attendance': 'Attendance Records',
+  'admin-work-updates': 'Work Reviews',
   'admin-users': 'Team Directory',
-  'admin-approvals': 'Approvals & Requests',
+  'admin-approvals': 'Leave Approvals',
   'admin-reports': 'Reports & Analytics',
-  'admin-settings': 'Company Shift Policies',
+  'admin-settings': 'Shift Rules & System',
   'admin-audit-logs': 'Security Audit Trail',
 };
 
@@ -58,11 +61,11 @@ const MainWorkspace: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center">
-        <div className="w-10 h-10 rounded-xl bg-[#0B1F3A] flex items-center justify-center text-white font-bold text-base animate-pulse">
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 rounded-2xl bg-brand-gradient flex items-center justify-center text-white font-black text-lg shadow-brand-glow shadow-lg animate-pulse">
           BX
         </div>
-        <p className="mt-4 text-xs font-semibold text-slate-500 tracking-wide uppercase">
+        <p className="mt-4 text-xs font-bold text-slate-500 tracking-wider uppercase">
           Loading BUILDREX Workspace...
         </p>
       </div>
@@ -117,7 +120,7 @@ const MainWorkspace: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col text-slate-900 selection:bg-[#0B1F3A] selection:text-white">
+    <div className="min-h-screen flex flex-col text-slate-900 selection:bg-brand-primary selection:text-white">
       {/* Top Navbar */}
       <Navbar
         onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
@@ -125,7 +128,7 @@ const MainWorkspace: React.FC = () => {
       />
 
       {/* Main Body with Sidebar + Content */}
-      <div className="flex-1 flex max-w-[1600px] w-full mx-auto">
+      <div className="flex-1 flex max-w-[1700px] w-full mx-auto">
         <Sidebar
           currentTab={currentTab}
           setCurrentTab={setCurrentTab}
@@ -133,23 +136,25 @@ const MainWorkspace: React.FC = () => {
           onCloseMobile={() => setIsMobileSidebarOpen(false)}
         />
 
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 min-w-0 p-3 sm:p-5 lg:p-8 overflow-y-auto pb-24 md:pb-10">
           {renderActiveView()}
         </main>
       </div>
+
+      {/* Mobile Floating App Dock for Smartphones */}
+      <MobileDock currentTab={currentTab} setCurrentTab={setCurrentTab} />
     </div>
   );
 };
 
-import { ToastProvider } from './context/ToastContext';
-
 export default function App() {
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <MainWorkspace />
-      </AuthProvider>
-    </ToastProvider>
+    <ThemeProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <MainWorkspace />
+        </AuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
   );
 }
-

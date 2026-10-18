@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { ThemeSelector } from '../components/ThemeSelector';
 import { api } from '../api';
-import { ArrowRight, AlertCircle, Eye, EyeOff, CheckCircle2, ShieldCheck, Check } from 'lucide-react';
+import { ArrowRight, AlertCircle, Eye, EyeOff, ShieldCheck, Check, Sparkles, UserCheck, Shield, Briefcase, GraduationCap } from 'lucide-react';
 import { Modal } from '../components/Modal';
 
 export const LoginView: React.FC = () => {
   const { login } = useAuth();
+  const { activeThemeOption } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -36,11 +39,19 @@ export const LoginView: React.FC = () => {
     }
   };
 
-  const handleAutofill = (demoEmail: string, demoPass: string, demoKey: string) => {
+  const handleInstantLogin = async (demoEmail: string, demoPass: string, demoKey: string) => {
     setEmail(demoEmail);
     setPassword(demoPass);
     setSelectedDemo(demoKey);
     setErrorMessage('');
+    setIsLoading(true);
+    try {
+      await login(demoEmail, demoPass);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to authenticate demo account.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -59,135 +70,157 @@ export const LoginView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#080E1E] text-slate-100 font-sans antialiased selection:bg-slate-200 selection:text-slate-900">
-      {/* LEFT HERO SECTION — Premium Dark Navy with Dot Matrix Texture */}
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#080E1E] text-slate-100 font-sans antialiased selection:bg-brand-accent selection:text-white">
+      {/* LEFT HERO SECTION — Luxury Executive Dark Mesh */}
       <div
-        className="relative lg:w-[58%] xl:w-[60%] flex flex-col justify-between p-8 sm:p-12 lg:p-16 overflow-hidden"
+        className="relative lg:w-[56%] xl:w-[58%] flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-hidden"
         style={{
           backgroundColor: '#080E1E',
-          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px)',
           backgroundSize: '24px 24px',
         }}
       >
-        {/* Subtle radial glow in background for high-end depth */}
-        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Dynamic theme glow in background */}
+        <div
+          className="absolute top-1/4 -left-20 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-25 transition-all duration-700"
+          style={{ backgroundColor: activeThemeOption.accentColor }}
+        />
+        <div
+          className="absolute bottom-10 right-10 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20 transition-all duration-700"
+          style={{ backgroundColor: activeThemeOption.primaryColor }}
+        />
 
         {/* Brand Top Header */}
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-slate-950 font-black text-base shadow-md">
-            B
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-brand-gradient flex items-center justify-center text-white font-black text-base shadow-lg ring-1 ring-white/20">
+              BX
+            </div>
+            <div>
+              <span className="text-white font-extrabold tracking-wider text-base block leading-none">
+                BUILDREX
+              </span>
+              <span className="text-[10px] font-semibold text-slate-400 tracking-widest uppercase block mt-0.5">
+                SMART WORKSPACE OS
+              </span>
+            </div>
           </div>
-          <span className="text-white font-bold tracking-wider text-base">
-            BUILDREX
-          </span>
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold tracking-widest text-slate-300 border border-slate-700/70 bg-slate-800/50 uppercase">
-            ENTERPRISE
-          </span>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider hidden sm:inline">Theme:</span>
+            <ThemeSelector variant="compact" />
+          </div>
         </div>
 
         {/* Center Main Content */}
-        <div className="relative z-10 my-auto py-12 lg:py-16 max-w-2xl">
+        <div className="relative z-10 my-auto py-8 sm:py-12 max-w-2xl">
           {/* Live Workforce Status Pill */}
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/60 shadow-inner mb-8">
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/60 shadow-inner mb-6 sm:mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
             </span>
-            <span className="text-[11px] font-semibold tracking-wider text-slate-200 uppercase">
-              LIVE WORKFORCE • 6 ACTIVE
+            <span className="text-[11px] font-bold tracking-wider text-slate-200 uppercase">
+              BIOMETRIC CORE ONLINE • 6 MEMBERS ACTIVE
             </span>
           </div>
 
           {/* Hero Headline */}
-          <h1 className="text-4xl sm:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.08]">
-            Attendance that
+          <h1 className="text-3xl sm:text-5xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.1]">
+            Next-Gen Workforce
             <br />
-            actually gets used.
+            <span
+              className="text-transparent bg-clip-text transition-all duration-500"
+              style={{ backgroundImage: `linear-gradient(135deg, #FFFFFF 20%, ${activeThemeOption.accentColor} 100%)` }}
+            >
+              &amp; Attendance Suite.
+            </span>
           </h1>
 
           {/* Subtitle */}
-          <p className="mt-6 text-sm sm:text-base text-slate-300/85 leading-relaxed max-w-xl font-normal">
-            Premium white, navy &amp; black system inspired by Linear &amp; Stripe. Check-in in 1 tap, submit work updates, and give admins real-time visibility.
+          <p className="mt-4 sm:mt-6 text-xs sm:text-base text-slate-300/85 leading-relaxed max-w-xl font-normal">
+            Precision 1-tap biometric check-ins, structured daily work summaries, automated leave reviews, and executive analytics designed for high-performing engineering &amp; operations teams.
           </p>
 
-          {/* Metrics / Key Stats Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-12 sm:mt-14">
-            {/* Metric 1 */}
-            <div className="bg-[#0D182E]/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-4 transition-all hover:border-slate-700/90 shadow-sm">
-              <span className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase block">
-                CHECK-IN TIME
+          {/* Metrics Row */}
+          <div className="grid grid-cols-3 gap-2.5 sm:gap-4 mt-8 sm:mt-12">
+            <div className="bg-[#0D182E]/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-3 sm:p-4 hover:border-slate-700 transition-all shadow-sm">
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase block">
+                CHECK-IN
               </span>
-              <div className="text-2xl font-bold text-white mt-1.5 tracking-tight">
-                &lt; 2 sec
+              <div className="text-lg sm:text-2xl font-black text-white mt-1 tracking-tight font-mono">
+                &lt; 1.5s
               </div>
-              <span className="text-[11px] text-slate-400/80 mt-0.5 block">
-                Server timestamp
+              <span className="text-[10px] text-emerald-400/90 mt-0.5 block font-medium">
+                Biometric synced
               </span>
             </div>
 
-            {/* Metric 2 */}
-            <div className="bg-[#0D182E]/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-4 transition-all hover:border-slate-700/90 shadow-sm">
-              <span className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase block">
-                DUPLICATE GUARD
+            <div className="bg-[#0D182E]/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-3 sm:p-4 hover:border-slate-700 transition-all shadow-sm">
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase block">
+                INTEGRITY
               </span>
-              <div className="text-2xl font-bold text-white mt-1.5 tracking-tight">
+              <div className="text-lg sm:text-2xl font-black text-white mt-1 tracking-tight font-mono">
                 100%
               </div>
-              <span className="text-[11px] text-slate-400/80 mt-0.5 block">
-                DB constraints
+              <span className="text-[10px] text-brand-accent mt-0.5 block font-medium">
+                ACID protected
               </span>
             </div>
 
-            {/* Metric 3 */}
-            <div className="bg-[#0D182E]/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-4 transition-all hover:border-slate-700/90 shadow-sm">
-              <span className="text-[10px] font-semibold text-slate-400 tracking-wider uppercase block">
-                UPTIME
+            <div className="bg-[#0D182E]/80 backdrop-blur-md border border-slate-800/90 rounded-2xl p-3 sm:p-4 hover:border-slate-700 transition-all shadow-sm">
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase block">
+                AVAILABILITY
               </span>
-              <div className="text-2xl font-bold text-white mt-1.5 tracking-tight">
+              <div className="text-lg sm:text-2xl font-black text-white mt-1 tracking-tight font-mono">
                 99.9%
               </div>
-              <span className="text-[11px] text-slate-400/80 mt-0.5 block">
-                Audit logged
+              <span className="text-[10px] text-cyan-400 mt-0.5 block font-medium">
+                TiDB Cloud &amp; JSON
               </span>
             </div>
           </div>
         </div>
 
         {/* Footer info in Hero */}
-        <div className="relative z-10 text-xs text-slate-500/90 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-slate-400" />
-          <span>SOC-2 &amp; GDPR Compliant • Cloud Distributed TiDB &amp; SQLite Dual Mode</span>
+        <div className="relative z-10 text-[11px] text-slate-500/90 flex items-center gap-2 pt-4">
+          <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+          <span>SOC-2 &amp; GDPR Compliant • Cloud Distributed TiDB &amp; Local Fallback</span>
         </div>
       </div>
 
-      {/* RIGHT LOGIN FORM SECTION — Crisp Floating Card */}
-      <div className="lg:w-[42%] xl:w-[40%] bg-[#F9FAFB] flex items-center justify-center p-6 sm:p-10 lg:p-12 relative min-h-screen">
-        <div className="w-full max-w-[430px] bg-white rounded-3xl p-8 sm:p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] border border-slate-200/80">
+      {/* RIGHT LOGIN FORM SECTION — Crisp Elevated Card */}
+      <div className="lg:w-[44%] xl:w-[42%] bg-[#F8FAFC] flex items-center justify-center p-4 sm:p-8 lg:p-12 relative min-h-[550px]">
+        <div className="w-full max-w-[440px] bg-white rounded-3xl p-6 sm:p-9 shadow-xl border border-slate-200/90 my-4">
           {/* Card Header */}
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Sign in to BUILDREX
-            </h2>
-            <p className="text-sm text-slate-500 mt-1">
-              Workforce management for high-performing teams
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+                Sign In
+              </h2>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                v2.4
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Access your workspace attendance and daily reporting hub
             </p>
           </div>
 
           {/* Error Message banner */}
           {errorMessage && (
-            <div className="mt-5 flex items-center gap-2.5 p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl animate-shake">
+            <div className="mt-4 flex items-center gap-2.5 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {/* Form */}
-          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <form className="mt-5 space-y-3.5" onSubmit={handleSubmit}>
             {/* Work Email */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Work email
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Work Email
               </label>
               <input
                 type="email"
@@ -197,21 +230,21 @@ export const LoginView: React.FC = () => {
                   setEmail(e.target.value);
                   setSelectedDemo(null);
                 }}
-                placeholder="you@buildrex.com"
-                className="w-full px-4 py-3 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-slate-900 placeholder:text-slate-400 transition-all shadow-xs"
+                placeholder="e.g. admin@buildrex.com"
+                className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-slate-900 placeholder:text-slate-400 bg-slate-50/50 hover:bg-white transition-colors"
               />
             </div>
 
             {/* Password */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-slate-700">
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-slate-700">
                   Password
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsForgotModalOpen(true)}
-                  className="text-xs text-slate-500 hover:text-slate-900 font-medium transition-colors"
+                  className="text-[11px] font-semibold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
                 >
                   Forgot?
                 </button>
@@ -225,14 +258,13 @@ export const LoginView: React.FC = () => {
                     setPassword(e.target.value);
                     setSelectedDemo(null);
                   }}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 pr-11 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 text-slate-900 placeholder:text-slate-400 transition-all shadow-xs"
+                  placeholder="••••••••••••"
+                  className="w-full px-3.5 py-2.5 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 pr-10 text-slate-900 placeholder:text-slate-400 bg-slate-50/50 hover:bg-white transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors p-1"
-                  aria-label="Toggle password visibility"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -243,69 +275,118 @@ export const LoginView: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 flex justify-center items-center gap-2 py-3.5 px-4 text-sm font-semibold rounded-xl text-white bg-[#0B1528] hover:bg-[#122242] active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-slate-900/20 transition-all disabled:opacity-50 shadow-md cursor-pointer"
+              className="w-full mt-2 flex justify-center items-center gap-2 py-3 px-4 text-xs font-bold rounded-xl text-white bg-brand-gradient hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-50 shadow-md cursor-pointer"
             >
+              <span>{isLoading ? 'Authenticating...' : 'Sign In to Workspace'}</span>
               <ArrowRight className="w-4 h-4" />
-              <span>{isLoading ? 'Signing in...' : 'Continue to dashboard'}</span>
             </button>
           </form>
 
-          {/* DEMO ACCOUNTS — CLICK TO AUTOFILL Section */}
-          <div className="mt-8 pt-6 border-t border-slate-100">
-            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-3">
-              DEMO ACCOUNTS — CLICK TO AUTOFILL
-            </span>
+          {/* ONE-CLICK DEMO ACCESS CARDS */}
+          <div className="mt-6 pt-5 border-t border-slate-100">
+            <div className="flex items-center justify-between mb-2.5">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">
+                ONE-CLICK INSTANT DEMO LOGIN
+              </span>
+              <span className="text-[9px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full font-bold">
+                1 Tap Access
+              </span>
+            </div>
 
-            <div className="space-y-2.5">
-              {/* Demo 1: Admin — Sarah Chen */}
+            <div className="space-y-2">
+              {/* Demo 1: Administrator */}
               <button
                 type="button"
-                onClick={() => handleAutofill('admin@buildrex.com', 'admin123', 'admin')}
-                className={`w-full p-3.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
+                disabled={isLoading}
+                onClick={() => handleInstantLogin('admin@buildrex.com', 'Buildrex@2026', 'admin')}
+                className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
                   selectedDemo === 'admin'
-                    ? 'border-slate-900 bg-slate-50/90 ring-1 ring-slate-900/10 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/60'
+                    ? 'border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-500 shadow-xs'
+                    : 'border-slate-200/90 hover:border-slate-400 hover:bg-slate-50/80'
                 }`}
               >
-                <div>
-                  <div className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
-                    <span>Admin — Sarah Chen</span>
-                    {selectedDemo === 'admin' && (
-                      <Check className="w-3.5 h-3.5 text-emerald-600 inline" />
-                    )}
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <Shield className="w-3.5 h-3.5" />
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5 font-mono">
-                    admin@buildrex.com / admin123
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <span className="truncate">Alex Vance</span>
+                      <span className="text-[9px] bg-purple-100 text-purple-800 font-extrabold px-1.5 py-0.2 rounded uppercase">
+                        COO / Admin
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-mono truncate">
+                      admin@buildrex.com
+                    </div>
                   </div>
                 </div>
-                <span className="bg-[#0B1528] text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider uppercase shadow-xs">
-                  ADMIN
+                <span className="text-[10px] font-bold text-indigo-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0 ml-1">
+                  Login &rarr;
                 </span>
               </button>
 
-              {/* Demo 2: Employee — Alex Morgan */}
+              {/* Demo 2: Employee */}
               <button
                 type="button"
-                onClick={() => handleAutofill('alex@buildrex.com', 'employee123', 'employee')}
-                className={`w-full p-3.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
+                disabled={isLoading}
+                onClick={() => handleInstantLogin('sarah.chen@buildrex.com', 'Buildrex@2026', 'employee')}
+                className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
                   selectedDemo === 'employee'
-                    ? 'border-slate-900 bg-slate-50/90 ring-1 ring-slate-900/10 shadow-xs'
-                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50/60'
+                    ? 'border-blue-600 bg-blue-50/70 ring-1 ring-blue-500 shadow-xs'
+                    : 'border-slate-200/90 hover:border-slate-400 hover:bg-slate-50/80'
                 }`}
               >
-                <div>
-                  <div className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
-                    <span>Employee — Alex Morgan</span>
-                    {selectedDemo === 'employee' && (
-                      <Check className="w-3.5 h-3.5 text-emerald-600 inline" />
-                    )}
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <Briefcase className="w-3.5 h-3.5" />
                   </div>
-                  <div className="text-[11px] text-slate-500 mt-0.5 font-mono">
-                    alex@buildrex.com / employee123
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <span className="truncate">Sarah Chen</span>
+                      <span className="text-[9px] bg-blue-100 text-blue-800 font-extrabold px-1.5 py-0.2 rounded uppercase">
+                        Lead / Emp
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-mono truncate">
+                      sarah.chen@buildrex.com
+                    </div>
                   </div>
                 </div>
-                <span className="border border-slate-300 bg-white text-slate-700 text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider uppercase">
-                  EMPLOYEE
+                <span className="text-[10px] font-bold text-blue-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0 ml-1">
+                  Login &rarr;
+                </span>
+              </button>
+
+              {/* Demo 3: Intern */}
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => handleInstantLogin('intern.dev@buildrex.com', 'Buildrex@2026', 'intern')}
+                className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
+                  selectedDemo === 'intern'
+                    ? 'border-amber-600 bg-amber-50/70 ring-1 ring-amber-500 shadow-xs'
+                    : 'border-slate-200/90 hover:border-slate-400 hover:bg-slate-50/80'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <GraduationCap className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <span className="truncate">Devin Patel</span>
+                      <span className="text-[9px] bg-amber-100 text-amber-800 font-extrabold px-1.5 py-0.2 rounded uppercase">
+                        Frontend Intern
+                      </span>
+                    </div>
+                    <div className="text-[10px] text-slate-500 font-mono truncate">
+                      intern.dev@buildrex.com
+                    </div>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold text-amber-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 shrink-0 ml-1">
+                  Login &rarr;
                 </span>
               </button>
             </div>
@@ -318,29 +399,29 @@ export const LoginView: React.FC = () => {
         isOpen={isForgotModalOpen}
         onClose={() => setIsForgotModalOpen(false)}
         title="Reset Account Password"
-        subtitle="Enter your corporate BUILDREX email address to receive reset instructions"
+        subtitle="Enter your corporate BUILDREX email address to receive recovery instructions."
       >
         <form onSubmit={handleForgotPassword} className="space-y-4">
           {forgotStatus.message && (
             <div
-              className={`p-3 text-xs rounded-lg flex items-start gap-2 ${
+              className={`p-3 text-xs rounded-xl flex items-center gap-2 ${
                 forgotStatus.success
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}
             >
               {forgotStatus.success ? (
-                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                <Check className="w-4 h-4 shrink-0" />
               ) : (
-                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <AlertCircle className="w-4 h-4 shrink-0" />
               )}
               <span>{forgotStatus.message}</span>
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Registered Work Email
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Registered Corporate Email
             </label>
             <input
               type="email"
@@ -356,14 +437,14 @@ export const LoginView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsForgotModalOpen(false)}
-              className="px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isForgotLoading}
-              className="px-4 py-2 text-xs font-semibold text-white bg-[#0B1528] hover:bg-[#122242] rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2 text-xs font-bold text-white bg-brand-gradient hover:opacity-95 rounded-xl transition-all disabled:opacity-50 cursor-pointer shadow-sm"
             >
               {isForgotLoading ? 'Sending...' : 'Send Reset Link'}
             </button>

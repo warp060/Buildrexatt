@@ -288,14 +288,14 @@ export const MyAttendanceView: React.FC = () => {
 
 
       {/* Today's Active Session Quick-Action Card */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-2xs">
+      <div className="card-premium p-5 sm:p-6 bg-white/95 relative overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
           <div>
-            <h2 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[#0B1F3A]" />
-              Today's Live Attendance Session
+            <h2 className="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+              <Clock className="w-4 h-4 text-brand-accent" />
+              Today's Live Attendance Station
             </h2>
-            <p className="text-xs text-slate-500">Record check-in and check-out in real time</p>
+            <p className="text-xs text-slate-500">Record check-in and check-out with biometric accuracy</p>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-400">Current Status:</span>
@@ -311,23 +311,23 @@ export const MyAttendanceView: React.FC = () => {
           </div>
         </div>
 
-        <div className="pt-5 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Live Timer Counter */}
           <div className="text-center md:text-left">
-            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
               {todayAttendance.status_summary === 'Checked In'
-                ? 'Active Working Session'
+                ? '⚡ Active Working Session'
                 : todayAttendance.status_summary === 'Checked Out'
-                ? 'Completed Working Duration'
-                : 'Today Not Yet Checked In'}
+                ? '✓ Completed Working Duration'
+                : 'Session Ready to Begin'}
             </p>
-            <div className="mt-1 font-mono text-3xl sm:text-4xl font-bold tabular-nums text-slate-900 tracking-tight">
+            <div className="mt-1 font-mono text-4xl sm:text-5xl font-black tabular-nums text-slate-900 tracking-tight digital-glow">
               {formatTimer(elapsedSeconds)}
             </div>
-            <div className="mt-2 text-xs text-slate-500 flex items-center justify-center md:justify-start gap-3">
-              <span>
+            <div className="mt-2.5 text-xs text-slate-500 flex flex-wrap items-center justify-center md:justify-start gap-3">
+              <span className="bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
                 Check In:{' '}
-                <strong className="text-slate-700 font-mono">
+                <strong className="text-slate-800 font-mono font-bold">
                   {todayAttendance.record
                     ? new Date(todayAttendance.record.check_in).toLocaleTimeString([], {
                         hour: '2-digit',
@@ -336,10 +336,9 @@ export const MyAttendanceView: React.FC = () => {
                     : '--:--'}
                 </strong>
               </span>
-              <span>·</span>
-              <span>
+              <span className="bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
                 Check Out:{' '}
-                <strong className="text-slate-700 font-mono">
+                <strong className="text-slate-800 font-mono font-bold">
                   {todayAttendance.record?.check_out
                     ? new Date(todayAttendance.record.check_out).toLocaleTimeString([], {
                         hour: '2-digit',
@@ -357,10 +356,10 @@ export const MyAttendanceView: React.FC = () => {
               <button
                 onClick={handleCheckIn}
                 disabled={isActionLoading}
-                className="w-full md:w-48 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-xs text-white bg-[#0B1F3A] hover:bg-[#142C4E] active:scale-[0.99] transition-all shadow-sm disabled:opacity-50"
+                className="w-full md:w-52 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-xs text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/25 disabled:opacity-50 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" />
-                {isActionLoading ? 'Processing...' : 'Clock In Now'}
+                {isActionLoading ? 'Processing...' : 'Punch In Now'}
               </button>
             )}
 
@@ -368,20 +367,20 @@ export const MyAttendanceView: React.FC = () => {
               <button
                 onClick={handleCheckOut}
                 disabled={isActionLoading}
-                className="w-full md:w-48 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold text-xs text-white bg-rose-600 hover:bg-rose-700 active:scale-[0.99] transition-all shadow-sm disabled:opacity-50"
+                className="w-full md:w-52 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-xs text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-rose-600/25 disabled:opacity-50 cursor-pointer"
               >
                 <Square className="w-4 h-4 fill-current" />
-                {isActionLoading ? 'Processing...' : 'Clock Out Now'}
+                {isActionLoading ? 'Processing...' : 'Punch Out Now'}
               </button>
             )}
 
             {todayAttendance.status_summary === 'Checked Out' && (
-              <div className="text-center p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium">
+              <div className="text-center p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs">
                 <div className="flex items-center gap-1.5 justify-center">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
                   <span>Session Complete for Today</span>
                 </div>
-                <span className="block text-[11px] text-emerald-600 mt-0.5">
+                <span className="block text-[11px] text-emerald-600 mt-0.5 font-mono">
                   Logged: {(todayAttendance.record?.total_minutes! / 60).toFixed(1)} hrs
                 </span>
               </div>
@@ -391,49 +390,49 @@ export const MyAttendanceView: React.FC = () => {
       </div>
 
       {/* Summary Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Days Logged</p>
-          <p className="text-2xl font-bold font-mono tabular-nums text-slate-900 mt-1">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <div className="card-premium-interactive p-4 sm:p-5 bg-white/95">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Days Logged</p>
+          <p className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-900 mt-1">
             {summary.total_days_logged}
           </p>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">Recorded work sessions</span>
+          <span className="text-[11px] text-slate-500 mt-1 block">Recorded work sessions</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Hours Worked</p>
-          <p className="text-2xl font-bold font-mono tabular-nums text-slate-900 mt-1">
+        <div className="card-premium-interactive p-4 sm:p-5 bg-white/95">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Hours Worked</p>
+          <p className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-900 mt-1">
             {summary.total_hours_worked} <span className="text-xs font-normal text-slate-400">hrs</span>
           </p>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">Cumulative time</span>
+          <span className="text-[11px] text-slate-500 mt-1 block">Cumulative time</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Daily Average</p>
-          <p className="text-2xl font-bold font-mono tabular-nums text-slate-900 mt-1">
-            {summary.average_hours_per_day} <span className="text-xs font-normal text-slate-400">hrs/day</span>
+        <div className="card-premium-interactive p-4 sm:p-5 bg-white/95">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Daily Average</p>
+          <p className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-slate-900 mt-1">
+            {summary.average_hours_per_day} <span className="text-xs font-normal text-slate-400">hrs/d</span>
           </p>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">Per completed session</span>
+          <span className="text-[11px] text-slate-500 mt-1 block">Per completed session</span>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Late Arrivals</p>
-          <p className="text-2xl font-bold font-mono tabular-nums text-amber-700 mt-1">
+        <div className="card-premium-interactive p-4 sm:p-5 bg-white/95">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Late Arrivals</p>
+          <p className="text-2xl sm:text-3xl font-black font-mono tabular-nums text-amber-600 mt-1">
             {summary.late_arrivals_count}
           </p>
-          <span className="text-[11px] text-slate-500 mt-0.5 block">Past 9:15 AM window</span>
+          <span className="text-[11px] text-slate-500 mt-1 block">Past 9:15 AM window</span>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-4">
+      <div className="card-premium p-4 bg-white/95 flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Interactive segmented status filter */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg">
+        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl overflow-x-auto no-scrollbar">
           {['all', 'present', 'late', 'half_day'].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors capitalize ${
+              className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all capitalize whitespace-nowrap cursor-pointer ${
                 statusFilter === st
                   ? 'bg-white text-slate-900 shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -445,8 +444,8 @@ export const MyAttendanceView: React.FC = () => {
         </div>
 
         {/* Date Filters */}
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-500">Date Range:</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="text-slate-500 font-medium">Date Range:</span>
           <input
             type="date"
             value={startDate}

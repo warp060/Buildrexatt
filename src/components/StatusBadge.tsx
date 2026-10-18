@@ -8,7 +8,7 @@ interface StatusBadgeProps {
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attendance', showPill = true }) => {
   let label = status;
-  let textClass = 'text-slate-600';
+  let textClass = 'text-slate-700';
   let dotClass = 'bg-slate-400';
   let bgClass = 'bg-slate-50 border-slate-200';
   let isLive = false;
@@ -19,32 +19,32 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attend
         label = 'Present';
         textClass = 'text-emerald-700';
         dotClass = 'bg-emerald-500';
-        bgClass = 'bg-emerald-50/80 border-emerald-200';
+        bgClass = 'bg-emerald-50/90 border-emerald-300/70 shadow-xs';
         isLive = true;
         break;
       case 'late':
         label = 'Late Arrival';
         textClass = 'text-amber-700';
         dotClass = 'bg-amber-500';
-        bgClass = 'bg-amber-50/80 border-amber-200';
+        bgClass = 'bg-amber-50/90 border-amber-300/70 shadow-xs';
         break;
       case 'half_day':
         label = 'Half Day';
-        textClass = 'text-blue-700';
-        dotClass = 'bg-blue-500';
-        bgClass = 'bg-blue-50/80 border-blue-200';
+        textClass = 'text-sky-700';
+        dotClass = 'bg-sky-500';
+        bgClass = 'bg-sky-50/90 border-sky-300/70 shadow-xs';
         break;
       case 'absent':
         label = 'Absent';
         textClass = 'text-rose-700';
         dotClass = 'bg-rose-500';
-        bgClass = 'bg-rose-50/80 border-rose-200';
+        bgClass = 'bg-rose-50/90 border-rose-300/70 shadow-xs';
         break;
       case 'incomplete':
         label = 'Incomplete';
         textClass = 'text-orange-700';
         dotClass = 'bg-orange-500';
-        bgClass = 'bg-orange-50/80 border-orange-200';
+        bgClass = 'bg-orange-50/90 border-orange-300/70 shadow-xs';
         break;
       default:
         label = status;
@@ -55,25 +55,25 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attend
         label = 'Reviewed';
         textClass = 'text-emerald-700';
         dotClass = 'bg-emerald-500';
-        bgClass = 'bg-emerald-50/80 border-emerald-200';
+        bgClass = 'bg-emerald-50/90 border-emerald-300/70 shadow-xs';
         break;
       case 'submitted':
         label = 'Submitted';
-        textClass = 'text-blue-700';
-        dotClass = 'bg-blue-500';
-        bgClass = 'bg-blue-50/80 border-blue-200';
+        textClass = 'text-indigo-700';
+        dotClass = 'bg-indigo-500';
+        bgClass = 'bg-indigo-50/90 border-indigo-300/70 shadow-xs';
         break;
       case 'draft':
         label = 'Draft';
         textClass = 'text-slate-600';
         dotClass = 'bg-slate-400';
-        bgClass = 'bg-slate-100/80 border-slate-200';
+        bgClass = 'bg-slate-100 border-slate-200';
         break;
       case 'needs_revision':
         label = 'Needs Revision';
         textClass = 'text-amber-700';
         dotClass = 'bg-amber-500';
-        bgClass = 'bg-amber-50/80 border-amber-200';
+        bgClass = 'bg-amber-50/90 border-amber-300/70 shadow-xs';
         break;
     }
   } else if (type === 'request') {
@@ -82,19 +82,19 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attend
         label = 'Approved';
         textClass = 'text-emerald-700';
         dotClass = 'bg-emerald-500';
-        bgClass = 'bg-emerald-50/80 border-emerald-200';
+        bgClass = 'bg-emerald-50/90 border-emerald-300/70 shadow-xs';
         break;
       case 'pending':
         label = 'Pending Review';
         textClass = 'text-amber-700';
         dotClass = 'bg-amber-500';
-        bgClass = 'bg-amber-50/80 border-amber-200';
+        bgClass = 'bg-amber-50/90 border-amber-300/70 shadow-xs';
         break;
       case 'rejected':
         label = 'Rejected';
         textClass = 'text-rose-700';
         dotClass = 'bg-rose-500';
-        bgClass = 'bg-rose-50/80 border-rose-200';
+        bgClass = 'bg-rose-50/90 border-rose-300/70 shadow-xs';
         break;
     }
   } else if (type === 'user') {
@@ -103,7 +103,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attend
         label = 'Active';
         textClass = 'text-emerald-700';
         dotClass = 'bg-emerald-500';
-        bgClass = 'bg-emerald-50/80 border-emerald-200';
+        bgClass = 'bg-emerald-50/90 border-emerald-300/70 shadow-xs';
         isLive = true;
         break;
       case 'inactive':
@@ -118,7 +118,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attend
   if (showPill) {
     return (
       <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${bgClass} ${textClass}`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${bgClass} ${textClass} tracking-tight select-none`}
       >
         <span
           className={`w-1.5 h-1.5 rounded-full ${dotClass} ${isLive ? 'pulse-dot' : ''} shrink-0`}
@@ -130,7 +130,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attend
   }
 
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${textClass}`}>
+    <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${textClass} select-none`}>
       <span
         className={`w-1.5 h-1.5 rounded-full ${dotClass} ${isLive ? 'pulse-dot' : ''} shrink-0`}
         aria-hidden="true"
@@ -139,4 +139,3 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'attend
     </span>
   );
 };
-

@@ -133,6 +133,19 @@
   ],
   "attendance": [
     {
+      "id": "att-1792311672590-l7jbv",
+      "user_id": "user-emp-1",
+      "work_date": "2026-10-18",
+      "check_in": "2026-10-18T08:21:12.588Z",
+      "check_out": null,
+      "total_minutes": 0,
+      "status": "late",
+      "notes": "Late arrival (checked in after grace window)",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-18T08:21:12.588Z",
+      "updated_at": "2026-10-18T08:21:12.588Z"
+    },
+    {
       "id": "att-1791978682812-bvv44",
       "user_id": "user-int-1",
       "work_date": "2026-10-14",
@@ -1221,6 +1234,49 @@
     }
   ],
   "audit_logs": [
+    {
+      "id": "audit-1792311672610-oarbb",
+      "actor_id": "user-emp-1",
+      "actor_name": "Sarah Chen",
+      "action": "ATTENDANCE_CHECK_IN",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1792311672590-l7jbv",
+      "details": {
+        "work_date": "2026-10-18",
+        "check_in": "2026-10-18T08:21:12.588Z",
+        "status": "late"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-18T08:21:12.610Z"
+    },
+    {
+      "id": "audit-1792311576558-fyru7",
+      "actor_id": "user-emp-1",
+      "actor_name": "Sarah Chen",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-emp-1",
+      "details": {
+        "email": "sarah.chen@buildrex.com",
+        "role": "employee"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-18T08:19:36.558Z"
+    },
+    {
+      "id": "audit-1792311533805-2rrp9",
+      "actor_id": "user-admin-1",
+      "actor_name": "Alex Vance",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-1",
+      "details": {
+        "email": "admin@buildrex.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-18T08:18:53.805Z"
+    },
     {
       "id": "audit-1791983037751-8oyxu",
       "actor_id": "user-admin-1",
