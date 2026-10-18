@@ -96,17 +96,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => handleSelectTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg transition-colors group ${
-                isActive
+              className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg transition-colors group ${isActive
                   ? 'bg-[#0B1F3A] text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70'
-              }`}
+                }`}
             >
               <div className="flex items-center gap-2.5 truncate">
                 <Icon
-                  className={`w-4 h-4 shrink-0 transition-colors ${
-                    isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'
-                  }`}
+                  className={`w-4 h-4 shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-700'
+                    }`}
                 />
                 <span className="truncate">{item.label}</span>
               </div>

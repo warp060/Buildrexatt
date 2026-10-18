@@ -136,14 +136,14 @@
       "id": "att-1791978682812-bvv44",
       "user_id": "user-int-1",
       "work_date": "2026-10-14",
-      "check_in": "2026-10-14T11:51:22.811Z",
-      "check_out": "2026-10-14T12:25:24.127Z",
+      "check_in": "2026-10-14 11:51:22",
+      "check_out": "2026-10-14 12:25:24",
       "total_minutes": 34,
       "status": "late",
       "notes": "Late arrival (checked in after grace window)",
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T11:51:22.811Z",
-      "updated_at": "2026-10-14T12:25:24.127Z"
+      "created_at": "2026-10-14 11:52:47",
+      "updated_at": "2026-10-14 12:25:26"
     },
     {
       "id": "att-1791856747973-q6eia",
@@ -162,414 +162,414 @@
       "user_id": "user-int-1",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 09:05:00",
-      "check_out": "2026-10-12 15:50:08",
+      "check_out": "2026-10-12 10:20:08",
       "total_minutes": 405,
       "status": "present",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:16",
-      "updated_at": "2026-10-13 12:44:16"
+      "updated_at": "2026-10-14 11:52:48"
     },
     {
       "id": "att-sarah-today",
       "user_id": "user-emp-1",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 08:52:00",
-      "check_out": "2026-10-12 16:00:04",
+      "check_out": "2026-10-12 10:30:04",
       "total_minutes": 428,
       "status": "present",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:16",
-      "updated_at": "2026-10-13 12:44:16"
+      "updated_at": "2026-10-14 11:52:48"
     },
     {
       "id": "att-user-emp-2-2026-10-09",
       "user_id": "user-emp-2",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 09:25:00",
-      "check_out": "2026-10-09 17:35:00",
+      "check_out": "2026-10-09 12:05:00",
       "total_minutes": 490,
       "status": "late",
       "notes": "Late arrival past 9:15 AM grace window",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:15",
-      "updated_at": "2026-10-13 12:44:15"
-    },
-    {
-      "id": "att-user-int-3-2026-10-09",
-      "user_id": "user-int-3",
-      "work_date": "2026-10-09",
-      "check_in": "2026-10-09 08:55:00",
-      "check_out": "2026-10-09 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:16",
-      "updated_at": "2026-10-13 12:44:16"
+      "updated_at": "2026-10-14 11:52:48"
     },
     {
       "id": "att-user-int-2-2026-10-09",
       "user_id": "user-int-2",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 08:55:00",
-      "check_out": "2026-10-09 17:35:00",
+      "check_out": "2026-10-09 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:16",
-      "updated_at": "2026-10-13 12:44:16"
+      "updated_at": "2026-10-14 11:52:48"
     },
     {
       "id": "att-user-emp-1-2026-10-09",
       "user_id": "user-emp-1",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 08:55:00",
-      "check_out": "2026-10-09 17:35:00",
+      "check_out": "2026-10-09 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:15",
-      "updated_at": "2026-10-13 12:44:15"
+      "updated_at": "2026-10-14 11:52:48"
     },
     {
       "id": "att-user-int-1-2026-10-09",
       "user_id": "user-int-1",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 08:55:00",
-      "check_out": "2026-10-09 17:35:00",
+      "check_out": "2026-10-09 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:15",
-      "updated_at": "2026-10-13 12:44:15"
+      "updated_at": "2026-10-14 11:52:49"
     },
     {
-      "id": "att-user-emp-1-2026-10-08",
-      "user_id": "user-emp-1",
-      "work_date": "2026-10-08",
-      "check_in": "2026-10-08 09:25:00",
-      "check_out": "2026-10-08 17:35:00",
-      "total_minutes": 490,
-      "status": "late",
-      "notes": "Late arrival past 9:15 AM grace window",
+      "id": "att-user-int-3-2026-10-09",
+      "user_id": "user-int-3",
+      "work_date": "2026-10-09",
+      "check_in": "2026-10-09 08:55:00",
+      "check_out": "2026-10-09 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:13",
-      "updated_at": "2026-10-13 12:44:13"
+      "created_at": "2026-10-13 12:44:16",
+      "updated_at": "2026-10-14 11:52:48"
     },
     {
       "id": "att-user-int-3-2026-10-08",
       "user_id": "user-int-3",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 09:25:00",
-      "check_out": "2026-10-08 17:35:00",
+      "check_out": "2026-10-08 12:05:00",
       "total_minutes": 490,
       "status": "late",
       "notes": "Late arrival past 9:15 AM grace window",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:14",
-      "updated_at": "2026-10-13 12:44:14"
+      "updated_at": "2026-10-14 11:52:49"
     },
     {
-      "id": "att-user-int-2-2026-10-08",
-      "user_id": "user-int-2",
+      "id": "att-user-emp-1-2026-10-08",
+      "user_id": "user-emp-1",
       "work_date": "2026-10-08",
-      "check_in": "2026-10-08 08:55:00",
-      "check_out": "2026-10-08 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
+      "check_in": "2026-10-08 09:25:00",
+      "check_out": "2026-10-08 12:05:00",
+      "total_minutes": 490,
+      "status": "late",
+      "notes": "Late arrival past 9:15 AM grace window",
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:14",
-      "updated_at": "2026-10-13 12:44:14"
+      "created_at": "2026-10-13 12:44:13",
+      "updated_at": "2026-10-14 11:52:49"
     },
     {
       "id": "att-user-int-1-2026-10-08",
       "user_id": "user-int-1",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 08:55:00",
-      "check_out": "2026-10-08 17:35:00",
+      "check_out": "2026-10-08 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:14",
-      "updated_at": "2026-10-13 12:44:14"
+      "updated_at": "2026-10-14 11:52:49"
+    },
+    {
+      "id": "att-user-int-2-2026-10-08",
+      "user_id": "user-int-2",
+      "work_date": "2026-10-08",
+      "check_in": "2026-10-08 08:55:00",
+      "check_out": "2026-10-08 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:14",
+      "updated_at": "2026-10-14 11:52:49"
     },
     {
       "id": "att-user-emp-2-2026-10-08",
       "user_id": "user-emp-2",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 08:55:00",
-      "check_out": "2026-10-08 17:35:00",
+      "check_out": "2026-10-08 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:13",
-      "updated_at": "2026-10-13 12:44:13"
+      "updated_at": "2026-10-14 11:52:50"
     },
     {
       "id": "att-user-int-2-2026-10-07",
       "user_id": "user-int-2",
       "work_date": "2026-10-07",
       "check_in": "2026-10-07 09:25:00",
-      "check_out": "2026-10-07 17:35:00",
+      "check_out": "2026-10-07 12:05:00",
       "total_minutes": 490,
       "status": "late",
       "notes": "Late arrival past 9:15 AM grace window",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:13",
-      "updated_at": "2026-10-13 12:44:13"
-    },
-    {
-      "id": "att-user-emp-1-2026-10-07",
-      "user_id": "user-emp-1",
-      "work_date": "2026-10-07",
-      "check_in": "2026-10-07 08:55:00",
-      "check_out": "2026-10-07 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:12",
-      "updated_at": "2026-10-13 12:44:12"
-    },
-    {
-      "id": "att-user-int-3-2026-10-07",
-      "user_id": "user-int-3",
-      "work_date": "2026-10-07",
-      "check_in": "2026-10-07 08:55:00",
-      "check_out": "2026-10-07 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:13",
-      "updated_at": "2026-10-13 12:44:13"
+      "updated_at": "2026-10-14 11:52:50"
     },
     {
       "id": "att-user-emp-2-2026-10-07",
       "user_id": "user-emp-2",
       "work_date": "2026-10-07",
       "check_in": "2026-10-07 08:55:00",
-      "check_out": "2026-10-07 17:35:00",
+      "check_out": "2026-10-07 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:13",
-      "updated_at": "2026-10-13 12:44:13"
+      "updated_at": "2026-10-14 11:52:50"
+    },
+    {
+      "id": "att-user-int-3-2026-10-07",
+      "user_id": "user-int-3",
+      "work_date": "2026-10-07",
+      "check_in": "2026-10-07 08:55:00",
+      "check_out": "2026-10-07 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:13",
+      "updated_at": "2026-10-14 11:52:50"
+    },
+    {
+      "id": "att-user-emp-1-2026-10-07",
+      "user_id": "user-emp-1",
+      "work_date": "2026-10-07",
+      "check_in": "2026-10-07 08:55:00",
+      "check_out": "2026-10-07 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:12",
+      "updated_at": "2026-10-14 11:52:50"
     },
     {
       "id": "att-user-int-1-2026-10-07",
       "user_id": "user-int-1",
       "work_date": "2026-10-07",
       "check_in": "2026-10-07 08:55:00",
-      "check_out": "2026-10-07 17:35:00",
+      "check_out": "2026-10-07 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:13",
-      "updated_at": "2026-10-13 12:44:13"
+      "updated_at": "2026-10-14 11:52:50"
     },
     {
       "id": "att-user-int-1-2026-10-06",
       "user_id": "user-int-1",
       "work_date": "2026-10-06",
       "check_in": "2026-10-06 09:25:00",
-      "check_out": "2026-10-06 17:35:00",
+      "check_out": "2026-10-06 12:05:00",
       "total_minutes": 490,
       "status": "late",
       "notes": "Late arrival past 9:15 AM grace window",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:12",
-      "updated_at": "2026-10-13 12:44:12"
-    },
-    {
-      "id": "att-user-emp-1-2026-10-06",
-      "user_id": "user-emp-1",
-      "work_date": "2026-10-06",
-      "check_in": "2026-10-06 08:55:00",
-      "check_out": "2026-10-06 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:12",
-      "updated_at": "2026-10-13 12:44:12"
-    },
-    {
-      "id": "att-user-int-3-2026-10-06",
-      "user_id": "user-int-3",
-      "work_date": "2026-10-06",
-      "check_in": "2026-10-06 08:55:00",
-      "check_out": "2026-10-06 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:12",
-      "updated_at": "2026-10-13 12:44:12"
-    },
-    {
-      "id": "att-user-emp-2-2026-10-06",
-      "user_id": "user-emp-2",
-      "work_date": "2026-10-06",
-      "check_in": "2026-10-06 08:55:00",
-      "check_out": "2026-10-06 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:12",
-      "updated_at": "2026-10-13 12:44:12"
+      "updated_at": "2026-10-14 11:52:51"
     },
     {
       "id": "att-user-int-2-2026-10-06",
       "user_id": "user-int-2",
       "work_date": "2026-10-06",
       "check_in": "2026-10-06 08:55:00",
-      "check_out": "2026-10-06 17:35:00",
+      "check_out": "2026-10-06 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:12",
-      "updated_at": "2026-10-13 12:44:12"
+      "updated_at": "2026-10-14 11:52:51"
+    },
+    {
+      "id": "att-user-emp-2-2026-10-06",
+      "user_id": "user-emp-2",
+      "work_date": "2026-10-06",
+      "check_in": "2026-10-06 08:55:00",
+      "check_out": "2026-10-06 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:12",
+      "updated_at": "2026-10-14 11:52:51"
+    },
+    {
+      "id": "att-user-emp-1-2026-10-06",
+      "user_id": "user-emp-1",
+      "work_date": "2026-10-06",
+      "check_in": "2026-10-06 08:55:00",
+      "check_out": "2026-10-06 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:12",
+      "updated_at": "2026-10-14 11:52:51"
+    },
+    {
+      "id": "att-user-int-3-2026-10-06",
+      "user_id": "user-int-3",
+      "work_date": "2026-10-06",
+      "check_in": "2026-10-06 08:55:00",
+      "check_out": "2026-10-06 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:12",
+      "updated_at": "2026-10-14 11:52:51"
     },
     {
       "id": "att-user-emp-2-2026-10-05",
       "user_id": "user-emp-2",
       "work_date": "2026-10-05",
       "check_in": "2026-10-05 09:25:00",
-      "check_out": "2026-10-05 17:35:00",
+      "check_out": "2026-10-05 12:05:00",
       "total_minutes": 490,
       "status": "late",
       "notes": "Late arrival past 9:15 AM grace window",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:11",
-      "updated_at": "2026-10-13 12:44:11"
-    },
-    {
-      "id": "att-user-int-2-2026-10-05",
-      "user_id": "user-int-2",
-      "work_date": "2026-10-05",
-      "check_in": "2026-10-05 08:55:00",
-      "check_out": "2026-10-05 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:11",
-      "updated_at": "2026-10-13 12:44:11"
-    },
-    {
-      "id": "att-user-int-1-2026-10-05",
-      "user_id": "user-int-1",
-      "work_date": "2026-10-05",
-      "check_in": "2026-10-05 08:55:00",
-      "check_out": "2026-10-05 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:11",
-      "updated_at": "2026-10-13 12:44:11"
+      "updated_at": "2026-10-14 11:52:52"
     },
     {
       "id": "att-user-int-3-2026-10-05",
       "user_id": "user-int-3",
       "work_date": "2026-10-05",
       "check_in": "2026-10-05 08:55:00",
-      "check_out": "2026-10-05 17:35:00",
+      "check_out": "2026-10-05 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:11",
-      "updated_at": "2026-10-13 12:44:11"
+      "updated_at": "2026-10-14 11:52:52"
     },
     {
       "id": "att-user-emp-1-2026-10-05",
       "user_id": "user-emp-1",
       "work_date": "2026-10-05",
       "check_in": "2026-10-05 08:55:00",
-      "check_out": "2026-10-05 17:35:00",
+      "check_out": "2026-10-05 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:11",
-      "updated_at": "2026-10-13 12:44:11"
+      "updated_at": "2026-10-14 11:52:52"
+    },
+    {
+      "id": "att-user-int-2-2026-10-05",
+      "user_id": "user-int-2",
+      "work_date": "2026-10-05",
+      "check_in": "2026-10-05 08:55:00",
+      "check_out": "2026-10-05 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:11",
+      "updated_at": "2026-10-14 11:52:52"
+    },
+    {
+      "id": "att-user-int-1-2026-10-05",
+      "user_id": "user-int-1",
+      "work_date": "2026-10-05",
+      "check_in": "2026-10-05 08:55:00",
+      "check_out": "2026-10-05 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:11",
+      "updated_at": "2026-10-14 11:52:52"
     },
     {
       "id": "att-user-int-1-2026-10-02",
       "user_id": "user-int-1",
       "work_date": "2026-10-02",
       "check_in": "2026-10-02 09:25:00",
-      "check_out": "2026-10-02 17:35:00",
+      "check_out": "2026-10-02 12:05:00",
       "total_minutes": 490,
       "status": "late",
       "notes": "Late arrival past 9:15 AM grace window",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:10",
-      "updated_at": "2026-10-13 12:44:10"
-    },
-    {
-      "id": "att-user-emp-2-2026-10-02",
-      "user_id": "user-emp-2",
-      "work_date": "2026-10-02",
-      "check_in": "2026-10-02 08:55:00",
-      "check_out": "2026-10-02 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:10",
-      "updated_at": "2026-10-13 12:44:10"
-    },
-    {
-      "id": "att-user-int-2-2026-10-02",
-      "user_id": "user-int-2",
-      "work_date": "2026-10-02",
-      "check_in": "2026-10-02 08:55:00",
-      "check_out": "2026-10-02 17:35:00",
-      "total_minutes": 520,
-      "status": "present",
-      "notes": "Normal shift completed",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-13 12:44:10",
-      "updated_at": "2026-10-13 12:44:10"
+      "updated_at": "2026-10-14 11:52:52"
     },
     {
       "id": "att-user-int-3-2026-10-02",
       "user_id": "user-int-3",
       "work_date": "2026-10-02",
       "check_in": "2026-10-02 08:55:00",
-      "check_out": "2026-10-02 17:35:00",
+      "check_out": "2026-10-02 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:11",
-      "updated_at": "2026-10-13 12:44:11"
+      "updated_at": "2026-10-14 11:52:53"
+    },
+    {
+      "id": "att-user-emp-2-2026-10-02",
+      "user_id": "user-emp-2",
+      "work_date": "2026-10-02",
+      "check_in": "2026-10-02 08:55:00",
+      "check_out": "2026-10-02 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:10",
+      "updated_at": "2026-10-14 11:52:52"
+    },
+    {
+      "id": "att-user-int-2-2026-10-02",
+      "user_id": "user-int-2",
+      "work_date": "2026-10-02",
+      "check_in": "2026-10-02 08:55:00",
+      "check_out": "2026-10-02 12:05:00",
+      "total_minutes": 520,
+      "status": "present",
+      "notes": "Normal shift completed",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-13 12:44:10",
+      "updated_at": "2026-10-14 11:52:53"
     },
     {
       "id": "att-user-emp-1-2026-10-02",
       "user_id": "user-emp-1",
       "work_date": "2026-10-02",
       "check_in": "2026-10-02 08:55:00",
-      "check_out": "2026-10-02 17:35:00",
+      "check_out": "2026-10-02 12:05:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-13 12:44:10",
-      "updated_at": "2026-10-13 12:44:10"
+      "updated_at": "2026-10-14 11:52:53"
     }
   ],
   "work_updates": [
@@ -605,9 +605,9 @@
       "submitted_at": "2026-10-09 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-09 18:00:00",
+      "reviewed_at": "2026-10-09 12:30:00",
       "created_at": "2026-10-13 12:44:22",
-      "updated_at": "2026-10-13 12:44:22"
+      "updated_at": "2026-10-14 11:52:53"
     },
     {
       "id": "wu-user-int-2-2026-10-09",
@@ -623,9 +623,9 @@
       "submitted_at": "2026-10-09 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-09 18:00:00",
+      "reviewed_at": "2026-10-09 12:30:00",
       "created_at": "2026-10-13 12:44:22",
-      "updated_at": "2026-10-13 12:44:22"
+      "updated_at": "2026-10-14 11:52:53"
     },
     {
       "id": "wu-user-int-1-2026-10-09",
@@ -641,9 +641,9 @@
       "submitted_at": "2026-10-09 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-09 18:00:00",
+      "reviewed_at": "2026-10-09 12:30:00",
       "created_at": "2026-10-13 12:44:22",
-      "updated_at": "2026-10-13 12:44:22"
+      "updated_at": "2026-10-14 11:52:54"
     },
     {
       "id": "wu-user-emp-2-2026-10-09",
@@ -659,9 +659,9 @@
       "submitted_at": "2026-10-09 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-09 18:00:00",
+      "reviewed_at": "2026-10-09 12:30:00",
       "created_at": "2026-10-13 12:44:21",
-      "updated_at": "2026-10-13 12:44:21"
+      "updated_at": "2026-10-14 11:52:54"
     },
     {
       "id": "wu-user-emp-1-2026-10-09",
@@ -677,9 +677,9 @@
       "submitted_at": "2026-10-09 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-09 18:00:00",
+      "reviewed_at": "2026-10-09 12:30:00",
       "created_at": "2026-10-13 12:44:20",
-      "updated_at": "2026-10-13 12:44:20"
+      "updated_at": "2026-10-14 11:52:54"
     },
     {
       "id": "wu-user-emp-2-2026-10-08",
@@ -695,9 +695,9 @@
       "submitted_at": "2026-10-08 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-08 18:00:00",
+      "reviewed_at": "2026-10-08 12:30:00",
       "created_at": "2026-10-13 12:44:20",
-      "updated_at": "2026-10-13 12:44:20"
+      "updated_at": "2026-10-14 11:52:54"
     },
     {
       "id": "wu-user-int-3-2026-10-08",
@@ -713,9 +713,9 @@
       "submitted_at": "2026-10-08 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-08 18:00:00",
+      "reviewed_at": "2026-10-08 12:30:00",
       "created_at": "2026-10-13 12:44:20",
-      "updated_at": "2026-10-13 12:44:20"
+      "updated_at": "2026-10-14 11:52:54"
     },
     {
       "id": "wu-user-emp-1-2026-10-08",
@@ -731,9 +731,9 @@
       "submitted_at": "2026-10-08 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-08 18:00:00",
+      "reviewed_at": "2026-10-08 12:30:00",
       "created_at": "2026-10-13 12:44:20",
-      "updated_at": "2026-10-13 12:44:20"
+      "updated_at": "2026-10-14 11:52:55"
     },
     {
       "id": "wu-user-int-1-2026-10-08",
@@ -749,9 +749,9 @@
       "submitted_at": "2026-10-08 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-08 18:00:00",
+      "reviewed_at": "2026-10-08 12:30:00",
       "created_at": "2026-10-13 12:44:20",
-      "updated_at": "2026-10-13 12:44:20"
+      "updated_at": "2026-10-14 11:52:55"
     },
     {
       "id": "wu-user-int-2-2026-10-08",
@@ -767,9 +767,9 @@
       "submitted_at": "2026-10-08 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-08 18:00:00",
+      "reviewed_at": "2026-10-08 12:30:00",
       "created_at": "2026-10-13 12:44:20",
-      "updated_at": "2026-10-13 12:44:20"
+      "updated_at": "2026-10-14 11:52:55"
     },
     {
       "id": "wu-user-emp-2-2026-10-07",
@@ -785,9 +785,9 @@
       "submitted_at": "2026-10-07 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-07 18:00:00",
+      "reviewed_at": "2026-10-07 12:30:00",
       "created_at": "2026-10-13 12:44:19",
-      "updated_at": "2026-10-13 12:44:19"
+      "updated_at": "2026-10-14 11:52:55"
     },
     {
       "id": "wu-user-int-1-2026-10-07",
@@ -803,9 +803,9 @@
       "submitted_at": "2026-10-07 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-07 18:00:00",
+      "reviewed_at": "2026-10-07 12:30:00",
       "created_at": "2026-10-13 12:44:19",
-      "updated_at": "2026-10-13 12:44:19"
+      "updated_at": "2026-10-14 11:52:55"
     },
     {
       "id": "wu-user-int-3-2026-10-07",
@@ -821,9 +821,9 @@
       "submitted_at": "2026-10-07 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-07 18:00:00",
+      "reviewed_at": "2026-10-07 12:30:00",
       "created_at": "2026-10-13 12:44:19",
-      "updated_at": "2026-10-13 12:44:19"
+      "updated_at": "2026-10-14 11:52:55"
     },
     {
       "id": "wu-user-emp-1-2026-10-07",
@@ -839,9 +839,9 @@
       "submitted_at": "2026-10-07 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-07 18:00:00",
+      "reviewed_at": "2026-10-07 12:30:00",
       "created_at": "2026-10-13 12:44:19",
-      "updated_at": "2026-10-13 12:44:19"
+      "updated_at": "2026-10-14 11:52:56"
     },
     {
       "id": "wu-user-int-2-2026-10-07",
@@ -857,9 +857,9 @@
       "submitted_at": "2026-10-07 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-07 18:00:00",
+      "reviewed_at": "2026-10-07 12:30:00",
       "created_at": "2026-10-13 12:44:19",
-      "updated_at": "2026-10-13 12:44:19"
+      "updated_at": "2026-10-14 11:52:56"
     },
     {
       "id": "wu-user-int-3-2026-10-06",
@@ -875,9 +875,9 @@
       "submitted_at": "2026-10-06 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-06 18:00:00",
+      "reviewed_at": "2026-10-06 12:30:00",
       "created_at": "2026-10-13 12:44:19",
-      "updated_at": "2026-10-13 12:44:19"
+      "updated_at": "2026-10-14 11:52:56"
     },
     {
       "id": "wu-user-emp-2-2026-10-06",
@@ -893,9 +893,9 @@
       "submitted_at": "2026-10-06 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-06 18:00:00",
+      "reviewed_at": "2026-10-06 12:30:00",
       "created_at": "2026-10-13 12:44:18",
-      "updated_at": "2026-10-13 12:44:18"
+      "updated_at": "2026-10-14 11:52:56"
     },
     {
       "id": "wu-user-int-1-2026-10-06",
@@ -911,9 +911,9 @@
       "submitted_at": "2026-10-06 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-06 18:00:00",
+      "reviewed_at": "2026-10-06 12:30:00",
       "created_at": "2026-10-13 12:44:18",
-      "updated_at": "2026-10-13 12:44:18"
+      "updated_at": "2026-10-14 11:52:56"
     },
     {
       "id": "wu-user-emp-1-2026-10-06",
@@ -929,9 +929,9 @@
       "submitted_at": "2026-10-06 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-06 18:00:00",
+      "reviewed_at": "2026-10-06 12:30:00",
       "created_at": "2026-10-13 12:44:18",
-      "updated_at": "2026-10-13 12:44:18"
+      "updated_at": "2026-10-14 11:52:57"
     },
     {
       "id": "wu-user-int-2-2026-10-06",
@@ -947,9 +947,9 @@
       "submitted_at": "2026-10-06 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-06 18:00:00",
+      "reviewed_at": "2026-10-06 12:30:00",
       "created_at": "2026-10-13 12:44:18",
-      "updated_at": "2026-10-13 12:44:18"
+      "updated_at": "2026-10-14 11:52:57"
     },
     {
       "id": "wu-user-int-3-2026-10-05",
@@ -965,9 +965,9 @@
       "submitted_at": "2026-10-05 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-05 18:00:00",
+      "reviewed_at": "2026-10-05 12:30:00",
       "created_at": "2026-10-13 12:44:18",
-      "updated_at": "2026-10-13 12:44:18"
+      "updated_at": "2026-10-14 11:52:57"
     },
     {
       "id": "wu-user-int-2-2026-10-05",
@@ -983,9 +983,9 @@
       "submitted_at": "2026-10-05 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-05 18:00:00",
+      "reviewed_at": "2026-10-05 12:30:00",
       "created_at": "2026-10-13 12:44:18",
-      "updated_at": "2026-10-13 12:44:18"
+      "updated_at": "2026-10-14 11:52:57"
     },
     {
       "id": "wu-user-int-1-2026-10-05",
@@ -1001,9 +1001,9 @@
       "submitted_at": "2026-10-05 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-05 18:00:00",
+      "reviewed_at": "2026-10-05 12:30:00",
       "created_at": "2026-10-13 12:44:17",
-      "updated_at": "2026-10-13 12:44:17"
+      "updated_at": "2026-10-14 11:52:57"
     },
     {
       "id": "wu-user-emp-2-2026-10-05",
@@ -1019,9 +1019,9 @@
       "submitted_at": "2026-10-05 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-05 18:00:00",
+      "reviewed_at": "2026-10-05 12:30:00",
       "created_at": "2026-10-13 12:44:17",
-      "updated_at": "2026-10-13 12:44:17"
+      "updated_at": "2026-10-14 11:52:57"
     },
     {
       "id": "wu-user-emp-1-2026-10-05",
@@ -1037,9 +1037,9 @@
       "submitted_at": "2026-10-05 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-05 18:00:00",
+      "reviewed_at": "2026-10-05 12:30:00",
       "created_at": "2026-10-13 12:44:17",
-      "updated_at": "2026-10-13 12:44:17"
+      "updated_at": "2026-10-14 11:52:58"
     },
     {
       "id": "wu-user-int-2-2026-10-02",
@@ -1055,9 +1055,9 @@
       "submitted_at": "2026-10-02 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-02 18:00:00",
+      "reviewed_at": "2026-10-02 12:30:00",
       "created_at": "2026-10-13 12:44:17",
-      "updated_at": "2026-10-13 12:44:17"
+      "updated_at": "2026-10-14 11:52:58"
     },
     {
       "id": "wu-user-int-3-2026-10-02",
@@ -1073,9 +1073,9 @@
       "submitted_at": "2026-10-02 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-02 18:00:00",
+      "reviewed_at": "2026-10-02 12:30:00",
       "created_at": "2026-10-13 12:44:17",
-      "updated_at": "2026-10-13 12:44:17"
+      "updated_at": "2026-10-14 11:52:58"
     },
     {
       "id": "wu-user-int-1-2026-10-02",
@@ -1091,9 +1091,9 @@
       "submitted_at": "2026-10-02 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-02 18:00:00",
+      "reviewed_at": "2026-10-02 12:30:00",
       "created_at": "2026-10-13 12:44:17",
-      "updated_at": "2026-10-13 12:44:17"
+      "updated_at": "2026-10-14 11:52:58"
     },
     {
       "id": "wu-user-emp-2-2026-10-02",
@@ -1109,9 +1109,9 @@
       "submitted_at": "2026-10-02 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-02 18:00:00",
+      "reviewed_at": "2026-10-02 12:30:00",
       "created_at": "2026-10-13 12:44:17",
-      "updated_at": "2026-10-13 12:44:17"
+      "updated_at": "2026-10-14 11:52:58"
     },
     {
       "id": "wu-user-emp-1-2026-10-02",
@@ -1127,9 +1127,9 @@
       "submitted_at": "2026-10-02 17:30:00",
       "reviewed_by": "user-admin-1",
       "review_comment": "Solid velocity and clear daily documentation. Keep up the high standard.",
-      "reviewed_at": "2026-10-02 18:00:00",
+      "reviewed_at": "2026-10-02 12:30:00",
       "created_at": "2026-10-13 12:44:16",
-      "updated_at": "2026-10-13 12:44:16"
+      "updated_at": "2026-10-14 11:52:59"
     }
   ],
   "leave_requests": [
@@ -1141,10 +1141,10 @@
       "end_date": "2026-10-19",
       "days_count": 2,
       "reason": "Medical checkup and recovery period",
-      "status": "pending",
-      "reviewed_by": null,
-      "review_comment": null,
-      "reviewed_at": null,
+      "status": "approved",
+      "reviewed_by": "user-admin-1",
+      "review_comment": "sure",
+      "reviewed_at": "2026-10-14 13:03:57",
       "created_at": "2026-10-13 12:44:23"
     },
     {
@@ -1158,7 +1158,7 @@
       "status": "approved",
       "reviewed_by": "user-admin-1",
       "review_comment": "Approved. Ensure handoff document is shared.",
-      "reviewed_at": "2026-10-12 15:37:37",
+      "reviewed_at": "2026-10-12 10:07:37",
       "created_at": "2026-10-13 12:44:23"
     }
   ],
@@ -1180,14 +1180,14 @@
   ],
   "notifications": [
     {
-      "id": "notif-2",
-      "user_id": "user-admin-1",
-      "title": "Attendance Correction Requested",
-      "message": "Liam Ross (BRX-INT-03) requested correction for Oct 09.",
-      "type": "warning",
+      "id": "notif-1791983037739-zwel",
+      "user_id": "user-int-2",
+      "title": "Leave Request Approved",
+      "message": "Your leave request for 2026-10-18 to 2026-10-19 has been approved. Note: sure",
+      "type": "success",
       "read_at": null,
-      "link": "/admin/leave-requests",
-      "created_at": "2026-10-13 12:44:23"
+      "link": "/leave-requests",
+      "created_at": "2026-10-14 13:04:17"
     },
     {
       "id": "notif-3",
@@ -1208,11 +1208,50 @@
       "read_at": null,
       "link": "/admin/leave-requests",
       "created_at": "2026-10-13 12:44:23"
+    },
+    {
+      "id": "notif-2",
+      "user_id": "user-admin-1",
+      "title": "Attendance Correction Requested",
+      "message": "Liam Ross (BRX-INT-03) requested correction for Oct 09.",
+      "type": "warning",
+      "read_at": null,
+      "link": "/admin/leave-requests",
+      "created_at": "2026-10-13 12:44:23"
     }
   ],
   "audit_logs": [
     {
-      "id": "audit-1791981252381-wj83o",
+      "id": "audit-1791983037751-8oyxu",
+      "actor_id": "user-admin-1",
+      "actor_name": "Alex Vance",
+      "action": "APPROVE_LEAVE_REQUEST",
+      "entity_type": "LEAVE_REQUEST",
+      "entity_id": "leave-1",
+      "details": {
+        "review_comment": "sure",
+        "status": "approved",
+        "target_user": "user-int-2"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14 13:04:18"
+    },
+    {
+      "id": "audit-1791982936461-2bkly",
+      "actor_id": "user-admin-1",
+      "actor_name": "Alex Vance",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-1",
+      "details": {
+        "email": "admin@buildrex.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14 13:02:39"
+    },
+    {
+      "id": "audit-1791982801145-xwhfd",
       "actor_id": "user-int-1",
       "actor_name": "Devin Patel",
       "action": "USER_LOGIN",
@@ -1223,7 +1262,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:34:12.381Z"
+      "created_at": "2026-10-14 13:00:17"
     },
     {
       "id": "audit-1791981247253-syhpa",
@@ -1237,7 +1276,7 @@
         "role": "employee"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:34:07.253Z"
+      "created_at": "2026-10-14 12:34:18"
     },
     {
       "id": "audit-1791981246025-dr8jq",
@@ -1251,7 +1290,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:34:06.025Z"
+      "created_at": "2026-10-14 12:34:18"
     },
     {
       "id": "audit-1791981244035-zr180",
@@ -1265,21 +1304,21 @@
         "role": "employee"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:34:04.035Z"
+      "created_at": "2026-10-14 12:34:18"
     },
     {
-      "id": "audit-1791981219924-nrrzx",
-      "actor_id": "user-admin-1",
-      "actor_name": "Alex Vance",
+      "id": "audit-1791981252381-wj83o",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
       "action": "USER_LOGIN",
       "entity_type": "USER",
-      "entity_id": "user-admin-1",
+      "entity_id": "user-int-1",
       "details": {
-        "email": "admin@buildrex.com",
-        "role": "admin"
+        "email": "intern.dev@buildrex.com",
+        "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:33:39.924Z"
+      "created_at": "2026-10-14 12:34:17"
     },
     {
       "id": "audit-1791981209263-si7z0",
@@ -1293,7 +1332,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:33:29.263Z"
+      "created_at": "2026-10-14 12:33:51"
     },
     {
       "id": "audit-1791981206137-f7ife",
@@ -1307,38 +1346,10 @@
         "role": "admin"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:33:26.137Z"
+      "created_at": "2026-10-14 12:33:51"
     },
     {
-      "id": "audit-1791980750613-3tp60",
-      "actor_id": "user-int-1",
-      "actor_name": "Devin Patel",
-      "action": "USER_LOGIN",
-      "entity_type": "USER",
-      "entity_id": "user-int-1",
-      "details": {
-        "email": "intern.dev@buildrex.com",
-        "role": "intern"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:25:50.613Z"
-    },
-    {
-      "id": "audit-1791980748940-3qnfd",
-      "actor_id": "user-emp-1",
-      "actor_name": "Sarah Chen",
-      "action": "USER_LOGIN",
-      "entity_type": "USER",
-      "entity_id": "user-emp-1",
-      "details": {
-        "email": "sarah.chen@buildrex.com",
-        "role": "employee"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:25:48.940Z"
-    },
-    {
-      "id": "audit-1791980732747-q1s92",
+      "id": "audit-1791981219924-nrrzx",
       "actor_id": "user-admin-1",
       "actor_name": "Alex Vance",
       "action": "USER_LOGIN",
@@ -1349,23 +1360,7 @@
         "role": "admin"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:25:32.747Z"
-    },
-    {
-      "id": "audit-1791980724136-e4wn0",
-      "actor_id": "user-int-1",
-      "actor_name": "Devin Patel",
-      "action": "ATTENDANCE_CHECK_OUT",
-      "entity_type": "ATTENDANCE",
-      "entity_id": "att-1791978682812-bvv44",
-      "details": {
-        "work_date": "2026-10-14",
-        "check_out": "2026-10-14T12:25:24.127Z",
-        "total_minutes": 34,
-        "status": "late"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:25:24.136Z"
+      "created_at": "2026-10-14 12:33:50"
     },
     {
       "id": "audit-1791980721421-i0fap",
@@ -1379,10 +1374,26 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T12:25:21.421Z"
+      "created_at": "2026-10-14 12:26:23"
     },
     {
-      "id": "audit-1791979030581-c28sq",
+      "id": "audit-1791980724136-e4wn0",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "ATTENDANCE_CHECK_OUT",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1791978682812-bvv44",
+      "details": {
+        "check_out": "2026-10-14T12:25:24.127Z",
+        "status": "late",
+        "total_minutes": 34,
+        "work_date": "2026-10-14"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14 12:26:18"
+    },
+    {
+      "id": "audit-1791980732747-q1s92",
       "actor_id": "user-admin-1",
       "actor_name": "Alex Vance",
       "action": "USER_LOGIN",
@@ -1393,7 +1404,35 @@
         "role": "admin"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T11:57:10.581Z"
+      "created_at": "2026-10-14 12:26:14"
+    },
+    {
+      "id": "audit-1791980750613-3tp60",
+      "actor_id": "user-int-1",
+      "actor_name": "Devin Patel",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-int-1",
+      "details": {
+        "email": "intern.dev@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14 12:26:13"
+    },
+    {
+      "id": "audit-1791980748940-3qnfd",
+      "actor_id": "user-emp-1",
+      "actor_name": "Sarah Chen",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-emp-1",
+      "details": {
+        "email": "sarah.chen@buildrex.com",
+        "role": "employee"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14 12:26:13"
     },
     {
       "id": "audit-1791978794884-og3i4",
@@ -1407,7 +1446,21 @@
         "role": "employee"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T11:53:14.884Z"
+      "created_at": "2026-10-14 11:57:24"
+    },
+    {
+      "id": "audit-1791979030581-c28sq",
+      "actor_id": "user-admin-1",
+      "actor_name": "Alex Vance",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-1",
+      "details": {
+        "email": "admin@buildrex.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-14 11:57:23"
     },
     {
       "id": "audit-1791978763093-3i7i7",
@@ -1421,7 +1474,7 @@
         "role": "admin"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T11:52:43.093Z"
+      "created_at": "2026-10-14 11:53:00"
     },
     {
       "id": "audit-1791978682822-vnps0",
@@ -1431,12 +1484,12 @@
       "entity_type": "ATTENDANCE",
       "entity_id": "att-1791978682812-bvv44",
       "details": {
-        "work_date": "2026-10-14",
         "check_in": "2026-10-14T11:51:22.811Z",
-        "status": "late"
+        "status": "late",
+        "work_date": "2026-10-14"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T11:51:22.822Z"
+      "created_at": "2026-10-14 11:53:00"
     },
     {
       "id": "audit-1791978678211-ytqw6",
@@ -1450,7 +1503,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-14T11:51:18.211Z"
+      "created_at": "2026-10-14 11:53:00"
     },
     {
       "id": "audit-2",

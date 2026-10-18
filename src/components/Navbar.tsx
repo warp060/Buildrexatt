@@ -138,31 +138,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
             <span className="text-slate-400 text-[10px] uppercase px-1.5 font-semibold">Demo:</span>
             <button
               onClick={() => handleQuickDemoSwitch('admin')}
-              className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${
-                user?.role === 'admin'
+              className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${user?.role === 'admin'
                   ? 'bg-white text-slate-900 font-semibold shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
-              }`}
+                }`}
             >
               Admin
             </button>
             <button
               onClick={() => handleQuickDemoSwitch('employee')}
-              className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${
-                user?.role === 'employee'
+              className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${user?.role === 'employee'
                   ? 'bg-white text-slate-900 font-semibold shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
-              }`}
+                }`}
             >
               Employee
             </button>
             <button
               onClick={() => handleQuickDemoSwitch('intern')}
-              className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${
-                user?.role === 'intern'
+              className={`px-2 py-1 rounded transition-colors whitespace-nowrap ${user?.role === 'intern'
                   ? 'bg-white text-slate-900 font-semibold shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
-              }`}
+                }`}
             >
               Intern
             </button>
@@ -216,9 +213,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
                       <div
                         key={n.id}
                         onClick={() => markNotificationRead(n.id)}
-                        className={`p-3 text-left hover:bg-slate-50 transition-colors cursor-pointer ${
-                          !n.read_at ? 'bg-slate-50/70' : ''
-                        }`}
+                        className={`p-3 text-left hover:bg-slate-50 transition-colors cursor-pointer ${!n.read_at ? 'bg-slate-50/70' : ''
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-2">
                           <p className="text-xs font-medium text-slate-900">{n.title}</p>
