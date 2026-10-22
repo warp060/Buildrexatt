@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { ThemeSelector } from '../components/ThemeSelector';
 import { api } from '../api';
-import { ArrowRight, AlertCircle, Eye, EyeOff, ShieldCheck, Check, Sparkles, UserCheck, Shield, Briefcase, GraduationCap } from 'lucide-react';
+import { ArrowRight, AlertCircle, Eye, EyeOff, ShieldCheck, Check, Sparkles, UserCheck, Shield, Briefcase, GraduationCap, Users, Copy, Search, RefreshCw, KeyRound } from 'lucide-react';
 import { Modal } from '../components/Modal';
 
 export const LoginView: React.FC = () => {
@@ -15,6 +15,14 @@ export const LoginView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedDemo, setSelectedDemo] = useState<string | null>(null);
+
+  // Team Directory & Credentials modal state
+  const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState(false);
+  const [credentialsList, setCredentialsList] = useState<any[]>([]);
+  const [isLoadingCreds, setIsLoadingCreds] = useState(false);
+  const [searchCreds, setSearchCreds] = useState('');
+  const [filterCredsRole, setFilterCredsRole] = useState('all');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Forgot password modal state
   const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
@@ -68,6 +76,40 @@ export const LoginView: React.FC = () => {
       setIsForgotLoading(false);
     }
   };
+
+  const handleOpenCredentialsModal = async () => {
+    setIsCredentialsModalOpen(true);
+    if (credentialsList.length === 0) {
+      setIsLoadingCreds(true);
+      try {
+        const res = await api.getTeamCredentials();
+        if (res.success) {
+          setCredentialsList(res.credentials);
+        }
+      } catch (e) {
+        console.warn('Failed to load team credentials:', e);
+      } finally {
+        setIsLoadingCreds(false);
+      }
+    }
+  };
+
+  const handleCopyPassword = (id: string, pw: string) => {
+    navigator.clipboard.writeText(pw);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const filteredCredentials = credentialsList.filter((c) => {
+    const matchesSearch =
+      !searchCreds ||
+      c.name.toLowerCase().includes(searchCreds.toLowerCase()) ||
+      c.email.toLowerCase().includes(searchCreds.toLowerCase()) ||
+      c.position.toLowerCase().includes(searchCreds.toLowerCase()) ||
+      c.department.toLowerCase().includes(searchCreds.toLowerCase());
+    const matchesRole = filterCredsRole === 'all' || c.role === filterCredsRole;
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#080E1E] text-slate-100 font-sans antialiased selection:bg-brand-accent selection:text-white">
@@ -294,30 +336,30 @@ export const LoginView: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              {/* Demo 1: Administrator */}
+              {/* Quick Login 1: CFO — Admin */}
               <button
                 type="button"
                 disabled={isLoading}
-                onClick={() => handleInstantLogin('admin@buildrex.com', 'Buildrex@2026', 'admin')}
+                onClick={() => handleInstantLogin('layeequeahmed602@gmail.com', 'Layeeque@Brx26', 'layeeque')}
                 className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
-                  selectedDemo === 'admin'
+                  selectedDemo === 'layeeque'
                     ? 'border-indigo-600 bg-indigo-50/70 ring-1 ring-indigo-500 shadow-xs'
                     : 'border-slate-200/90 hover:border-slate-400 hover:bg-slate-50/80'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <Shield className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-2xs font-bold text-xs">
+                    LA
                   </div>
                   <div className="min-w-0">
                     <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <span className="truncate">Alex Vance</span>
+                      <span className="truncate">Layeeque Ahmed.S</span>
                       <span className="text-[9px] bg-purple-100 text-purple-800 font-extrabold px-1.5 py-0.2 rounded uppercase">
-                        COO / Admin
+                        CFO / Admin
                       </span>
                     </div>
                     <div className="text-[10px] text-slate-500 font-mono truncate">
-                      admin@buildrex.com
+                      layeequeahmed602@gmail.com
                     </div>
                   </div>
                 </div>
@@ -326,30 +368,30 @@ export const LoginView: React.FC = () => {
                 </span>
               </button>
 
-              {/* Demo 2: Employee */}
+              {/* Quick Login 2: CTO — Admin */}
               <button
                 type="button"
                 disabled={isLoading}
-                onClick={() => handleInstantLogin('sarah.chen@buildrex.com', 'Buildrex@2026', 'employee')}
+                onClick={() => handleInstantLogin('syedmdaakif007@gmail.com', 'Aakif@Brx26', 'aakif')}
                 className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
-                  selectedDemo === 'employee'
+                  selectedDemo === 'aakif'
                     ? 'border-blue-600 bg-blue-50/70 ring-1 ring-blue-500 shadow-xs'
                     : 'border-slate-200/90 hover:border-slate-400 hover:bg-slate-50/80'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <Briefcase className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-2xs font-bold text-xs">
+                    SA
                   </div>
                   <div className="min-w-0">
                     <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <span className="truncate">Sarah Chen</span>
+                      <span className="truncate">S Mohammed Aakif</span>
                       <span className="text-[9px] bg-blue-100 text-blue-800 font-extrabold px-1.5 py-0.2 rounded uppercase">
-                        Lead / Emp
+                        CTO / Admin
                       </span>
                     </div>
                     <div className="text-[10px] text-slate-500 font-mono truncate">
-                      sarah.chen@buildrex.com
+                      syedmdaakif007@gmail.com
                     </div>
                   </div>
                 </div>
@@ -358,30 +400,30 @@ export const LoginView: React.FC = () => {
                 </span>
               </button>
 
-              {/* Demo 3: Intern */}
+              {/* Quick Login 3: Full Stack Intern */}
               <button
                 type="button"
                 disabled={isLoading}
-                onClick={() => handleInstantLogin('intern.dev@buildrex.com', 'Buildrex@2026', 'intern')}
+                onClick={() => handleInstantLogin('abbas6618532@gmail.com', 'Abbas@Brx26', 'abbas')}
                 className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all group cursor-pointer ${
-                  selectedDemo === 'intern'
+                  selectedDemo === 'abbas'
                     ? 'border-amber-600 bg-amber-50/70 ring-1 ring-amber-500 shadow-xs'
                     : 'border-slate-200/90 hover:border-slate-400 hover:bg-slate-50/80'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <GraduationCap className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-2xs font-bold text-xs">
+                    MA
                   </div>
                   <div className="min-w-0">
                     <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                      <span className="truncate">Devin Patel</span>
+                      <span className="truncate">Mohammed Abbas R Y</span>
                       <span className="text-[9px] bg-amber-100 text-amber-800 font-extrabold px-1.5 py-0.2 rounded uppercase">
-                        Frontend Intern
+                        Full Stack Intern
                       </span>
                     </div>
                     <div className="text-[10px] text-slate-500 font-mono truncate">
-                      intern.dev@buildrex.com
+                      abbas6618532@gmail.com
                     </div>
                   </div>
                 </div>
@@ -389,10 +431,165 @@ export const LoginView: React.FC = () => {
                   Login &rarr;
                 </span>
               </button>
+
+              {/* View All 22 Team Members Credentials Button */}
+              <button
+                type="button"
+                onClick={handleOpenCredentialsModal}
+                className="w-full mt-3 py-2.5 px-3 rounded-xl border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100/80 text-indigo-900 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-2xs group"
+              >
+                <Users className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
+                <span>View All 22 Team Member Passwords & Direct Access</span>
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* TEAM CREDENTIALS DIRECTORY MODAL */}
+      <Modal
+        isOpen={isCredentialsModalOpen}
+        onClose={() => setIsCredentialsModalOpen(false)}
+        title="Official Team Directory & Generated Passwords"
+        subtitle="Direct credentials extracted from BUILDREX Google Sheet. Each member has a unique, secure password."
+      >
+        <div className="space-y-4 max-h-[75vh] flex flex-col">
+          {/* Search & Filter Bar */}
+          <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+            <div className="relative flex-1">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search by name, email, department, role..."
+                value={searchCreds}
+                onChange={(e) => setSearchCreds(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+              />
+            </div>
+            <select
+              value={filterCredsRole}
+              onChange={(e) => setFilterCredsRole(e.target.value)}
+              className="px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-700 shrink-0"
+            >
+              <option value="all">All Roles (23)</option>
+              <option value="admin">Administrators / Leaders</option>
+              <option value="employee">Employees</option>
+              <option value="intern">Interns</option>
+            </select>
+          </div>
+
+          {/* Member List */}
+          <div className="overflow-y-auto space-y-2.5 pr-1 flex-1">
+            {isLoadingCreds ? (
+              <div className="py-12 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
+                <RefreshCw className="w-5 h-5 animate-spin text-indigo-600" />
+                <span>Loading team credentials from database...</span>
+              </div>
+            ) : filteredCredentials.length === 0 ? (
+              <div className="py-8 text-center text-slate-400 text-xs">
+                No team members match your search criteria.
+              </div>
+            ) : (
+              filteredCredentials.map((c) => (
+                <div
+                  key={c.id}
+                  className="p-3 rounded-xl border border-slate-200/90 hover:border-indigo-300 bg-white hover:bg-slate-50/70 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                >
+                  <div className="flex items-start gap-2.5 min-w-0">
+                    <div
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 font-bold text-xs text-white ${
+                        c.role === 'admin'
+                          ? 'bg-purple-600'
+                          : c.role === 'intern'
+                          ? 'bg-amber-600'
+                          : 'bg-blue-600'
+                      }`}
+                    >
+                      {c.name
+                        .split(' ')
+                        .map((n: string) => n[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-bold text-slate-900">{c.name}</span>
+                        <span
+                          className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded uppercase ${
+                            c.role === 'admin'
+                              ? 'bg-purple-100 text-purple-800'
+                              : c.role === 'intern'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}
+                        >
+                          {c.role}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {c.employee_code}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-600 font-medium truncate mt-0.5">
+                        {c.position} &bull; <span className="text-slate-400">{c.department}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-mono truncate">
+                        {c.email} {c.phone && `\u2022 ${c.phone}`}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Password & Login actions */}
+                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                    <div className="flex items-center bg-slate-100 border border-slate-200 rounded-lg px-2 py-1 gap-1.5">
+                      <KeyRound className="w-3 h-3 text-slate-500" />
+                      <span className="text-[11px] font-mono font-bold text-slate-800 select-all">
+                        {c.password}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyPassword(c.id, c.password)}
+                        className="text-slate-400 hover:text-indigo-600 transition-colors p-0.5 rounded cursor-pointer"
+                        title="Copy password"
+                      >
+                        {copiedId === c.id ? (
+                          <Check className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => {
+                        setIsCredentialsModalOpen(false);
+                        handleInstantLogin(c.email, c.password, c.id);
+                      }}
+                      className="px-2.5 py-1 text-[11px] font-bold text-white bg-brand-gradient hover:opacity-95 rounded-lg transition-all shadow-2xs cursor-pointer flex items-center gap-1"
+                    >
+                      <span>Sign In</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+            <span>Official BUILDREX Google Sheet Sync Active</span>
+            <button
+              type="button"
+              onClick={() => setIsCredentialsModalOpen(false)}
+              className="px-3 py-1 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Forgot Password Modal */}
       <Modal

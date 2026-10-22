@@ -66,7 +66,7 @@ export const AdminAttendanceView: React.FC = () => {
 
   const handleOpenEdit = (rec: AttendanceRecord) => {
     setSelectedRecord(rec);
-    setEditCheckIn(rec.check_in.slice(11, 16));
+    setEditCheckIn(rec.check_in ? rec.check_in.slice(11, 16) : '09:00');
     setEditCheckOut(rec.check_out ? rec.check_out.slice(11, 16) : '18:00');
     setEditStatus(rec.status);
     setEditNotes(rec.notes || '');
@@ -275,13 +275,22 @@ export const AdminAttendanceView: React.FC = () => {
                       {r.work_date}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
-                      {new Date(r.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {r.check_in ? (
+                        new Date(r.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      ) : (
+                        <span className="text-slate-400">--:--</span>
+                      )}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
                       {r.check_out ? (
                         new Date(r.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                      ) : r.check_in ? (
+                        <span className="text-emerald-600 font-sans font-medium flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          Currently Working
+                        </span>
                       ) : (
-                        <span className="text-blue-600 font-sans font-medium">Active</span>
+                        <span className="text-slate-400">--:--</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-right font-mono tabular-nums font-semibold text-slate-900 whitespace-nowrap">

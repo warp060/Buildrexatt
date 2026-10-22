@@ -111,10 +111,18 @@ router.get('/dashboard-stats', authenticate, requireRole('admin'), (req: Authent
     pending_corrections: pendingCorrections,
   };
 
+  // Identify non-admin team members who have NOT punched in today
+  const todayUserIds = new Set(todayRecords.map((a) => a.user_id));
+  const unpunchedToday = totalUsers
+    .filter((u) => u.role !== 'admin' && !todayUserIds.has(u.id))
+    .map(enrichUser);
+
   res.json({
     success: true,
     stats,
     recent_attendance: recentAttendance,
+    today_attendance: todayRecords.map(enrichAttendance),
+    unpunched_today: unpunchedToday,
     department_stats: departmentStats,
     trend_days: trendDays,
   });

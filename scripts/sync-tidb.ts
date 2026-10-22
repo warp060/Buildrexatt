@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { getDb } from '../server/db';
-import { syncAllToTiDB, verifyConnection, getPool, isTiDBConfigured, getTableCounts } from '../server/tidb';
+import { syncAllToTiDB, verifyConnection, getPool, isTiDBConfigured, getTableCounts, clearAllTiDBTables } from '../server/tidb';
 
 dotenv.config();
 
@@ -32,7 +32,10 @@ async function main() {
   console.log(`- Attendance Corrections: ${localDb.attendance_corrections.length}`);
   console.log(`- Audit Logs: ${localDb.audit_logs.length}\n`);
 
-  console.log('Synchronizing to TiDB Cloud...');
+  console.log('Purging legacy dummy rows from TiDB Cloud...');
+  await clearAllTiDBTables(pool);
+
+  console.log('Synchronizing real Google Sheet team dataset to TiDB Cloud...');
   const result = await syncAllToTiDB(localDb);
 
   if (result.ok) {

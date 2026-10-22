@@ -82,11 +82,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const quickDemoLogin = async (role: UserRole) => {
     setIsLoading(true);
-    let email = 'admin@buildrex.com';
-    if (role === 'employee') email = 'sarah.chen@buildrex.com';
-    if (role === 'intern') email = 'intern.dev@buildrex.com';
+    let email = 'layeequeahmed602@gmail.com';
+    let pass = 'Layeeque@Brx26';
 
-    await login(email, 'Buildrex@2026');
+    if (role === 'admin') {
+      email = 'layeequeahmed602@gmail.com';
+      pass = 'Layeeque@Brx26';
+    } else if (role === 'employee') {
+      email = 'sajidahmedrs10@gmail.com';
+      pass = 'Sajid@Brx26';
+    } else if (role === 'intern') {
+      email = 'abbas6618532@gmail.com';
+      pass = 'Abbas@Brx26';
+    }
+
+    await login(email, pass);
   };
 
   const markNotificationRead = async (id: string) => {

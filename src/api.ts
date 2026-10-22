@@ -245,6 +245,8 @@ export const api = {
       success: boolean;
       stats: DashboardStats;
       recent_attendance: AttendanceRecord[];
+      today_attendance: AttendanceRecord[];
+      unpunched_today: User[];
       department_stats: Array<{ id: string; name: string; code: string; total_members: number; present_today: number; rate: number }>;
       trend_days: Array<{ date: string; present: number; late: number; rate: number }>;
     }>('/api/admin/dashboard-stats'),
@@ -400,4 +402,48 @@ export const api = {
     request<{ success: boolean; message: string }>('/api/admin/database/migrate', {
       method: 'POST',
     }),
+
+  // Google Sheet Real-time Sync & Credentials
+  getGoogleSheetStatus: () =>
+    request<{
+      success: boolean;
+      lastSyncTime: string | null;
+      activeTeamCount: number;
+      tiDbConnected: boolean;
+      sheetUrl: string;
+      lastResult: any;
+    }>('/api/sync/google-sheet-status'),
+
+  syncGoogleSheet: () =>
+    request<{
+      success: boolean;
+      message: string;
+      data: {
+        totalMembers: number;
+        addedCount: number;
+        updatedCount: number;
+        timestamp: string;
+        members: any[];
+      };
+    }>('/api/sync/google-sheet', { method: 'POST' }),
+
+  getTeamCredentials: () =>
+    request<{
+      success: boolean;
+      total: number;
+      lastSyncTime: string | null;
+      credentials: Array<{
+        id: string;
+        employee_code: string;
+        name: string;
+        email: string;
+        role: string;
+        position: string;
+        department: string;
+        phone: string;
+        joining_date: string;
+        status: string;
+        password: string;
+      }>;
+    }>('/api/sync/team-credentials'),
 };

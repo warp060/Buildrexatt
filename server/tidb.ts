@@ -233,7 +233,7 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
         id VARCHAR(36) PRIMARY KEY,
         user_id VARCHAR(36) NOT NULL,
         work_date DATE NOT NULL,
-        check_in DATETIME NOT NULL,
+        check_in DATETIME NULL,
         check_out DATETIME NULL,
         total_minutes INT UNSIGNED DEFAULT 0,
         status ENUM('present', 'late', 'half_day', 'absent', 'incomplete') NOT NULL DEFAULT 'present',
@@ -321,7 +321,7 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
       `CREATE TABLE IF NOT EXISTS audit_logs (
         id VARCHAR(36) PRIMARY KEY,
         actor_id VARCHAR(36) NULL,
-        actor_name VARCHAR(120) NOT NULL,
+        actor_name VARCHAR(120) NULL DEFAULT 'System',
         action VARCHAR(80) NOT NULL,
         entity_type VARCHAR(60) NOT NULL,
         entity_id VARCHAR(60) NOT NULL,
@@ -361,6 +361,10 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
     for (const sql of tableDefinitions) {
       await conn.query(sql);
     }
+
+    // Ensure check_in column is nullable for absent records
+    await conn.query('ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL').catch(() => {});
+    await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {});
 
     console.log('[TiDB] ✅ All 10 tables verified and ready in TiDB Cloud.');
   } finally {
@@ -768,10 +772,10 @@ export async function syncAllToTiDB(data: {
         [
           log.id,
           log.actor_id || null,
-          log.actor_name,
-          log.action,
-          log.entity_type,
-          log.entity_id,
+          log.actor_name || 'System',
+          log.action || 'SYSTEM_ACTION',
+          log.entity_type || 'system',
+          log.entity_id || 'system',
           log.details ? JSON.stringify(log.details) : null,
           log.ip_address || null,
         ]
@@ -860,6 +864,36 @@ export async function getTiDBStatus(): Promise<TiDBStatus> {
     tableCounts,
     error: error || null,
   };
+}
+
+/**
+ * Clear all tables in TiDB Cloud for clean re-seeding or synchronization.
+ */
+export async function clearAllTiDBTables(targetPool?: Pool): Promise<void> {
+  const p = targetPool || getPool();
+  const conn = await p.getConnection();
+  try {
+    const tables = [
+      'audit_logs',
+      'notifications',
+      'attendance_corrections',
+      'leave_requests',
+      'work_updates',
+      'attendance',
+      'users',
+      'departments',
+      'company_settings',
+      'holidays',
+    ];
+    for (const t of tables) {
+      await conn.query(`DELETE FROM ${t}`).catch(() => {});
+    }
+    console.log('[TiDB] 🧹 Cleared legacy tables in TiDB Cloud for fresh synchronization.');
+  } catch (err: any) {
+    console.warn('[TiDB] Notice while clearing tables:', err.message);
+  } finally {
+    conn.release();
+  }
 }
 
 /**

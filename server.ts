@@ -9,6 +9,7 @@ import workUpdatesRoutes from './server/routes/workUpdates';
 import leaveAndCorrectionsRoutes from './server/routes/leaveAndCorrections';
 import adminRoutes from './server/routes/admin';
 import aiRoutes from './server/routes/ai';
+import syncRoutes from './server/routes/googleSheetSync';
 import { getDb, initDatabase, isTiDBConnected } from './server/db';
 
 dotenv.config();
@@ -36,6 +37,7 @@ async function startServer() {
   app.use('/api/admin', adminRoutes);
   app.use('/api', adminRoutes); // For /api/departments, /api/notifications
   app.use('/api/ai', aiRoutes);
+  app.use('/api/sync', syncRoutes);
 
   // Health check route
   app.get('/api/health', (req, res) => {

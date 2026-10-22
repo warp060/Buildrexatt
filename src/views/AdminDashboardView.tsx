@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../api';
-import { DashboardStats, AttendanceRecord } from '../types';
+import { DashboardStats, AttendanceRecord, User } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import {
   Users,
@@ -27,6 +27,9 @@ interface AdminDashboardViewProps {
 export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNavigateTab }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentAttendance, setRecentAttendance] = useState<AttendanceRecord[]>([]);
+  const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord[]>([]);
+  const [unpunchedToday, setUnpunchedToday] = useState<User[]>([]);
+  const [activeAttendanceTab, setActiveAttendanceTab] = useState<'today' | 'unpunched' | 'recent'>('today');
   const [departmentStats, setDepartmentStats] = useState<Array<{
     id: string;
     name: string;
@@ -50,6 +53,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
       if (res.success) {
         setStats(res.stats);
         setRecentAttendance(res.recent_attendance);
+        setTodayAttendance(res.today_attendance || []);
+        setUnpunchedToday(res.unpunched_today || []);
         setDepartmentStats(res.department_stats);
         setTrendDays(res.trend_days);
       }
@@ -344,21 +349,61 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
         </div>
       </div>
 
-      {/* Real-time Activity: Recent Attendance Stream Table */}
+      {/* Real-time Activity: Workforce Attendance Stream Table */}
       <div className="card-premium overflow-hidden bg-white/95">
-        <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Activity className="w-4 h-4 text-emerald-600" />
             <h2 className="text-xs font-black text-slate-900 uppercase tracking-wider">
               Live Workforce Attendance Stream
             </h2>
           </div>
-          <button
-            onClick={() => onNavigateTab('admin-attendance')}
-            className="text-xs font-bold text-brand-accent hover:underline cursor-pointer"
-          >
-            All records &rarr;
-          </button>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Filter Tabs */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setActiveAttendanceTab('today')}
+                className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                  activeAttendanceTab === 'today'
+                    ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Punched In Today ({todayAttendance.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveAttendanceTab('unpunched')}
+                className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                  activeAttendanceTab === 'unpunched'
+                    ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Awaiting Punch-In ({unpunchedToday.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveAttendanceTab('recent')}
+                className={`px-3 py-1 rounded-md transition-all cursor-pointer ${
+                  activeAttendanceTab === 'recent'
+                    ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Recent History
+              </button>
+            </div>
+
+            <button
+              onClick={() => onNavigateTab('admin-attendance')}
+              className="text-xs font-bold text-brand-accent hover:underline cursor-pointer ml-2"
+            >
+              All records &rarr;
+            </button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
@@ -375,12 +420,96 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
-              {recentAttendance.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-slate-400">
-                    No recent attendance records.
-                  </td>
-                </tr>
+              {activeAttendanceTab === 'today' ? (
+                todayAttendance.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                      <div className="flex flex-col items-center gap-1.5">
+                        <Clock className="w-5 h-5 text-slate-300" />
+                        <span className="font-semibold text-slate-600">No team members have punched in today yet.</span>
+                        <span className="text-[11px] text-slate-400">
+                          {unpunchedToday.length} active employees & interns are currently awaiting shift check-in.
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  todayAttendance.map((rec) => (
+                    <tr key={rec.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">
+                        {rec.user_name}
+                        <span className="block text-[10px] font-mono text-slate-400 font-normal">
+                          {rec.employee_code}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 capitalize text-slate-600 whitespace-nowrap font-medium">
+                        {rec.role}
+                      </td>
+                      <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
+                        {rec.department_name}
+                      </td>
+                      <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
+                        {rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}
+                      </td>
+                      <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
+                        {rec.check_out ? (
+                          new Date(rec.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        ) : (
+                          <span className="text-emerald-600 font-sans font-bold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot" />
+                            Currently Working
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-right font-mono tabular-nums font-bold text-slate-900 whitespace-nowrap">
+                        {(rec.total_minutes / 60).toFixed(1)} hrs
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <StatusBadge status={rec.status} />
+                      </td>
+                    </tr>
+                  ))
+                )
+              ) : activeAttendanceTab === 'unpunched' ? (
+                unpunchedToday.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-emerald-600 font-semibold">
+                      All team members have punched in today!
+                    </td>
+                  </tr>
+                ) : (
+                  unpunchedToday.map((u) => (
+                    <tr key={u.id} className="hover:bg-slate-50/80 transition-colors opacity-85">
+                      <td className="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">
+                        {u.name}
+                        <span className="block text-[10px] font-mono text-slate-400 font-normal">
+                          {u.employee_code}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 capitalize text-slate-600 whitespace-nowrap font-medium">
+                        {u.role}
+                      </td>
+                      <td className="py-3 px-4 text-slate-600 whitespace-nowrap">
+                        {u.department_name || 'General'}
+                      </td>
+                      <td className="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">
+                        --:--
+                      </td>
+                      <td className="py-3 px-4 font-mono text-slate-400 whitespace-nowrap">
+                        --:--
+                      </td>
+                      <td className="py-3 px-4 text-right font-mono text-slate-400 whitespace-nowrap">
+                        0.0 hrs
+                      </td>
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                          <UserX className="w-3 h-3 text-slate-400" />
+                          Not Punched In
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )
               ) : (
                 recentAttendance.map((rec) => (
                   <tr key={rec.id} className="hover:bg-slate-50/80 transition-colors">
@@ -397,7 +526,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
                       {rec.department_name}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
-                      {new Date(rec.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}
+                      <span className="block text-[9px] font-sans text-slate-400">{rec.work_date}</span>
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
                       {rec.check_out ? (
