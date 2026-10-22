@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { ThemeSelector } from '../components/ThemeSelector';
 import { api } from '../api';
 import { ArrowRight, AlertCircle, Eye, EyeOff, ShieldCheck, Check, Sparkles, UserCheck, Shield, Briefcase, GraduationCap } from 'lucide-react';
 import { Modal } from '../components/Modal';
@@ -92,11 +91,6 @@ export const LoginView: React.FC = () => {
                 SMART WORKSPACE OS
               </span>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider hidden sm:inline">Theme:</span>
-            <ThemeSelector variant="compact" />
           </div>
         </div>
 
