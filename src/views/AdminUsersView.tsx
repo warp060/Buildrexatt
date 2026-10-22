@@ -3,7 +3,8 @@ import { api } from '../api';
 import { User, Department, UserRole, UserStatus } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
-import { Search, UserPlus, Edit2, Key, CheckCircle2, AlertCircle, Shield, GraduationCap, Briefcase, RefreshCw, Copy, Check, ExternalLink, KeyRound, CloudLightning } from 'lucide-react';
+import { TeamCredentialsModal } from '../components/TeamCredentialsModal';
+import { Search, UserPlus, Edit2, Key, CheckCircle2, AlertCircle, Shield, GraduationCap, Briefcase, RefreshCw, Copy, Check, ExternalLink, KeyRound, CloudLightning, Users } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
 
@@ -16,10 +17,6 @@ export const AdminUsersView: React.FC = () => {
   // Google Sheet Sync & Credentials state
   const [isSyncingSheet, setIsSyncingSheet] = useState(false);
   const [isCredsModalOpen, setIsCredsModalOpen] = useState(false);
-  const [teamCreds, setTeamCreds] = useState<any[]>([]);
-  const [isLoadingCreds, setIsLoadingCreds] = useState(false);
-  const [copiedCredId, setCopiedCredId] = useState<string | null>(null);
-  const [searchCreds, setSearchCreds] = useState('');
 
   // Filters
   const [search, setSearch] = useState('');
@@ -219,27 +216,7 @@ export const AdminUsersView: React.FC = () => {
     }
   };
 
-  const handleOpenCreds = async () => {
-    setIsCredsModalOpen(true);
-    setIsLoadingCreds(true);
-    try {
-      const res = await api.getTeamCredentials();
-      if (res.success) {
-        setTeamCreds(res.credentials);
-      }
-    } catch (err: any) {
-      showToast('Failed to load team credentials', 'error');
-    } finally {
-      setIsLoadingCreds(false);
-    }
-  };
 
-  const handleCopyCredPassword = (id: string, pw: string) => {
-    navigator.clipboard.writeText(pw);
-    setCopiedCredId(id);
-    showToast('Password copied to clipboard', 'info');
-    setTimeout(() => setCopiedCredId(null), 2000);
-  };
 
   return (
     <div className="space-y-6">
@@ -271,11 +248,11 @@ export const AdminUsersView: React.FC = () => {
 
           <button
             type="button"
-            onClick={handleOpenCreds}
+            onClick={() => setIsCredsModalOpen(true)}
             className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-all shadow-2xs shrink-0 cursor-pointer"
           >
             <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Team Passwords</span>
+            <span>Team Passwords &amp; Direct Access</span>
           </button>
 
           <button
@@ -287,6 +264,35 @@ export const AdminUsersView: React.FC = () => {
             <span>Add Member</span>
           </button>
         </div>
+      </div>
+
+      {/* 22 Team Member Passwords & Direct Access Section Banner */}
+      <div className="bg-gradient-to-r from-indigo-50/90 via-purple-50/70 to-blue-50/90 border border-indigo-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-indigo-950 flex items-center gap-2">
+              <span>Official Team Credentials &amp; Direct Access</span>
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-200/70 text-indigo-900 uppercase">
+                Admin Exclusive
+              </span>
+            </h2>
+            <p className="text-xs text-indigo-700/80 mt-0.5">
+              Securely view, copy generated passwords for all 22 Google Sheet team members, or test direct 1-click account access.
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setIsCredsModalOpen(true)}
+          className="px-4 py-2.5 rounded-xl border border-indigo-300 bg-white hover:bg-indigo-50 text-indigo-950 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs group shrink-0 active:scale-[0.98]"
+        >
+          <Users className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
+          <span>View All 22 Team Member Passwords &amp; Direct Access</span>
+        </button>
       </div>
 
       {/* Filters and Search Bar */}
@@ -650,119 +656,10 @@ export const AdminUsersView: React.FC = () => {
       </Modal>
 
       {/* TEAM CREDENTIALS DIRECTORY MODAL */}
-      <Modal
+      <TeamCredentialsModal
         isOpen={isCredsModalOpen}
         onClose={() => setIsCredsModalOpen(false)}
-        title="Official Team Passwords & Access Credentials"
-        subtitle="Individual credentials for all 22 members synchronized from the BUILDREX Google Sheet"
-      >
-        <div className="space-y-4 max-h-[75vh] flex flex-col">
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search member, email, or department..."
-                value={searchCreds}
-                onChange={(e) => setSearchCreds(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A] bg-white"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleSyncGoogleSheet}
-              disabled={isSyncingSheet}
-              className="px-3 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingSheet ? 'animate-spin' : ''}`} />
-              <span>Sync</span>
-            </button>
-          </div>
-
-          <div className="overflow-y-auto space-y-2 pr-1 flex-1">
-            {isLoadingCreds ? (
-              <div className="py-12 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
-                <RefreshCw className="w-5 h-5 animate-spin text-indigo-600" />
-                <span>Loading team passwords...</span>
-              </div>
-            ) : teamCreds.length === 0 ? (
-              <div className="py-8 text-center text-slate-400 text-xs">No team credentials found.</div>
-            ) : (
-              teamCreds
-                .filter(
-                  (c) =>
-                    !searchCreds ||
-                    c.name.toLowerCase().includes(searchCreds.toLowerCase()) ||
-                    c.email.toLowerCase().includes(searchCreds.toLowerCase()) ||
-                    c.department.toLowerCase().includes(searchCreds.toLowerCase()) ||
-                    c.position.toLowerCase().includes(searchCreds.toLowerCase())
-                )
-                .map((c) => (
-                  <div
-                    key={c.id}
-                    className="p-3 rounded-lg border border-slate-200 hover:border-slate-300 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-slate-900">{c.name}</span>
-                        <span
-                          className={`text-[9px] font-extrabold px-1.5 py-0.2 rounded uppercase ${
-                            c.role === 'admin'
-                              ? 'bg-purple-100 text-purple-800'
-                              : c.role === 'intern'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-blue-100 text-blue-800'
-                          }`}
-                        >
-                          {c.role}
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-mono">{c.employee_code}</span>
-                      </div>
-                      <div className="text-[11px] text-slate-600 truncate mt-0.5">
-                        {c.position} &bull; <span className="text-slate-400">{c.department}</span>
-                      </div>
-                      <div className="text-[10px] text-slate-500 font-mono truncate">
-                        {c.email} {c.phone && `\u2022 ${c.phone}`}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                      <div className="flex items-center bg-slate-50 border border-slate-200 rounded px-2 py-1 gap-1.5">
-                        <KeyRound className="w-3 h-3 text-slate-400" />
-                        <span className="text-[11px] font-mono font-bold text-slate-800 select-all">
-                          {c.password}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCredPassword(c.id, c.password)}
-                          className="text-slate-400 hover:text-indigo-600 transition-colors p-0.5 cursor-pointer"
-                          title="Copy password"
-                        >
-                          {copiedCredId === c.id ? (
-                            <Check className="w-3 h-3 text-emerald-600" />
-                          ) : (
-                            <Copy className="w-3 h-3" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-            )}
-          </div>
-
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-500">
-            <span>{teamCreds.length} members loaded</span>
-            <button
-              type="button"
-              onClick={() => setIsCredsModalOpen(false)}
-              className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </Modal>
+      />
     </div>
   );
 };

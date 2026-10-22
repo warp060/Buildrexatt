@@ -273,19 +273,18 @@ export async function performGoogleSheetSync(): Promise<{
       members: syncedMemberList,
     };
 
-    logAudit({
-      actor_id: 'system',
-      actor_name: 'Google Sheet Live Sync',
-      action: 'GOOGLE_SHEET_LIVE_SYNC',
-      entity_type: 'system',
-      entity_id: 'google-sheet-live',
-      details: {
+    logAudit(
+      { id: 'system', name: 'Google Sheet Live Sync' },
+      'GOOGLE_SHEET_LIVE_SYNC',
+      'system',
+      'google-sheet-live',
+      {
         totalMembers: syncedMemberList.length,
         addedCount,
         updatedCount,
         tidbSynced: isTiDBConnected(),
-      },
-    });
+      }
+    );
 
     return lastSyncResult;
   } catch (err: any) {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../api';
 import { DashboardStats, AttendanceRecord, User } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
+import { TeamCredentialsModal } from '../components/TeamCredentialsModal';
 import {
   Users,
   CheckCircle2,
@@ -26,6 +27,7 @@ interface AdminDashboardViewProps {
 
 export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNavigateTab }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isCredsModalOpen, setIsCredsModalOpen] = useState(false);
   const [recentAttendance, setRecentAttendance] = useState<AttendanceRecord[]>([]);
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord[]>([]);
   const [unpunchedToday, setUnpunchedToday] = useState<User[]>([]);
@@ -103,6 +105,15 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
 
         {/* Quick action buttons */}
         <div className="relative z-10 flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setIsCredsModalOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold text-indigo-950 bg-indigo-50/90 hover:bg-indigo-100 border border-indigo-200/90 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
+            title="View All 22 Team Member Passwords & Direct Access"
+          >
+            <Users className="w-4 h-4 text-indigo-600" />
+            <span className="hidden sm:inline">Team Passwords &amp; Access</span>
+            <span className="sm:hidden">Passwords</span>
+          </button>
           <button
             onClick={() => onNavigateTab('admin-approvals')}
             className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
@@ -552,6 +563,11 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
           </table>
         </div>
       </div>
+
+      <TeamCredentialsModal
+        isOpen={isCredsModalOpen}
+        onClose={() => setIsCredsModalOpen(false)}
+      />
     </div>
   );
 };
