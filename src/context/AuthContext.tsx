@@ -10,7 +10,6 @@ interface AuthContextType {
   unreadCount: number;
   login: (email: string, pass: string) => Promise<void>;
   logout: () => Promise<void>;
-  quickDemoLogin: (role: UserRole) => Promise<void>;
   refreshUser: () => Promise<void>;
   fetchNotifications: () => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
@@ -80,24 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const quickDemoLogin = async (role: UserRole) => {
-    setIsLoading(true);
-    let email = 'layeequeahmed602@gmail.com';
-    let pass = 'Layeeque@Brx26';
-
-    if (role === 'admin') {
-      email = 'layeequeahmed602@gmail.com';
-      pass = 'Layeeque@Brx26';
-    } else if (role === 'employee') {
-      email = 'sajidahmedrs10@gmail.com';
-      pass = 'Sajid@Brx26';
-    } else if (role === 'intern') {
-      email = 'abbas6618532@gmail.com';
-      pass = 'Abbas@Brx26';
-    }
-
-    await login(email, pass);
-  };
 
   const markNotificationRead = async (id: string) => {
     try {
@@ -133,7 +114,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         unreadCount,
         login,
         logout,
-        quickDemoLogin,
         refreshUser,
         fetchNotifications,
         markNotificationRead,

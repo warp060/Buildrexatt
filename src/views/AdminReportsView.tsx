@@ -3,6 +3,7 @@ import { api } from '../api';
 import { AttendanceRecord, WorkUpdate, Department } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Download, Printer, Filter, Calendar, BarChart3, FileSpreadsheet } from 'lucide-react';
+import { formatClockTime } from '../utils/time';
 
 import { useToast } from '../context/ToastContext';
 
@@ -346,13 +347,24 @@ export const AdminReportsView: React.FC = () => {
                         {r.work_date}
                       </td>
                       <td className="py-3 px-4 font-mono text-slate-600 whitespace-nowrap">
-                        {new Date(r.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatClockTime(r.check_in)}
                       </td>
                       <td className="py-3 px-4 font-mono text-slate-600 whitespace-nowrap">
-                        {r.check_out ? new Date(r.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Active'}
+                        {r.check_out ? formatClockTime(r.check_out) : (
+                          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full text-xs font-bold inline-flex items-center gap-1 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Currently Working
+                          </span>
+                        )}
                       </td>
                       <td className="py-3 px-4 text-right font-mono tabular-nums font-semibold text-slate-900 whitespace-nowrap">
-                        {(r.total_minutes / 60).toFixed(1)} hrs
+                        {!r.check_out ? (
+                          <span className="text-emerald-700 font-bold">
+                            {(r.total_minutes / 60).toFixed(1)} hrs (Live)
+                          </span>
+                        ) : (
+                          `${(r.total_minutes / 60).toFixed(1)} hrs`
+                        )}
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">
                         <StatusBadge status={r.status} />

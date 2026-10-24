@@ -3,7 +3,8 @@ import { api } from '../api';
 import { AttendanceRecord, Department } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
-import { Search, Filter, Edit, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, Filter, Edit, CheckCircle2, AlertCircle, RefreshCw, Clock } from 'lucide-react';
+import { formatClockTime, formatLiveTimer, getElapsedSeconds } from '../utils/time';
 
 import { useToast } from '../context/ToastContext';
 
@@ -13,6 +14,13 @@ export const AdminAttendanceView: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+
+  // Live second ticker for active attendance rows
+  const [, setLiveTick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setLiveTick((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Filters
   const [search, setSearch] = useState('');
@@ -275,17 +283,13 @@ export const AdminAttendanceView: React.FC = () => {
                       {r.work_date}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
-                      {r.check_in ? (
-                        new Date(r.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                      ) : (
-                        <span className="text-slate-400">--:--</span>
-                      )}
+                      {r.check_in ? formatClockTime(r.check_in) : <span className="text-slate-400">--:--</span>}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
                       {r.check_out ? (
-                        new Date(r.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        formatClockTime(r.check_out)
                       ) : r.check_in ? (
-                        <span className="text-emerald-600 font-sans font-medium flex items-center gap-1">
+                        <span className="text-emerald-700 font-sans font-bold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 rounded-full text-xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                           Currently Working
                         </span>
@@ -293,8 +297,22 @@ export const AdminAttendanceView: React.FC = () => {
                         <span className="text-slate-400">--:--</span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-right font-mono tabular-nums font-semibold text-slate-900 whitespace-nowrap">
-                      {(r.total_minutes / 60).toFixed(1)} hrs
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                      {!r.check_out && r.check_in ? (
+                        <div className="inline-flex flex-col items-end">
+                          <span className="inline-flex items-center gap-1 font-mono font-bold text-xs text-emerald-800 bg-emerald-50 border border-emerald-300/80 px-2 py-0.5 rounded-lg shadow-2xs">
+                            <Clock className="w-3 h-3 text-emerald-600 animate-pulse" />
+                            {formatLiveTimer(r.check_in)}
+                          </span>
+                          <span className="text-[10px] font-mono text-emerald-700 mt-0.5 font-semibold">
+                            {(getElapsedSeconds(r.check_in) / 3600).toFixed(1)} hrs active
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="font-mono tabular-nums font-semibold text-slate-900">
+                          {(r.total_minutes / 60).toFixed(1)} hrs
+                        </span>
+                      )}
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       <StatusBadge status={r.status} />

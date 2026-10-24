@@ -46,7 +46,7 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         role="dialog"
         aria-modal="true"
-        className={`relative w-full ${maxWidth} bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-10 transform transition-all text-slate-900 max-h-[92vh] sm:max-h-[88vh] flex flex-col`}
+        className={`relative w-full ${maxWidth} bg-white rounded-t-xl sm:rounded-xl shadow-2xl border border-slate-200/90 overflow-hidden z-10 transform transition-all text-slate-900 max-h-[92vh] sm:max-h-[88vh] flex flex-col`}
       >
         {/* Mobile Drag Indicator */}
         <div className="sm:hidden w-12 h-1.5 bg-slate-200 rounded-full mx-auto mt-2.5 mb-1" />
@@ -59,7 +59,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Close dialog"
           >
             <X className="w-4 h-4" />

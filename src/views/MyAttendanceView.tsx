@@ -4,6 +4,7 @@ import { AttendanceRecord } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { useToast } from '../context/ToastContext';
+import { formatClockTime, formatLiveTimer, getElapsedSeconds } from '../utils/time';
 import {
   Clock,
   Filter,
@@ -72,8 +73,7 @@ export const MyAttendanceView: React.FC = () => {
           status_summary: res.status_summary,
         });
         if (res.record && !res.record.check_out) {
-          const startTime = new Date(res.record.check_in).getTime();
-          setElapsedSeconds(Math.max(0, Math.floor((Date.now() - startTime) / 1000)));
+          setElapsedSeconds(getElapsedSeconds(res.record.check_in));
         } else if (res.record && res.record.check_out) {
           setElapsedSeconds(res.record.total_minutes * 60);
         }
@@ -113,8 +113,7 @@ export const MyAttendanceView: React.FC = () => {
     let timer: NodeJS.Timeout | null = null;
     if (todayAttendance.record && !todayAttendance.record.check_out) {
       timer = setInterval(() => {
-        const startTime = new Date(todayAttendance.record!.check_in).getTime();
-        setElapsedSeconds(Math.max(0, Math.floor((Date.now() - startTime) / 1000)));
+        setElapsedSeconds(getElapsedSeconds(todayAttendance.record!.check_in));
       }, 1000);
     }
     return () => {
@@ -381,7 +380,7 @@ export const MyAttendanceView: React.FC = () => {
                   <span>Session Complete for Today</span>
                 </div>
                 <span className="block text-[11px] text-emerald-600 mt-0.5 font-mono">
-                  Logged: {(todayAttendance.record?.total_minutes! / 60).toFixed(1)} hrs
+                  Logged: {todayAttendance.record?.check_out ? (todayAttendance.record.total_minutes / 60).toFixed(1) : (elapsedSeconds / 3600).toFixed(1)} hrs
                 </span>
               </div>
             )}
@@ -508,15 +507,29 @@ export const MyAttendanceView: React.FC = () => {
                       {r.work_date}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
-                      {new Date(r.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {formatClockTime(r.check_in)}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
-                      {r.check_out
-                        ? new Date(r.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        : <span className="text-amber-600 font-sans font-medium">In Progress</span>}
+                      {r.check_out ? (
+                        formatClockTime(r.check_out)
+                      ) : (
+                        <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-sans text-xs font-bold inline-flex items-center gap-1 border border-emerald-200">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Currently Working
+                        </span>
+                      )}
                     </td>
-                    <td className="py-3 px-4 text-right font-mono tabular-nums font-medium text-slate-900 whitespace-nowrap">
-                      {(r.total_minutes / 60).toFixed(1)} hrs
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                      {!r.check_out && r.check_in ? (
+                        <span className="font-mono tabular-nums font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md text-xs inline-flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-emerald-600 animate-pulse" />
+                          {formatLiveTimer(r.check_in)} ({(getElapsedSeconds(r.check_in) / 3600).toFixed(1)} hrs)
+                        </span>
+                      ) : (
+                        <span className="font-mono tabular-nums font-medium text-slate-900">
+                          {(r.total_minutes / 60).toFixed(1)} hrs
+                        </span>
+                      )}
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       <StatusBadge status={r.status} />

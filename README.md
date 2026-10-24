@@ -17,14 +17,13 @@ BUILDREX is a comprehensive, modern, enterprise-grade attendance and daily work 
 
 All accounts come pre-configured with password: `Buildrex@2026`
 
-| Role | Name | Email | Code |
+| Role | Name | Email | Password |
 | :--- | :--- | :--- | :--- |
-| **Administrator** | Alex Vance (COO) | `admin@buildrex.com` | `BRX-001` |
-| **Employee Lead** | Sarah Chen (Eng Lead) | `sarah.chen@buildrex.com` | `BRX-102` |
-| **Employee** | Marcus Reed (UI/UX) | `marcus.reed@buildrex.com` | `BRX-105` |
-| **Intern** | Devin Patel (Frontend) | `intern.dev@buildrex.com` | `BRX-INT-01` |
-| **Intern** | Priya Sharma (AI Lab) | `priya.sharma@buildrex.com` | `BRX-INT-02` |
-| **Intern** | Liam Ross (Operations) | `liam.ross@buildrex.com` | `BRX-INT-03` |
+| **Administrator (Sole Admin)** | Buildrex Admin | `adminbrx@gmail.com` | `buidrex@123` |
+| **Executive** | G Mohamed Ehsaan (COO) | `ehsaanehsaan61@gmail.com` | `Ehsaan@Brx26` |
+| **Executive** | Mohamed Emad Ur Rahman (CTO) | `emadurrahmank2008@gmail.com` | `Emad@Brx26` |
+| **Employee Lead** | Zafeera (Ops Lead) | `faisalzafeera@gmail.com` | `Zafeera@Brx26` |
+| **Intern** | Muhammad Ameen J | `jmuhammadameen19@gmail.com` | `Ameen@Brx26` |
 
 *Note: You can also use the one-click demo persona switcher on the login page or in the top navigation bar.*
 

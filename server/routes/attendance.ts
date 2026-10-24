@@ -199,20 +199,21 @@ router.get('/history', authenticate, (req: AuthenticatedRequest, res: Response):
   // Sort descending by work_date
   records.sort((a, b) => b.work_date.localeCompare(a.work_date));
 
-  // Compute metrics
-  const totalDays = records.length;
-  const totalMinutes = records.reduce((acc, cur) => acc + (cur.total_minutes || 0), 0);
-  const lateDays = records.filter((r) => r.status === 'late').length;
-  const halfDays = records.filter((r) => r.status === 'half_day').length;
+  // Compute metrics with live active session enrichment
+  const enriched = records.map(enrichAttendance);
+  const totalDays = enriched.length;
+  const totalMinutes = enriched.reduce((acc, cur) => acc + (cur.total_minutes || 0), 0);
+  const lateDays = enriched.filter((r) => r.status === 'late').length;
+  const halfDays = enriched.filter((r) => r.status === 'half_day').length;
 
   const pageSize = Number(limit) || 20;
   const currentPage = Number(page) || 1;
   const startIndex = (currentPage - 1) * pageSize;
-  const paginated = records.slice(startIndex, startIndex + pageSize);
+  const paginated = enriched.slice(startIndex, startIndex + pageSize);
 
   res.json({
     success: true,
-    total: records.length,
+    total: enriched.length,
     page: currentPage,
     page_size: pageSize,
     summary: {
@@ -222,7 +223,7 @@ router.get('/history', authenticate, (req: AuthenticatedRequest, res: Response):
       late_arrivals_count: lateDays,
       half_days_count: halfDays,
     },
-    records: paginated.map(enrichAttendance),
+    records: paginated,
   });
 });
 

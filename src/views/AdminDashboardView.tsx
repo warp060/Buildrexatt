@@ -3,6 +3,7 @@ import { api } from '../api';
 import { DashboardStats, AttendanceRecord, User } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { TeamCredentialsModal } from '../components/TeamCredentialsModal';
+import { formatClockTime, formatLiveTimer, getElapsedSeconds } from '../utils/time';
 import {
   Users,
   CheckCircle2,
@@ -32,6 +33,13 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
   const [todayAttendance, setTodayAttendance] = useState<AttendanceRecord[]>([]);
   const [unpunchedToday, setUnpunchedToday] = useState<User[]>([]);
   const [activeAttendanceTab, setActiveAttendanceTab] = useState<'today' | 'unpunched' | 'recent'>('today');
+
+  // Live timer tick so active sessions count live every second
+  const [, setLiveTick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setLiveTick((t) => t + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
   const [departmentStats, setDepartmentStats] = useState<Array<{
     id: string;
     name: string;
@@ -86,12 +94,12 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">
             <span>{todayStr}</span>
             <span className="text-slate-300">·</span>
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px] uppercase">
+            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-[10px] uppercase">
               Operations Control
             </span>
             <span className="text-slate-300">·</span>
-            <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-              <Cloud className="w-3 h-3 text-brand-accent" />
+            <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200/80">
+              <Cloud className="w-3 h-3 text-emerald-600" />
               TiDB Cloud Connected
             </span>
           </div>
@@ -107,16 +115,16 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
         <div className="relative z-10 flex flex-wrap items-center gap-2">
           <button
             onClick={() => setIsCredsModalOpen(true)}
-            className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold text-indigo-950 bg-indigo-50/90 hover:bg-indigo-100 border border-indigo-200/90 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
+            className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold text-emerald-950 bg-emerald-50/90 hover:bg-emerald-100 border border-emerald-200/90 rounded-lg transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
             title="View All 22 Team Member Passwords & Direct Access"
           >
-            <Users className="w-4 h-4 text-indigo-600" />
+            <Users className="w-4 h-4 text-emerald-700" />
             <span className="hidden sm:inline">Team Passwords &amp; Access</span>
             <span className="sm:hidden">Passwords</span>
           </button>
           <button
             onClick={() => onNavigateTab('admin-approvals')}
-            className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
+            className="flex items-center gap-2 px-3.5 py-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all shadow-2xs cursor-pointer active:scale-[0.98]"
           >
             <span>Leave &amp; Corrections</span>
             {(stats?.pending_leave_requests || 0) + (stats?.pending_corrections || 0) > 0 && (
@@ -127,11 +135,11 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
           </button>
           <button
             onClick={() => onNavigateTab('admin-work-updates')}
-            className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-brand-gradient hover:opacity-95 rounded-xl transition-all shadow-sm shadow-brand-glow cursor-pointer active:scale-[0.98]"
+            className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-gradient-to-r from-[#0F5132] to-[#0A3822] hover:opacity-95 rounded-lg transition-all shadow-sm shadow-emerald-950/20 cursor-pointer active:scale-[0.98]"
           >
             <span>Review Work Reports</span>
             {(stats?.pending_work_updates || 0) > 0 && (
-              <span className="w-5 h-5 rounded-full bg-white text-indigo-900 text-[10px] flex items-center justify-center font-black">
+              <span className="w-5 h-5 rounded-full bg-white text-emerald-950 text-[10px] flex items-center justify-center font-black">
                 {stats?.pending_work_updates}
               </span>
             )}
@@ -352,7 +360,7 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
           <div className="pt-4 border-t border-slate-100">
             <button
               onClick={() => onNavigateTab('admin-attendance')}
-              className="w-full py-2.5 px-3 text-xs font-bold text-slate-700 bg-slate-100/90 hover:bg-slate-200 rounded-xl transition-all text-center cursor-pointer active:scale-[0.99]"
+              className="w-full py-2.5 px-3 text-xs font-bold text-slate-700 bg-slate-100/90 hover:bg-slate-200 rounded-lg transition-all text-center cursor-pointer active:scale-[0.99]"
             >
               Filter Attendance by Division
             </button>
@@ -460,20 +468,34 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
                         {rec.department_name}
                       </td>
                       <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
-                        {rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}
+                        {rec.check_in ? formatClockTime(rec.check_in) : '--:--'}
                       </td>
                       <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
                         {rec.check_out ? (
-                          new Date(rec.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          formatClockTime(rec.check_out)
                         ) : (
-                          <span className="text-emerald-600 font-sans font-bold flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot" />
+                          <span className="text-emerald-700 font-sans font-bold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 rounded-full text-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Currently Working
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-right font-mono tabular-nums font-bold text-slate-900 whitespace-nowrap">
-                        {(rec.total_minutes / 60).toFixed(1)} hrs
+                      <td className="py-3 px-4 text-right whitespace-nowrap">
+                        {!rec.check_out && rec.check_in ? (
+                          <div className="inline-flex flex-col items-end">
+                            <span className="inline-flex items-center gap-1 font-mono font-bold text-xs text-emerald-800 bg-emerald-50 border border-emerald-300/80 px-2 py-0.5 rounded-lg shadow-2xs">
+                              <Clock className="w-3 h-3 text-emerald-600 animate-pulse" />
+                              {formatLiveTimer(rec.check_in)}
+                            </span>
+                            <span className="text-[10px] font-mono text-emerald-700 mt-0.5 font-semibold">
+                              {(getElapsedSeconds(rec.check_in) / 3600).toFixed(1)} hrs active
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="font-mono tabular-nums font-bold text-slate-900">
+                            {(rec.total_minutes / 60).toFixed(1)} hrs
+                          </span>
+                        )}
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">
                         <StatusBadge status={rec.status} />
@@ -537,21 +559,35 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
                       {rec.department_name}
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
-                      {rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--'}
+                      {rec.check_in ? formatClockTime(rec.check_in) : '--:--'}
                       <span className="block text-[9px] font-sans text-slate-400">{rec.work_date}</span>
                     </td>
                     <td className="py-3 px-4 font-mono tabular-nums text-slate-600 whitespace-nowrap">
                       {rec.check_out ? (
-                        new Date(rec.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        formatClockTime(rec.check_out)
                       ) : (
-                        <span className="text-emerald-600 font-sans font-bold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 pulse-dot" />
+                        <span className="text-emerald-700 font-sans font-bold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/90 px-2.5 py-0.5 rounded-full text-xs">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           Currently Working
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 text-right font-mono tabular-nums font-bold text-slate-900 whitespace-nowrap">
-                      {(rec.total_minutes / 60).toFixed(1)} hrs
+                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                      {!rec.check_out && rec.check_in ? (
+                        <div className="inline-flex flex-col items-end">
+                          <span className="inline-flex items-center gap-1 font-mono font-bold text-xs text-emerald-800 bg-emerald-50 border border-emerald-300/80 px-2 py-0.5 rounded-lg shadow-2xs">
+                            <Clock className="w-3 h-3 text-emerald-600 animate-pulse" />
+                            {formatLiveTimer(rec.check_in)}
+                          </span>
+                          <span className="text-[10px] font-mono text-emerald-700 mt-0.5 font-semibold">
+                            {(getElapsedSeconds(rec.check_in) / 3600).toFixed(1)} hrs active
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="font-mono tabular-nums font-bold text-slate-900">
+                          {(rec.total_minutes / 60).toFixed(1)} hrs
+                        </span>
+                      )}
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       <StatusBadge status={rec.status} />

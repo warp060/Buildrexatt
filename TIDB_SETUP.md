@@ -113,7 +113,7 @@ npm run db:setup
 
 Admins can inspect and manage the TiDB Cloud database directly from the browser:
 
-1. Log into BUILDREX as Admin (**Alex Vance** — `admin@buildrex.com` / `Buildrex@2026`).
+1. Log into BUILDREX as Admin (**Buildrex Admin** — `adminbrx@gmail.com` / `buidrex@123`).
 2. Go to **Settings** in the left sidebar.
 3. Scroll to the **TiDB Cloud Database Engine** section:
    - **Live Status Indicator**: Shows whether TiDB Cloud is online, version, and latency in milliseconds.

@@ -12,6 +12,7 @@ import {
   Clock,
   Sparkles,
   CheckCheck,
+  Building2,
 } from 'lucide-react';
 import { UserRole } from '../types';
 
@@ -21,7 +22,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSectionTitle }) => {
-  const { user, logout, quickDemoLogin, notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useAuth();
+  const { user, logout, notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useAuth();
   const { showToast } = useToast();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -66,28 +67,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
     return 'Employee';
   };
 
-  const handleQuickDemoSwitch = async (role: UserRole) => {
-    await quickDemoLogin(role);
-    showToast(`Switched active workspace session to ${getRoleLabel(role)}`, 'info');
-  };
-
   const getRoleBadge = (role?: UserRole) => {
     if (role === 'admin') {
       return (
-        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200">
           <Shield className="w-3 h-3" /> Admin
         </span>
       );
     }
     if (role === 'intern') {
       return (
-        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
           <GraduationCap className="w-3 h-3" /> Intern
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
         <Briefcase className="w-3 h-3" /> Employee
       </span>
     );
@@ -100,28 +96,28 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
           <button
             onClick={onToggleMobileSidebar}
-            className="md:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            className="md:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Toggle navigation drawer"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-brand-gradient flex items-center justify-center text-white font-extrabold text-sm tracking-wider shadow-sm ring-2 ring-white/80">
-              BX
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/20">
+              <Building2 className="w-4 h-4 text-emerald-100" />
             </div>
             <div className="hidden min-[380px]:block">
               <span className="text-base font-extrabold tracking-tight text-slate-900 leading-none block">
                 BUILDREX
               </span>
-              <span className="text-[10px] font-medium text-slate-400 tracking-wider uppercase block">
+              <span className="text-[10px] font-bold text-[#0F5132] tracking-wider uppercase block">
                 Workforce OS
               </span>
             </div>
           </div>
 
           <span className="hidden sm:inline-block text-slate-300 font-light">/</span>
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 whitespace-nowrap bg-slate-100/80 px-2.5 py-1 rounded-lg border border-slate-200/60">
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 whitespace-nowrap bg-white/90 px-2.5 py-1 rounded-md border border-slate-200/80 shadow-2xs">
             {currentSectionTitle}
           </span>
         </div>
@@ -143,39 +139,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
 
         {/* Zone 3: Actions (Theme Selector, Demo Switcher, Notifications, Profile) */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Quick Demo Switcher (Desktop) */}
-          <div className="hidden md:flex items-center gap-0.5 bg-slate-100/90 p-1 rounded-xl text-xs font-medium border border-slate-200/80">
-            <span className="text-slate-400 text-[10px] uppercase px-2 font-bold tracking-wider">Role:</span>
-            <button
-              onClick={() => handleQuickDemoSwitch('admin')}
-              className={`px-2.5 py-1 rounded-lg transition-all text-xs cursor-pointer ${
-                user?.role === 'admin'
-                  ? 'bg-brand-gradient text-white font-semibold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              Admin
-            </button>
-            <button
-              onClick={() => handleQuickDemoSwitch('employee')}
-              className={`px-2.5 py-1 rounded-lg transition-all text-xs cursor-pointer ${
-                user?.role === 'employee'
-                  ? 'bg-brand-gradient text-white font-semibold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              Employee
-            </button>
-            <button
-              onClick={() => handleQuickDemoSwitch('intern')}
-              className={`px-2.5 py-1 rounded-lg transition-all text-xs cursor-pointer ${
-                user?.role === 'intern'
-                  ? 'bg-brand-gradient text-white font-semibold shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              Intern
-            </button>
+          {/* Active Verified Role Badge (Static RBAC badge) */}
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100/90 border border-slate-200/80 text-xs shadow-2xs">
+            <span className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Role:</span>
+            {getRoleBadge(user?.role)}
           </div>
 
           {/* Theme Color Selector Pill */}
@@ -188,7 +155,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
                 setShowNotifications(!showNotifications);
                 setShowProfileMenu(false);
               }}
-              className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-all cursor-pointer border border-slate-200/60 bg-white/70 shadow-2xs"
+              className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all cursor-pointer border border-slate-200/60 bg-white/70 shadow-2xs"
               aria-label="View notifications"
             >
               <Bell className="w-4 h-4" />
@@ -200,16 +167,16 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200/90 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="flex items-center justify-between pb-2.5 px-1 border-b border-slate-100">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-slate-900 tracking-tight">Notifications</span>
                     {unreadCount > 0 ? (
-                      <span className="text-[10px] bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded-full border border-rose-200">
+                      <span className="text-[10px] bg-rose-50 text-rose-700 font-semibold px-2 py-0.5 rounded-md border border-rose-200">
                         {unreadCount} new
                       </span>
                     ) : (
-                      <span className="text-[10px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] bg-slate-100 text-slate-600 font-medium px-2 py-0.5 rounded-md">
                         All caught up
                       </span>
                     )}
@@ -217,7 +184,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllNotificationsRead}
-                      className="text-[11px] text-brand-accent hover:underline font-semibold flex items-center gap-1 cursor-pointer"
+                      className="text-[11px] text-[#0F5132] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
                     >
                       <CheckCheck className="w-3.5 h-3.5" />
                       Mark all read
@@ -235,8 +202,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
                       <div
                         key={n.id}
                         onClick={() => markNotificationRead(n.id)}
-                        className={`p-2.5 text-left rounded-xl hover:bg-slate-50 transition-colors cursor-pointer my-0.5 ${
-                          !n.read_at ? 'bg-indigo-50/50 border border-indigo-100/80' : ''
+                        className={`p-2.5 text-left rounded-lg hover:bg-slate-50 transition-colors cursor-pointer my-0.5 ${
+                          !n.read_at ? 'bg-emerald-50/60 border border-emerald-100/90' : ''
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -261,9 +228,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
                 setShowProfileMenu(!showProfileMenu);
                 setShowNotifications(false);
               }}
-              className="flex items-center gap-2 p-1 sm:p-1.5 hover:bg-slate-100 rounded-xl transition-all text-left cursor-pointer border border-slate-200/60 bg-white/70 shadow-2xs"
+              className="flex items-center gap-2 p-1 sm:p-1.5 hover:bg-slate-100 rounded-lg transition-all text-left cursor-pointer border border-slate-200/60 bg-white/70 shadow-2xs"
             >
-              <div className="w-8 h-8 rounded-lg bg-brand-gradient text-white flex items-center justify-center font-bold text-xs shadow-xs">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white flex items-center justify-center font-bold text-xs shadow-xs ring-1 ring-emerald-900/20">
                 {user?.name?.slice(0, 2).toUpperCase() || 'BX'}
               </div>
               <div className="hidden sm:block">
@@ -275,7 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
             </button>
 
             {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200/90 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                 <div className="pb-3 border-b border-slate-100">
                   <p className="text-xs font-bold text-slate-900">{user?.name}</p>
                   <p className="text-xs text-slate-500 truncate">{user?.email}</p>
@@ -297,42 +264,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
                 </div>
 
                 {/* Mobile Demo Switcher inside menu */}
-                <div className="md:hidden py-2 border-t border-slate-100">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1.5">
-                    Switch Workspace Role:
+                {/* Verified Role Information */}
+                <div className="md:hidden py-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                    Role:
                   </span>
-                  <div className="grid grid-cols-3 gap-1">
-                    <button
-                      onClick={() => handleQuickDemoSwitch('admin')}
-                      className={`py-1 text-[11px] rounded-lg font-semibold cursor-pointer ${
-                        user?.role === 'admin' ? 'bg-brand-gradient text-white' : 'bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      Admin
-                    </button>
-                    <button
-                      onClick={() => handleQuickDemoSwitch('employee')}
-                      className={`py-1 text-[11px] rounded-lg font-semibold cursor-pointer ${
-                        user?.role === 'employee' ? 'bg-brand-gradient text-white' : 'bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      Employee
-                    </button>
-                    <button
-                      onClick={() => handleQuickDemoSwitch('intern')}
-                      className={`py-1 text-[11px] rounded-lg font-semibold cursor-pointer ${
-                        user?.role === 'intern' ? 'bg-brand-gradient text-white' : 'bg-slate-100 text-slate-700'
-                      }`}
-                    >
-                      Intern
-                    </button>
-                  </div>
+                  {getRoleBadge(user?.role)}
                 </div>
 
                 <div className="border-t border-slate-100 pt-2">
                   <button
                     onClick={logout}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     Sign Out

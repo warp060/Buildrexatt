@@ -13,6 +13,14 @@ export interface ThemeOption {
 
 export const THEME_OPTIONS: ThemeOption[] = [
   {
+    id: 'emerald',
+    name: 'Forest Emerald',
+    primaryColor: '#0F5132',
+    accentColor: '#0F5132',
+    previewGradient: 'from-emerald-950 via-[#0F5132] to-emerald-600',
+    description: 'Signature Forest Emerald & Warm Alabaster Enterprise Suite',
+  },
+  {
     id: 'indigo',
     name: 'Midnight Indigo',
     primaryColor: '#0F172A',
@@ -27,14 +35,6 @@ export const THEME_OPTIONS: ThemeOption[] = [
     accentColor: '#8B5CF6',
     previewGradient: 'from-slate-950 via-purple-950 to-violet-600',
     description: 'Futuristic ultraviolet with vivid neon purple glow',
-  },
-  {
-    id: 'emerald',
-    name: 'Emerald Aurora',
-    primaryColor: '#062820',
-    accentColor: '#10B981',
-    previewGradient: 'from-slate-950 via-emerald-950 to-teal-500',
-    description: 'High-tech biometric forest with radiant emerald mint',
   },
   {
     id: 'sunset',
@@ -69,7 +69,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (saved && THEME_OPTIONS.some((t) => t.id === saved)) {
       return saved;
     }
-    return 'indigo';
+    return 'emerald';
   });
 
   useEffect(() => {

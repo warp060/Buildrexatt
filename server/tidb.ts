@@ -630,157 +630,156 @@ export async function syncAllToTiDB(data: {
 
   try {
     await conn.beginTransaction();
+    await conn.query('SET FOREIGN_KEY_CHECKS = 0');
+
+    const execBatch = async (table: string, columns: string[], rows: any[][], updateClause: string) => {
+      if (!rows || rows.length === 0) return;
+      const chunkSize = 50;
+      for (let i = 0; i < rows.length; i += chunkSize) {
+        const chunk = rows.slice(i, i + chunkSize);
+        const placeholders = chunk.map(() => `(${columns.map(() => '?').join(', ')})`).join(', ');
+        const flattened = chunk.flat();
+        await conn.query(
+          `INSERT INTO ${table} (${columns.join(', ')}) VALUES ${placeholders} ON DUPLICATE KEY UPDATE ${updateClause}`,
+          flattened
+        );
+      }
+    };
 
     // 1. Departments
-    for (const d of data.departments) {
-      await conn.query(
-        `INSERT INTO departments (id, name, code, description, manager_id)
-         VALUES (?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE name=VALUES(name), code=VALUES(code), description=VALUES(description), manager_id=VALUES(manager_id)`,
-        [d.id, d.name, d.code, d.description || null, d.manager_id || null]
-      );
-    }
+    await execBatch(
+      'departments',
+      ['id', 'name', 'code', 'description', 'manager_id'],
+      data.departments.map((d) => [d.id, d.name, d.code, d.description || null, d.manager_id || null]),
+      'name=VALUES(name), code=VALUES(code), description=VALUES(description), manager_id=VALUES(manager_id)'
+    );
 
     // 2. Users
-    for (const u of data.users) {
-      await conn.query(
-        `INSERT INTO users (id, employee_code, name, email, password_hash, role, department_id, manager_id, position, phone, joining_date, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE name=VALUES(name), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), status=VALUES(status)`,
-        [
-          u.id,
-          u.employee_code,
-          u.name,
-          u.email,
-          u.password_hash,
-          u.role,
-          u.department_id || null,
-          u.manager_id || null,
-          u.position || null,
-          u.phone || null,
-          u.joining_date,
-          u.status,
-        ]
-      );
-    }
+    await execBatch(
+      'users',
+      ['id', 'employee_code', 'name', 'email', 'password_hash', 'role', 'department_id', 'manager_id', 'position', 'phone', 'joining_date', 'status'],
+      data.users.map((u) => [
+        u.id,
+        u.employee_code,
+        u.name,
+        u.email,
+        u.password_hash,
+        u.role,
+        u.department_id || null,
+        u.manager_id || null,
+        u.position || null,
+        u.phone || null,
+        u.joining_date,
+        u.status,
+      ]),
+      'name=VALUES(name), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), status=VALUES(status)'
+    );
 
     // 3. Attendance
-    for (const a of data.attendance) {
-      await conn.query(
-        `INSERT INTO attendance (id, user_id, work_date, check_in, check_out, total_minutes, status, ip_address, notes)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE check_out=VALUES(check_out), total_minutes=VALUES(total_minutes), status=VALUES(status), notes=VALUES(notes)`,
-        [
-          a.id,
-          a.user_id,
-          a.work_date,
-          toSqlDateTime(a.check_in),
-          toSqlDateTime(a.check_out),
-          a.total_minutes || 0,
-          a.status,
-          a.ip_address || null,
-          a.notes || null,
-        ]
-      );
-    }
+    await execBatch(
+      'attendance',
+      ['id', 'user_id', 'work_date', 'check_in', 'check_out', 'total_minutes', 'status', 'ip_address', 'notes'],
+      data.attendance.map((a) => [
+        a.id,
+        a.user_id,
+        a.work_date,
+        toSqlDateTime(a.check_in),
+        toSqlDateTime(a.check_out),
+        a.total_minutes || 0,
+        a.status,
+        a.ip_address || null,
+        a.notes || null,
+      ]),
+      'check_out=VALUES(check_out), total_minutes=VALUES(total_minutes), status=VALUES(status), notes=VALUES(notes)'
+    );
 
     // 4. Work Updates
-    for (const w of data.work_updates) {
-      await conn.query(
-        `INSERT INTO work_updates (id, user_id, work_date, tasks_completed, project_details, accomplishments, blockers, next_day_plan, hours_spent, status, submitted_at, reviewed_by, review_comment, reviewed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE tasks_completed=VALUES(tasks_completed), project_details=VALUES(project_details), accomplishments=VALUES(accomplishments), blockers=VALUES(blockers), next_day_plan=VALUES(next_day_plan), hours_spent=VALUES(hours_spent), status=VALUES(status), reviewed_by=VALUES(reviewed_by), review_comment=VALUES(review_comment), reviewed_at=VALUES(reviewed_at)`,
-        [
-          w.id,
-          w.user_id,
-          w.work_date,
-          w.tasks_completed,
-          w.project_details,
-          w.accomplishments || null,
-          w.blockers || null,
-          w.next_day_plan || null,
-          w.hours_spent || 8,
-          w.status,
-          toSqlDateTime(w.submitted_at),
-          w.reviewed_by || null,
-          w.review_comment || null,
-          toSqlDateTime(w.reviewed_at),
-        ]
-      );
-    }
+    await execBatch(
+      'work_updates',
+      ['id', 'user_id', 'work_date', 'tasks_completed', 'project_details', 'accomplishments', 'blockers', 'next_day_plan', 'hours_spent', 'status', 'submitted_at', 'reviewed_by', 'review_comment', 'reviewed_at'],
+      data.work_updates.map((w) => [
+        w.id,
+        w.user_id,
+        w.work_date,
+        w.tasks_completed,
+        w.project_details,
+        w.accomplishments || null,
+        w.blockers || null,
+        w.next_day_plan || null,
+        w.hours_spent || 8,
+        w.status,
+        toSqlDateTime(w.submitted_at),
+        w.reviewed_by || null,
+        w.review_comment || null,
+        toSqlDateTime(w.reviewed_at),
+      ]),
+      'tasks_completed=VALUES(tasks_completed), project_details=VALUES(project_details), accomplishments=VALUES(accomplishments), blockers=VALUES(blockers), next_day_plan=VALUES(next_day_plan), hours_spent=VALUES(hours_spent), status=VALUES(status), reviewed_by=VALUES(reviewed_by), review_comment=VALUES(review_comment), reviewed_at=VALUES(reviewed_at)'
+    );
 
     // 5. Leave Requests
-    for (const l of data.leave_requests) {
-      await conn.query(
-        `INSERT INTO leave_requests (id, user_id, leave_type, start_date, end_date, days_count, reason, status, reviewed_by, review_comment, reviewed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE status=VALUES(status), reviewed_by=VALUES(reviewed_by), review_comment=VALUES(review_comment), reviewed_at=VALUES(reviewed_at)`,
-        [
-          l.id,
-          l.user_id,
-          l.leave_type,
-          l.start_date,
-          l.end_date,
-          l.days_count,
-          l.reason,
-          l.status,
-          l.reviewed_by || null,
-          l.review_comment || null,
-          toSqlDateTime(l.reviewed_at),
-        ]
-      );
-    }
+    await execBatch(
+      'leave_requests',
+      ['id', 'user_id', 'leave_type', 'start_date', 'end_date', 'days_count', 'reason', 'status', 'reviewed_by', 'review_comment', 'reviewed_at'],
+      data.leave_requests.map((l) => [
+        l.id,
+        l.user_id,
+        l.leave_type,
+        l.start_date,
+        l.end_date,
+        l.days_count,
+        l.reason,
+        l.status,
+        l.reviewed_by || null,
+        l.review_comment || null,
+        toSqlDateTime(l.reviewed_at),
+      ]),
+      'status=VALUES(status), reviewed_by=VALUES(reviewed_by), review_comment=VALUES(review_comment), reviewed_at=VALUES(reviewed_at)'
+    );
 
     // 6. Attendance Corrections
-    for (const c of data.attendance_corrections) {
-      await conn.query(
-        `INSERT INTO attendance_corrections (id, user_id, attendance_id, work_date, requested_check_in, requested_check_out, reason, status, reviewed_by, review_comment, reviewed_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE status=VALUES(status), reviewed_by=VALUES(reviewed_by), review_comment=VALUES(review_comment), reviewed_at=VALUES(reviewed_at)`,
-        [
-          c.id,
-          c.user_id,
-          c.attendance_id,
-          c.work_date || null,
-          toSqlDateTime(c.requested_check_in),
-          toSqlDateTime(c.requested_check_out),
-          c.reason,
-          c.status,
-          c.reviewed_by || null,
-          c.review_comment || null,
-          toSqlDateTime(c.reviewed_at),
-        ]
-      );
-    }
+    await execBatch(
+      'attendance_corrections',
+      ['id', 'user_id', 'attendance_id', 'work_date', 'requested_check_in', 'requested_check_out', 'reason', 'status', 'reviewed_by', 'review_comment', 'reviewed_at'],
+      data.attendance_corrections.map((c) => [
+        c.id,
+        c.user_id,
+        c.attendance_id,
+        c.work_date || null,
+        toSqlDateTime(c.requested_check_in),
+        toSqlDateTime(c.requested_check_out),
+        c.reason,
+        c.status,
+        c.reviewed_by || null,
+        c.review_comment || null,
+        toSqlDateTime(c.reviewed_at),
+      ]),
+      'status=VALUES(status), reviewed_by=VALUES(reviewed_by), review_comment=VALUES(review_comment), reviewed_at=VALUES(reviewed_at)'
+    );
 
     // 7. Notifications
-    for (const n of data.notifications.slice(0, 100)) {
-      await conn.query(
-        `INSERT INTO notifications (id, user_id, title, message, type, read_at, link)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE read_at=VALUES(read_at)`,
-        [n.id, n.user_id, n.title, n.message, n.type, toSqlDateTime(n.read_at), n.link || null]
-      );
-    }
+    await execBatch(
+      'notifications',
+      ['id', 'user_id', 'title', 'message', 'type', 'read_at', 'link'],
+      data.notifications.slice(0, 100).map((n) => [n.id, n.user_id, n.title, n.message, n.type, toSqlDateTime(n.read_at), n.link || null]),
+      'read_at=VALUES(read_at)'
+    );
 
     // 8. Audit Logs
-    for (const log of data.audit_logs.slice(0, 150)) {
-      await conn.query(
-        `INSERT INTO audit_logs (id, actor_id, actor_name, action, entity_type, entity_id, details, ip_address)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE id=VALUES(id)`,
-        [
-          log.id,
-          log.actor_id || null,
-          log.actor_name || 'System',
-          log.action || 'SYSTEM_ACTION',
-          log.entity_type || 'system',
-          log.entity_id || 'system',
-          log.details ? JSON.stringify(log.details) : null,
-          log.ip_address || null,
-        ]
-      );
-    }
+    await execBatch(
+      'audit_logs',
+      ['id', 'actor_id', 'actor_name', 'action', 'entity_type', 'entity_id', 'details', 'ip_address'],
+      data.audit_logs.slice(0, 150).map((log) => [
+        log.id,
+        log.actor_id || null,
+        log.actor_name || 'System',
+        log.action || 'SYSTEM_ACTION',
+        log.entity_type || 'system',
+        log.entity_id || 'system',
+        log.details ? JSON.stringify(log.details) : null,
+        log.ip_address || null,
+      ]),
+      'id=VALUES(id)'
+    );
 
     // 9. Company Settings
     const cs = data.company_settings;
@@ -810,15 +809,16 @@ export async function syncAllToTiDB(data: {
       );
     }
 
+    await conn.query('SET FOREIGN_KEY_CHECKS = 1');
     await conn.commit();
     console.log('[TiDB] ✅ Synchronized all records to TiDB Cloud successfully.');
     return { ok: true, message: 'All tables synced to TiDB Cloud.' };
   } catch (err: any) {
-    await conn.rollback();
+    await conn.rollback().catch(() => {});
     console.error('[TiDB] ❌ Sync failed:', err.message);
     return { ok: false, message: err.message };
   } finally {
-    conn.release();
+    try { conn.release(); } catch {}
   }
 }
 
@@ -885,14 +885,16 @@ export async function clearAllTiDBTables(targetPool?: Pool): Promise<void> {
       'company_settings',
       'holidays',
     ];
+    await conn.query('SET FOREIGN_KEY_CHECKS = 0').catch(() => {});
     for (const t of tables) {
       await conn.query(`DELETE FROM ${t}`).catch(() => {});
     }
+    await conn.query('SET FOREIGN_KEY_CHECKS = 1').catch(() => {});
     console.log('[TiDB] 🧹 Cleared legacy tables in TiDB Cloud for fresh synchronization.');
   } catch (err: any) {
     console.warn('[TiDB] Notice while clearing tables:', err.message);
   } finally {
-    conn.release();
+    try { conn.release(); } catch {}
   }
 }
 

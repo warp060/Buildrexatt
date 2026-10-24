@@ -42,7 +42,7 @@ export const MobileDock: React.FC<MobileDockProps> = ({ currentTab, setCurrentTa
     <div className="md:hidden fixed bottom-3 left-3 right-3 z-40">
       <nav
         aria-label="Mobile quick dock"
-        className="mobile-app-dock rounded-2xl flex items-center justify-around px-2 py-2 shadow-xl"
+        className="mobile-app-dock rounded-xl flex items-center justify-around px-2 py-1.5 shadow-xl"
       >
         {items.map((item) => {
           const Icon = item.icon;
@@ -51,14 +51,14 @@ export const MobileDock: React.FC<MobileDockProps> = ({ currentTab, setCurrentTa
             <button
               key={item.id}
               onClick={() => setCurrentTab(item.id)}
-              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-xl transition-all relative cursor-pointer ${
+              className={`flex flex-col items-center justify-center py-1 px-2.5 rounded-lg transition-all relative cursor-pointer ${
                 isActive
                   ? 'text-white'
                   : 'text-slate-500 hover:text-slate-900 active:scale-95'
               }`}
             >
               {isActive && (
-                <span className="absolute inset-0 bg-brand-gradient rounded-xl shadow-xs -z-10" />
+                <span className="absolute inset-0 bg-gradient-to-r from-[#0F5132] to-[#0B3D25] rounded-lg shadow-sm -z-10" />
               )}
               <Icon className="w-5 h-5 mb-0.5" />
               <span className={`text-[10px] font-semibold tracking-tight ${isActive ? 'text-white' : 'text-slate-600'}`}>

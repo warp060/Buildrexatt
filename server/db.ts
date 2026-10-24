@@ -72,12 +72,27 @@ export function getDb(): DatabaseSchema {
     try {
       const content = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(content);
-      // Ensure local file has the real Google Sheet team (22+ members including Layeeque)
+      // Ensure local file has the real Google Sheet team (15+ members including Ehsaan) and none of the removed users
+      const hasRemovedUsers = parsed.users.some((u: any) => [
+        'layeequeahmed602@gmail.com',
+        'nmuhammadshees11@gmail.com',
+        'syedmdaakif007@gmail.com',
+        'sajidahmedrs10@gmail.com',
+        'muzammilaamirmuzzu@gmail.com',
+        'vmohammedsaad@gmail.com',
+        'mohammedaffan1506@gmail.com',
+      ].includes(u.email));
+
+      const adminCount = parsed.users.filter((u: any) => u.role === 'admin').length;
+      const hasOnlyAdminBrx = adminCount === 1 && parsed.users.some((u: any) => u.email === 'adminbrx@gmail.com' && u.role === 'admin');
+
       if (
         parsed &&
         Array.isArray(parsed.users) &&
-        parsed.users.length >= 20 &&
-        parsed.users.some((u: any) => u.email === 'layeequeahmed602@gmail.com')
+        parsed.users.length >= 15 &&
+        parsed.users.some((u: any) => u.email === 'ehsaanehsaan61@gmail.com') &&
+        hasOnlyAdminBrx &&
+        !hasRemovedUsers
       ) {
         dbInstance = parsed;
         return dbInstance!;
@@ -159,22 +174,34 @@ export async function initDatabase(): Promise<{ engine: 'tidb' | 'json'; message
     if (ok) {
       isTiDBActive = true;
       const tidbData = await loadAllFromTiDB();
-      const hasRealSheetUsers = tidbData && tidbData.users.some((u) => u.email === 'layeequeahmed602@gmail.com');
+      const hasRealSheetUsers = tidbData && tidbData.users.some((u) => u.email === 'ehsaanehsaan61@gmail.com');
+      const hasRemovedFromTiDB = tidbData && tidbData.users.some((u) => [
+        'layeequeahmed602@gmail.com',
+        'nmuhammadshees11@gmail.com',
+        'syedmdaakif007@gmail.com',
+        'sajidahmedrs10@gmail.com',
+        'muzammilaamirmuzzu@gmail.com',
+        'vmohammedsaad@gmail.com',
+        'mohammedaffan1506@gmail.com',
+      ].includes(u.email));
 
-      if (tidbData && tidbData.users.length >= 20 && hasRealSheetUsers) {
+      const tidbAdminCount = tidbData ? tidbData.users.filter((u) => u.role === 'admin').length : 0;
+      const hasOnlyAdminBrxInTiDB = tidbAdminCount === 1 && (tidbData ? tidbData.users.some((u) => u.email === 'adminbrx@gmail.com' && u.role === 'admin') : false);
+
+      if (tidbData && tidbData.users.length >= 15 && hasRealSheetUsers && hasOnlyAdminBrxInTiDB && !hasRemovedFromTiDB) {
         dbInstance = tidbData;
         saveDbLocalOnly(dbInstance);
         console.log(`[Database] ☁️ Loaded ${dbInstance.users.length} users and ${dbInstance.attendance.length} attendance rows from TiDB Cloud.`);
         return { engine: 'tidb', message: 'Connected to TiDB Cloud and loaded active dataset.' };
       } else {
-        // TiDB tables empty or has legacy demo data (Sarah Chen, Alex Vance), purge and seed with real Google Sheet dataset!
-        console.log('[Database] ☁️ Seeding TiDB Cloud tables with real BUILDREX Google Sheet dataset (22 team members + admin)...');
+        // TiDB tables empty, legacy dummy data, removed users, or multiple admins: purge and re-sync
+        console.log('[Database] ☁️ Purging and synchronizing TiDB Cloud with 16 users (adminbrx@gmail.com exclusive admin)...');
         await clearAllTiDBTables();
         dbInstance = generateInitialSeed();
         saveDbLocalOnly(dbInstance);
         await syncAllToTiDB(dbInstance);
-        console.log('[Database] ✅ TiDB Cloud synchronized with 23 users and real team structure.');
-        return { engine: 'tidb', message: 'Connected to TiDB Cloud and seeded real Google Sheet dataset.' };
+        console.log('[Database] ✅ TiDB Cloud synchronized with 16 users and 1 exclusive admin.');
+        return { engine: 'tidb', message: 'Connected to TiDB Cloud and seeded exclusive admin dataset.' };
       }
     } else {
       isTiDBActive = false;
@@ -255,12 +282,39 @@ export function enrichUser(user: User): User {
   };
 }
 
+export function normalizeIsoDateTime(val?: string | null): string | null {
+  if (!val) return null;
+  let s = String(val).trim();
+  if (!s.includes('T') && /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}/.test(s)) {
+    s = s.replace(' ', 'T') + 'Z';
+  } else if (s.includes('T') && !s.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(s)) {
+    s = s + 'Z';
+  }
+  return s;
+}
+
 export function enrichAttendance(rec: AttendanceRecord): AttendanceRecord {
   const db = getDb();
   const user = db.users.find((u) => u.id === rec.user_id);
   const dept = user?.department_id ? db.departments.find((d) => d.id === user.department_id) : undefined;
+
+  const normalizedCheckIn = normalizeIsoDateTime(rec.check_in);
+  const normalizedCheckOut = normalizeIsoDateTime(rec.check_out);
+
+  let totalMinutes = Number(rec.total_minutes) || 0;
+  // If active session (checked in, not checked out yet), compute live duration up to current moment
+  if (normalizedCheckIn && !normalizedCheckOut) {
+    const startMs = new Date(normalizedCheckIn).getTime();
+    if (!isNaN(startMs)) {
+      totalMinutes = Math.max(0, Math.floor((Date.now() - startMs) / (1000 * 60)));
+    }
+  }
+
   return {
     ...rec,
+    check_in: normalizedCheckIn || rec.check_in,
+    check_out: normalizedCheckOut || rec.check_out,
+    total_minutes: totalMinutes,
     user_name: user?.name || 'Unknown',
     employee_code: user?.employee_code || '---',
     role: user?.role,

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Building2 } from 'lucide-react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -61,11 +62,11 @@ const MainWorkspace: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4">
-        <div className="w-12 h-12 rounded-2xl bg-brand-gradient flex items-center justify-center text-white font-black text-lg shadow-brand-glow shadow-lg animate-pulse">
-          BX
+      <div className="min-h-screen bg-[#FAF9F5] flex flex-col items-center justify-center p-4">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0F5132] to-[#0A3822] flex items-center justify-center text-white shadow-lg shadow-emerald-950/20 ring-1 ring-emerald-900/20 animate-pulse">
+          <Building2 className="w-6 h-6 text-emerald-100" />
         </div>
-        <p className="mt-4 text-xs font-bold text-slate-500 tracking-wider uppercase">
+        <p className="mt-4 text-xs font-bold text-slate-600 tracking-wider uppercase">
           Loading BUILDREX Workspace...
         </p>
       </div>
@@ -77,6 +78,11 @@ const MainWorkspace: React.FC = () => {
   }
 
   const renderActiveView = () => {
+    // Strict RBAC Guard: non-admin users can never view admin panel tabs
+    if (currentTab.startsWith('admin-') && user.role !== 'admin') {
+      return <EmployeeDashboard onNavigateTab={(tab) => setCurrentTab(tab)} />;
+    }
+
     switch (currentTab) {
       // Employee & Intern Views
       case 'dashboard':

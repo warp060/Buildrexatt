@@ -249,16 +249,16 @@ export const AdminUsersView: React.FC = () => {
           <button
             type="button"
             onClick={() => setIsCredsModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-all shadow-2xs shrink-0 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-all shadow-2xs shrink-0 cursor-pointer"
           >
-            <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
+            <KeyRound className="w-3.5 h-3.5 text-emerald-700" />
             <span>Team Passwords &amp; Direct Access</span>
           </button>
 
           <button
             type="button"
             onClick={handleOpenCreate}
-            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#142C4E] rounded-lg transition-colors shadow-2xs shrink-0 cursor-pointer"
+            className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-white bg-[#0F5132] hover:bg-[#0B3D25] rounded-lg transition-colors shadow-2xs shrink-0 cursor-pointer"
           >
             <UserPlus className="w-4 h-4" />
             <span>Add Member</span>
@@ -267,19 +267,19 @@ export const AdminUsersView: React.FC = () => {
       </div>
 
       {/* 22 Team Member Passwords & Direct Access Section Banner */}
-      <div className="bg-gradient-to-r from-indigo-50/90 via-purple-50/70 to-blue-50/90 border border-indigo-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-emerald-50/90 via-teal-50/70 to-emerald-50/90 border border-emerald-200/90 rounded-xl p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm">
-            <Users className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white flex items-center justify-center shrink-0 shadow-sm ring-1 ring-emerald-900/20">
+            <Users className="w-5 h-5 text-emerald-100" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-indigo-950 flex items-center gap-2">
+            <h2 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
               <span>Official Team Credentials &amp; Direct Access</span>
-              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-200/70 text-indigo-900 uppercase">
+              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-200/70 text-emerald-900 uppercase">
                 Admin Exclusive
               </span>
             </h2>
-            <p className="text-xs text-indigo-700/80 mt-0.5">
+            <p className="text-xs text-emerald-800/80 mt-0.5">
               Securely view, copy generated passwords for all 22 Google Sheet team members, or test direct 1-click account access.
             </p>
           </div>
@@ -288,9 +288,9 @@ export const AdminUsersView: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsCredsModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl border border-indigo-300 bg-white hover:bg-indigo-50 text-indigo-950 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs group shrink-0 active:scale-[0.98]"
+          className="px-4 py-2.5 rounded-lg border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-950 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs group shrink-0 active:scale-[0.98]"
         >
-          <Users className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
+          <Users className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition-transform" />
           <span>View All 22 Team Member Passwords &amp; Direct Access</span>
         </button>
       </div>

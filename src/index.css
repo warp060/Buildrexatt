@@ -1,7 +1,23 @@
 @import "tailwindcss";
 
 @layer base {
-  :root, [data-theme="indigo"] {
+  :root, [data-theme="emerald"] {
+    --brand-primary: #0F5132;
+    --brand-primary-dark: #0B3D25;
+    --brand-accent: #0F5132;
+    --brand-accent-hover: #0B3D25;
+    --brand-accent-light: #ECFDF5;
+    --brand-accent-text: #0F5132;
+    --brand-gradient: linear-gradient(135deg, #0F5132 0%, #064E3B 55%, #047857 100%);
+    --brand-gradient-accent: linear-gradient(135deg, #0F5132 0%, #059669 100%);
+    --brand-glow: rgba(15, 81, 50, 0.35);
+    --brand-glow-subtle: rgba(15, 81, 50, 0.12);
+    --bg-ambient-1: rgba(15, 81, 50, 0.05);
+    --bg-ambient-2: rgba(4, 120, 87, 0.04);
+    --theme-pill: #0F5132;
+  }
+
+  [data-theme="indigo"] {
     --brand-primary: #0F172A;
     --brand-primary-dark: #0A0F1D;
     --brand-accent: #6366F1;
@@ -31,22 +47,6 @@
     --bg-ambient-1: rgba(139, 92, 246, 0.06);
     --bg-ambient-2: rgba(217, 70, 239, 0.05);
     --theme-pill: #8B5CF6;
-  }
-
-  [data-theme="emerald"] {
-    --brand-primary: #06231C;
-    --brand-primary-dark: #031712;
-    --brand-accent: #10B981;
-    --brand-accent-hover: #059669;
-    --brand-accent-light: #ECFDF5;
-    --brand-accent-text: #047857;
-    --brand-gradient: linear-gradient(135deg, #06231C 0%, #064E3B 55%, #047857 100%);
-    --brand-gradient-accent: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
-    --brand-glow: rgba(16, 185, 129, 0.35);
-    --brand-glow-subtle: rgba(16, 185, 129, 0.12);
-    --bg-ambient-1: rgba(16, 185, 129, 0.06);
-    --bg-ambient-2: rgba(6, 182, 212, 0.05);
-    --theme-pill: #10B981;
   }
 
   [data-theme="sunset"] {
@@ -84,7 +84,7 @@
   body {
     font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #0F172A;
-    background-color: #F8FAFC;
+    background-color: #FAF9F5;
     background-image: 
       radial-gradient(at 0% 0%, var(--bg-ambient-1) 0px, transparent 50%),
       radial-gradient(at 100% 0%, var(--bg-ambient-2) 0px, transparent 50%),
@@ -132,23 +132,24 @@
 
 /* Glassmorphism & Surface Utilities */
 .glass-navbar {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(250, 249, 245, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
 }
 
 .glass-card {
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  border-radius: 0.75rem;
   border: 1px solid rgba(226, 232, 240, 0.85);
 }
 
-/* Premium Card System */
+/* Premium Card System with crisp reduced radius */
 .card-premium {
   background: #FFFFFF;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   border: 1px solid rgba(226, 232, 240, 0.85);
   box-shadow: 
     0 1px 3px 0 rgba(15, 23, 42, 0.03),
@@ -158,7 +159,7 @@
 
 .card-premium-interactive {
   background: #FFFFFF;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   border: 1px solid rgba(226, 232, 240, 0.85);
   box-shadow: 
     0 1px 3px 0 rgba(15, 23, 42, 0.03),
@@ -340,9 +341,9 @@
   border-color: var(--brand-accent) !important;
 }
 
-/* Card & Surface Polish for Existing Standard Cards */
-.bg-white.rounded-xl.border.border-slate-200 {
-  border-radius: 1rem;
+/* Card & Surface Polish for Existing Standard Cards - crisp reduced radius */
+.bg-white.rounded-xl.border, .bg-white.rounded-2xl.border {
+  border-radius: 0.75rem !important;
   border-color: rgba(226, 232, 240, 0.85);
   box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 4px 16px -2px rgba(15, 23, 42, 0.04);
 }

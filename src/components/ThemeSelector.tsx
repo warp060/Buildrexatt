@@ -40,7 +40,7 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'compact
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-200/90 p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200/90 p-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
           <div className="px-2 py-1.5 border-b border-slate-100 mb-1 flex items-center justify-between">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Color Themes
@@ -58,9 +58,9 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({ variant = 'compact
                     setTheme(t.id);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all cursor-pointer ${
+                  className={`w-full flex items-center justify-between p-2 rounded-lg text-left transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-slate-100/90 text-slate-900 font-semibold'
+                      ? 'bg-emerald-50 text-emerald-950 font-semibold'
                       : 'hover:bg-slate-50 text-slate-600 hover:text-slate-900'
                   }`}
                 >

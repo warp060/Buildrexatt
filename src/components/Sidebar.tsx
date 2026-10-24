@@ -17,6 +17,7 @@ import {
   Shield,
   Briefcase,
   GraduationCap,
+  Building2,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -72,12 +73,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header inside Sidebar */}
       <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-brand-gradient flex items-center justify-center text-white font-extrabold text-sm tracking-wider shadow-sm ring-2 ring-white/80">
-            BX
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/20">
+            <Building2 className="w-4 h-4 text-emerald-100" />
           </div>
           <div>
             <h2 className="text-sm font-extrabold tracking-tight text-slate-900 leading-none">BUILDREX</h2>
-            <span className="text-[10px] text-brand-accent font-semibold tracking-wider uppercase">
+            <span className="text-[10px] text-[#0F5132] font-bold tracking-wider uppercase">
               Smart Workspace
             </span>
           </div>
@@ -97,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <span className="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
             {isAdmin ? 'Administration Suite' : 'Personal Workspace'}
           </span>
-          <span className="text-[9px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded-full border border-emerald-200">
+          <span className="text-[9px] font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded-md border border-emerald-200/80">
             v2.4
           </span>
         </div>
@@ -109,10 +110,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               key={item.id}
               onClick={() => handleSelectTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-xl transition-all group cursor-pointer ${
+              className={`w-full flex items-center justify-between px-3 py-2 text-xs font-semibold rounded-lg transition-all group cursor-pointer ${
                 isActive
-                  ? 'bg-brand-gradient text-white shadow-brand-glow shadow-md scale-[1.01]'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 active:scale-[0.99]'
+                  ? 'bg-[#0F5132] text-white shadow-sm shadow-emerald-950/25'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-emerald-50/40 active:scale-[0.99]'
               }`}
             >
               <div className="flex items-center gap-2.5 truncate">
@@ -126,11 +127,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="flex items-center gap-1.5">
                 {item.badge && (
                   <span
-                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${
+                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
                       isActive
                         ? 'bg-white/20 text-white'
                         : item.badge === 'Live'
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                         : 'bg-amber-50 text-amber-700 border border-amber-200'
                     }`}
                   >
@@ -157,7 +158,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Bottom User Card in Sidebar */}
       <div className="p-3 border-t border-slate-100 bg-slate-50/70">
         <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-          <div className="w-8 h-8 rounded-lg bg-brand-gradient text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-xs ring-1 ring-emerald-900/20">
             {user?.name?.slice(0, 1).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">

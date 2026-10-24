@@ -89,13 +89,14 @@ export function getMemberPassword(email: string, name: string): string {
 /**
  * Map department string to internal ID
  */
-function mapDepartment(deptStr: string, titleStr: string): { deptId: string; role: 'admin' | 'employee' | 'intern' } {
+function mapDepartment(deptStr: string, titleStr: string, email?: string): { deptId: string; role: 'admin' | 'employee' | 'intern' } {
   const d = (deptStr || '').toLowerCase();
   const t = (titleStr || '').toLowerCase();
+  const e = (email || '').toLowerCase().trim();
 
-  // Role detection
+  // Role detection: ONLY adminbrx@gmail.com is permitted to have the admin role
   let role: 'admin' | 'employee' | 'intern' = 'employee';
-  if (t.includes('cfo') || t.includes('coo') || t.includes('cto') || t.includes('chief')) {
+  if (e === 'adminbrx@gmail.com') {
     role = 'admin';
   } else if (t.includes('intern') || t.includes('associate')) {
     role = 'intern';
@@ -172,13 +173,25 @@ export async function performGoogleSheetSync(): Promise<{
       const rawName = cleanStr(row[nameIdx >= 0 ? nameIdx : 1]);
       if (!email || !rawName) continue;
 
+      // Exclude permanently removed persons
+      const EXCLUDED_EMAILS = [
+        'layeequeahmed602@gmail.com',
+        'nmuhammadshees11@gmail.com',
+        'syedmdaakif007@gmail.com',
+        'sajidahmedrs10@gmail.com',
+        'muzammilaamirmuzzu@gmail.com',
+        'vmohammedsaad@gmail.com',
+        'mohammedaffan1506@gmail.com',
+      ];
+      if (EXCLUDED_EMAILS.includes(email)) continue;
+
       const phone = cleanStr(row[phoneIdx >= 0 ? phoneIdx : 2]);
       const deptRaw = cleanStr(row[deptIdx >= 0 ? deptIdx : 5]);
       const titleRaw = cleanStr(row[titleIdx >= 0 ? titleIdx : 6]);
       const dojRaw = cleanStr(row[dojIdx >= 0 ? dojIdx : 7]);
       const address = cleanStr(row[addrIdx >= 0 ? addrIdx : 8]);
 
-      const { deptId, role } = mapDepartment(deptRaw, titleRaw);
+      const { deptId, role } = mapDepartment(deptRaw, titleRaw, email);
       const plainPassword = getMemberPassword(email, rawName);
 
       // Parse joining date YYYY-MM-DD
@@ -232,7 +245,7 @@ export async function performGoogleSheetSync(): Promise<{
           password_hash: bcrypt.hashSync(plainPassword, 10),
           role,
           department_id: deptId,
-          manager_id: 'user-aakif',
+          manager_id: 'user-emad',
           position: titleRaw || (role === 'intern' ? 'Intern' : 'Team Member'),
           phone: phone || '',
           joining_date: joiningDate,

@@ -147,14 +147,14 @@ export const TeamCredentialsModal: React.FC<TeamCredentialsModalProps> = ({
               placeholder="Search member, email, department, code, or phone..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white"
+              className="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-[#0F5132] bg-white"
             />
           </div>
 
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white text-slate-700 shrink-0 font-medium cursor-pointer"
+            className="px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-[#0F5132] bg-white text-slate-700 shrink-0 font-medium cursor-pointer"
           >
             <option value="all">All Roles ({credentials.length})</option>
             <option value="admin">Administrators ({adminCount})</option>
@@ -167,27 +167,27 @@ export const TeamCredentialsModal: React.FC<TeamCredentialsModalProps> = ({
         <div className="overflow-y-auto space-y-2.5 pr-1 flex-1">
           {isLoading ? (
             <div className="py-12 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
-              <RefreshCw className="w-5 h-5 animate-spin text-indigo-600" />
+              <RefreshCw className="w-5 h-5 animate-spin text-[#0F5132]" />
               <span>Loading team passwords and credentials...</span>
             </div>
           ) : filteredCredentials.length === 0 ? (
-            <div className="py-10 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-xl">
+            <div className="py-10 text-center text-slate-400 text-xs border border-dashed border-slate-200 rounded-lg">
               No team members match your search criteria.
             </div>
           ) : (
             filteredCredentials.map((c) => (
               <div
                 key={c.id}
-                className="p-3.5 rounded-xl border border-slate-200/90 hover:border-indigo-300 bg-white hover:bg-slate-50/70 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                className="p-3.5 rounded-lg border border-slate-200/90 hover:border-emerald-300 bg-white hover:bg-slate-50/70 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
               >
                 <div className="flex items-start gap-3 min-w-0">
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold text-xs text-white shadow-2xs ${
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 font-bold text-xs text-white shadow-2xs ${
                       c.role === 'admin'
                         ? 'bg-purple-600'
                         : c.role === 'intern'
                         ? 'bg-amber-600'
-                        : 'bg-blue-600'
+                        : 'bg-emerald-700'
                     }`}
                   >
                     {c.name
@@ -202,12 +202,12 @@ export const TeamCredentialsModal: React.FC<TeamCredentialsModalProps> = ({
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-bold text-slate-900">{c.name}</span>
                       <span
-                        className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase ${
+                        className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase ${
                           c.role === 'admin'
                             ? 'bg-purple-100 text-purple-800'
                             : c.role === 'intern'
                             ? 'bg-amber-100 text-amber-800'
-                            : 'bg-blue-100 text-blue-800'
+                            : 'bg-emerald-100 text-emerald-800'
                         }`}
                       >
                         {c.role}
@@ -238,7 +238,7 @@ export const TeamCredentialsModal: React.FC<TeamCredentialsModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleCopyPassword(c.id, c.password)}
-                      className="text-slate-400 hover:text-indigo-600 transition-colors p-0.5 rounded cursor-pointer"
+                      className="text-slate-400 hover:text-[#0F5132] transition-colors p-0.5 rounded cursor-pointer"
                       title="Copy password"
                     >
                       {copiedId === c.id ? (
