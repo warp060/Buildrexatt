@@ -31,38 +31,39 @@ app.use((req, res, next) => {
   next();
 });
 
+// Restore original URL if rewritten by Vercel edge
+app.use((req, res, next) => {
+  const matched = (req.headers['x-matched-path'] || req.headers['x-now-route-matches']) as string;
+  if (matched && matched.startsWith('/api')) {
+    req.url = matched;
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Database lazy initialization singleton
-let dbInitPromise: Promise<any> | null = null;
+let dbInitStarted = false;
 
-export function ensureDbInitialized() {
-  if (!dbInitPromise) {
-    // Immediately ensure local database is loaded synchronously into memory
-    getDb();
-    dbInitPromise = initDatabase().catch((err: any) => {
-      console.warn('[Database] Auto-init fallback warning:', err?.message);
+export function ensureDbInitialized(): Promise<any> {
+  // Ensure local in-memory dataset is available instantly (0ms)
+  getDb();
+
+  if (!dbInitStarted) {
+    dbInitStarted = true;
+    return initDatabase().catch((err: any) => {
+      console.warn('[Database] Background init notice:', err?.message);
       return { engine: 'json', message: err?.message };
     });
   }
-  return dbInitPromise;
+  return Promise.resolve();
 }
 
-// Kick off initialization immediately
-ensureDbInitialized();
-
-// Middleware to ensure DB has a chance to initialize without hanging requests
-app.use(async (req, res, next) => {
-  try {
-    await Promise.race([
-      ensureDbInitialized(),
-      new Promise((resolve) => setTimeout(resolve, 3000)),
-    ]);
-  } catch {
-    // Proceed with local store
-  }
+// Background trigger without blocking serverless function cold start
+app.use((req, res, next) => {
+  ensureDbInitialized().catch(() => {});
   next();
 });
 
@@ -95,7 +96,7 @@ app.use('/api', adminRoutes); // For /api/departments, /api/notifications
 app.use('/api/ai', aiRoutes);
 app.use('/api/sync', syncRoutes);
 
-// Duplicate mounts without /api prefix to handle serverless rewrites seamlessly
+// Duplicate mounts without /api prefix for compatibility
 app.use('/auth', authRoutes);
 app.use('/attendance', attendanceRoutes);
 app.use('/work-updates', workUpdatesRoutes);

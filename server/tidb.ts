@@ -112,6 +112,7 @@ export function getPool(customConfig?: TiDBConfig): Pool {
 
   const config = customConfig || getConfig();
 
+  const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
   const newPool = mysql.createPool({
     host: config.host,
     port: config.port,
@@ -120,12 +121,12 @@ export function getPool(customConfig?: TiDBConfig): Pool {
     database: config.database,
     ssl: config.ssl ? { rejectUnauthorized: true } : undefined,
     waitForConnections: true,
-    connectionLimit: 10,
-    maxIdle: 5,
-    idleTimeout: 60000,
+    connectionLimit: isServerless ? 2 : 10,
+    maxIdle: isServerless ? 1 : 5,
+    idleTimeout: isServerless ? 3000 : 60000,
     queueLimit: 0,
-    enableKeepAlive: true,
-    keepAliveInitialDelay: 10000,
+    enableKeepAlive: !isServerless,
+    connectTimeout: 5000,
     timezone: '+00:00',
     dateStrings: true,
   });
@@ -920,7 +921,10 @@ export async function initializeTiDB(): Promise<boolean> {
   console.log(`[Database] 🚀 TiDB Cloud connected (v${version}, ${latencyMs}ms latency).`);
   activeEngine = 'tidb';
 
-  await runMigrations();
+  const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+  if (!isServerless || process.env.RUN_MIGRATIONS === 'true') {
+    await runMigrations();
+  }
   return true;
 }
 
