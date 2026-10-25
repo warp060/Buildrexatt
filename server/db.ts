@@ -41,9 +41,13 @@ interface DatabaseSchema {
 const DATA_DIR = path.resolve(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'buildrex.json');
 
-// Ensure directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// Ensure directory exists if filesystem is writable
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch {
+  // Read-only filesystem in serverless environments (Vercel)
 }
 
 let dbInstance: DatabaseSchema | null = null;
@@ -115,9 +119,20 @@ export function isTiDBConnected(): boolean {
 
 export function saveDbLocalOnly(data: DatabaseSchema): void {
   dbInstance = data;
-  const tempFile = `${DB_FILE}.tmp.${Date.now()}`;
-  fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf-8');
-  fs.renameSync(tempFile, DB_FILE);
+  try {
+    const tempFile = `${DB_FILE}.tmp.${Date.now()}`;
+    fs.writeFileSync(tempFile, JSON.stringify(data, null, 2), 'utf-8');
+    fs.renameSync(tempFile, DB_FILE);
+  } catch (err: any) {
+    // In serverless environments (Vercel), repository filesystem is read-only.
+    // In-memory dbInstance remains authoritative and TiDB Cloud handles persistence.
+    try {
+      const tmpFile = path.join('/tmp', 'buildrex.json');
+      fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
+    } catch {
+      // Ignore filesystem write error in serverless environments
+    }
+  }
 }
 
 let isSyncingToTiDB = false;
