@@ -13,6 +13,9 @@ async function build() {
     format: 'esm',
     target: 'node20',
     outfile: 'api/index.js',
+    banner: {
+      js: "import { createRequire } from 'module'; const require = createRequire(import.meta.url);",
+    },
   });
 
   fs.copyFileSync('api/index.js', 'api/[...path].js');
