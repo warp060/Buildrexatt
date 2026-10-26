@@ -13,7 +13,6 @@ async function build() {
     format: 'esm',
     target: 'node20',
     outfile: 'api/index.js',
-    external: ['mysql2'],
   });
 
   fs.copyFileSync('api/index.js', 'api/[...path].js');

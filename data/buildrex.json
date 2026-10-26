@@ -347,1885 +347,1885 @@
       "user_id": "user-mushrath",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:53:00",
-      "check_out": "2026-10-21 19:33:00",
+      "check_out": "2026-10-21 14:03:00",
       "total_minutes": 475,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-22",
       "user_id": "user-aysha",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:52:00",
-      "check_out": "2026-10-21 19:32:00",
+      "check_out": "2026-10-21 14:02:00",
       "total_minutes": 470,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-22",
       "user_id": "user-immanuel",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:51:00",
-      "check_out": "2026-10-21 19:31:00",
+      "check_out": "2026-10-21 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-22",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:40:00",
-      "check_out": "2026-10-21 19:40:00",
+      "check_out": "2026-10-21 14:10:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-22",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:39:00",
-      "check_out": "2026-10-21 19:39:00",
+      "check_out": "2026-10-21 14:09:00",
       "total_minutes": 517,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-22",
       "user_id": "user-ameen",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:38:00",
-      "check_out": "2026-10-21 19:38:00",
+      "check_out": "2026-10-21 14:08:00",
       "total_minutes": 514,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-22",
       "user_id": "user-fareed",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:37:00",
-      "check_out": "2026-10-21 19:37:00",
+      "check_out": "2026-10-21 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-22",
       "user_id": "user-azeez",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:35:00",
-      "check_out": "2026-10-21 19:47:00",
+      "check_out": "2026-10-21 14:17:00",
       "total_minutes": 541,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-22",
       "user_id": "user-abbas",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:34:00",
-      "check_out": "2026-10-21 19:46:00",
+      "check_out": "2026-10-21 14:16:00",
       "total_minutes": 538,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-22",
       "user_id": "user-afra",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:34:00",
-      "check_out": "2026-10-21 19:34:00",
+      "check_out": "2026-10-21 14:04:00",
       "total_minutes": 502,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-22",
       "user_id": "user-maleeha",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:33:00",
-      "check_out": "2026-10-21 19:45:00",
+      "check_out": "2026-10-21 14:15:00",
       "total_minutes": 535,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-22",
       "user_id": "user-sahil",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:32:00",
-      "check_out": "2026-10-21 19:44:00",
+      "check_out": "2026-10-21 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-22",
       "user_id": "user-admin-master",
       "work_date": "2026-10-22",
       "check_in": "2026-10-22 03:31:00",
-      "check_out": "2026-10-21 19:43:00",
+      "check_out": "2026-10-21 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-21",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:53:00",
-      "check_out": "2026-10-20 19:33:00",
+      "check_out": "2026-10-20 14:03:00",
       "total_minutes": 475,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-21",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:52:00",
-      "check_out": "2026-10-20 19:32:00",
+      "check_out": "2026-10-20 14:02:00",
       "total_minutes": 470,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-21",
       "user_id": "user-ameen",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:51:00",
-      "check_out": "2026-10-20 19:31:00",
+      "check_out": "2026-10-20 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-21",
       "user_id": "user-azeez",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:40:00",
-      "check_out": "2026-10-20 19:40:00",
+      "check_out": "2026-10-20 14:10:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-21",
       "user_id": "user-abbas",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:39:00",
-      "check_out": "2026-10-20 19:39:00",
+      "check_out": "2026-10-20 14:09:00",
       "total_minutes": 517,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-21",
       "user_id": "user-maleeha",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:38:00",
-      "check_out": "2026-10-20 19:38:00",
+      "check_out": "2026-10-20 14:08:00",
       "total_minutes": 514,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-21",
       "user_id": "user-sahil",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:37:00",
-      "check_out": "2026-10-20 19:37:00",
+      "check_out": "2026-10-20 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-21",
       "user_id": "user-admin-master",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:36:00",
-      "check_out": "2026-10-20 19:36:00",
+      "check_out": "2026-10-20 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-21",
       "user_id": "user-afra",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:35:00",
-      "check_out": "2026-10-20 19:47:00",
+      "check_out": "2026-10-20 14:17:00",
       "total_minutes": 541,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-21",
       "user_id": "user-mushrath",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:34:00",
-      "check_out": "2026-10-20 19:46:00",
+      "check_out": "2026-10-20 14:16:00",
       "total_minutes": 538,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-21",
       "user_id": "user-aysha",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:33:00",
-      "check_out": "2026-10-20 19:45:00",
+      "check_out": "2026-10-20 14:15:00",
       "total_minutes": 535,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-21",
       "user_id": "user-immanuel",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:32:00",
-      "check_out": "2026-10-20 19:44:00",
+      "check_out": "2026-10-20 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-21",
       "user_id": "user-zafeera",
       "work_date": "2026-10-21",
       "check_in": "2026-10-21 03:31:00",
-      "check_out": "2026-10-20 19:43:00",
+      "check_out": "2026-10-20 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-20",
       "user_id": "user-azeez",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:53:00",
-      "check_out": "2026-10-19 19:33:00",
+      "check_out": "2026-10-19 14:03:00",
       "total_minutes": 475,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-20",
       "user_id": "user-abbas",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:52:00",
-      "check_out": "2026-10-19 19:32:00",
+      "check_out": "2026-10-19 14:02:00",
       "total_minutes": 470,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-20",
       "user_id": "user-maleeha",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:51:00",
-      "check_out": "2026-10-19 19:31:00",
+      "check_out": "2026-10-19 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-20",
       "user_id": "user-afra",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:40:00",
-      "check_out": "2026-10-19 19:40:00",
+      "check_out": "2026-10-19 14:10:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-20",
       "user_id": "user-mushrath",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:39:00",
-      "check_out": "2026-10-19 19:39:00",
+      "check_out": "2026-10-19 14:09:00",
       "total_minutes": 517,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-20",
       "user_id": "user-aysha",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:38:00",
-      "check_out": "2026-10-19 19:38:00",
+      "check_out": "2026-10-19 14:08:00",
       "total_minutes": 514,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-20",
       "user_id": "user-immanuel",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:37:00",
-      "check_out": "2026-10-19 19:37:00",
+      "check_out": "2026-10-19 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-20",
       "user_id": "user-admin-master",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:37:00",
-      "check_out": "2026-10-19 19:49:00",
+      "check_out": "2026-10-19 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-20",
       "user_id": "user-zafeera",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:36:00",
-      "check_out": "2026-10-19 19:36:00",
+      "check_out": "2026-10-19 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-20",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:34:00",
-      "check_out": "2026-10-19 19:46:00",
+      "check_out": "2026-10-19 14:16:00",
       "total_minutes": 538,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-20",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:33:00",
-      "check_out": "2026-10-19 19:45:00",
+      "check_out": "2026-10-19 14:15:00",
       "total_minutes": 535,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-20",
       "user_id": "user-ameen",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:32:00",
-      "check_out": "2026-10-19 19:44:00",
+      "check_out": "2026-10-19 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-20",
       "user_id": "user-fareed",
       "work_date": "2026-10-20",
       "check_in": "2026-10-20 03:31:00",
-      "check_out": "2026-10-19 19:43:00",
+      "check_out": "2026-10-19 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-19",
       "user_id": "user-afra",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:53:00",
-      "check_out": "2026-10-18 19:33:00",
+      "check_out": "2026-10-18 14:03:00",
       "total_minutes": 475,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-19",
       "user_id": "user-mushrath",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:52:00",
-      "check_out": "2026-10-18 19:32:00",
+      "check_out": "2026-10-18 14:02:00",
       "total_minutes": 470,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-19",
       "user_id": "user-aysha",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:51:00",
-      "check_out": "2026-10-18 19:31:00",
+      "check_out": "2026-10-18 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-19",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:39:00",
-      "check_out": "2026-10-18 19:39:00",
+      "check_out": "2026-10-18 14:09:00",
       "total_minutes": 517,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-19",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:38:00",
-      "check_out": "2026-10-18 19:38:00",
+      "check_out": "2026-10-18 14:08:00",
       "total_minutes": 514,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-19",
       "user_id": "user-zafeera",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:37:00",
-      "check_out": "2026-10-18 19:49:00",
+      "check_out": "2026-10-18 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-19",
       "user_id": "user-ameen",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:37:00",
-      "check_out": "2026-10-18 19:37:00",
+      "check_out": "2026-10-18 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-19",
       "user_id": "user-fareed",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:36:00",
-      "check_out": "2026-10-18 19:36:00",
+      "check_out": "2026-10-18 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-19",
       "user_id": "user-azeez",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:34:00",
-      "check_out": "2026-10-18 19:46:00",
+      "check_out": "2026-10-18 14:16:00",
       "total_minutes": 538,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:34"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-19",
       "user_id": "user-abbas",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:33:00",
-      "check_out": "2026-10-18 19:45:00",
+      "check_out": "2026-10-18 14:15:00",
       "total_minutes": 535,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-19",
       "user_id": "user-maleeha",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:32:00",
-      "check_out": "2026-10-18 19:44:00",
+      "check_out": "2026-10-18 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-19",
       "user_id": "user-sahil",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:31:00",
-      "check_out": "2026-10-18 19:43:00",
+      "check_out": "2026-10-18 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-19",
       "user_id": "user-admin-master",
       "work_date": "2026-10-19",
       "check_in": "2026-10-19 03:30:00",
-      "check_out": "2026-10-18 19:42:00",
+      "check_out": "2026-10-18 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-16",
       "user_id": "user-afra",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:52:00",
-      "check_out": "2026-10-15 19:32:00",
+      "check_out": "2026-10-15 14:02:00",
       "total_minutes": 470,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-16",
       "user_id": "user-mushrath",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:51:00",
-      "check_out": "2026-10-15 19:31:00",
+      "check_out": "2026-10-15 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-16",
       "user_id": "user-admin-master",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:41:00",
-      "check_out": "2026-10-15 19:41:00",
+      "check_out": "2026-10-15 14:11:00",
       "total_minutes": 523,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-16",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:38:00",
-      "check_out": "2026-10-15 19:38:00",
+      "check_out": "2026-10-15 14:08:00",
       "total_minutes": 514,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-16",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:37:00",
-      "check_out": "2026-10-15 19:37:00",
+      "check_out": "2026-10-15 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-16",
       "user_id": "user-immanuel",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:37:00",
-      "check_out": "2026-10-15 19:49:00",
+      "check_out": "2026-10-15 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-16",
       "user_id": "user-zafeera",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:36:00",
-      "check_out": "2026-10-15 19:48:00",
+      "check_out": "2026-10-15 14:18:00",
       "total_minutes": 544,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-16",
       "user_id": "user-ameen",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:36:00",
-      "check_out": "2026-10-15 19:36:00",
+      "check_out": "2026-10-15 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-16",
       "user_id": "user-fareed",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:35:00",
-      "check_out": "2026-10-15 19:35:00",
+      "check_out": "2026-10-15 14:05:00",
       "total_minutes": 505,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-16",
       "user_id": "user-azeez",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:33:00",
-      "check_out": "2026-10-15 19:45:00",
+      "check_out": "2026-10-15 14:15:00",
       "total_minutes": 535,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-16",
       "user_id": "user-abbas",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:32:00",
-      "check_out": "2026-10-15 19:44:00",
+      "check_out": "2026-10-15 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-16",
       "user_id": "user-maleeha",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:31:00",
-      "check_out": "2026-10-15 19:43:00",
+      "check_out": "2026-10-15 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-16",
       "user_id": "user-sahil",
       "work_date": "2026-10-16",
       "check_in": "2026-10-16 03:30:00",
-      "check_out": "2026-10-15 19:42:00",
+      "check_out": "2026-10-15 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-15",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:51:00",
-      "check_out": "2026-10-14 19:31:00",
+      "check_out": "2026-10-14 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-15",
       "user_id": "user-zafeera",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:41:00",
-      "check_out": "2026-10-14 19:41:00",
+      "check_out": "2026-10-14 14:11:00",
       "total_minutes": 523,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-15",
       "user_id": "user-azeez",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:38:00",
-      "check_out": "2026-10-14 19:38:00",
+      "check_out": "2026-10-14 14:08:00",
       "total_minutes": 514,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-15",
       "user_id": "user-abbas",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:37:00",
-      "check_out": "2026-10-14 19:37:00",
+      "check_out": "2026-10-14 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-15",
       "user_id": "user-ameen",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:37:00",
-      "check_out": "2026-10-14 19:49:00",
+      "check_out": "2026-10-14 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-15",
       "user_id": "user-fareed",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:36:00",
-      "check_out": "2026-10-14 19:48:00",
+      "check_out": "2026-10-14 14:18:00",
       "total_minutes": 544,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-15",
       "user_id": "user-maleeha",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:36:00",
-      "check_out": "2026-10-14 19:36:00",
+      "check_out": "2026-10-14 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-15",
       "user_id": "user-sahil",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:35:00",
-      "check_out": "2026-10-14 19:35:00",
+      "check_out": "2026-10-14 14:05:00",
       "total_minutes": 505,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-15",
       "user_id": "user-admin-master",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:34:00",
-      "check_out": "2026-10-14 19:34:00",
+      "check_out": "2026-10-14 14:04:00",
       "total_minutes": 502,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-15",
       "user_id": "user-afra",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:33:00",
-      "check_out": "2026-10-14 19:45:00",
+      "check_out": "2026-10-14 14:15:00",
       "total_minutes": 535,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-15",
       "user_id": "user-mushrath",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:32:00",
-      "check_out": "2026-10-14 19:44:00",
+      "check_out": "2026-10-14 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-15",
       "user_id": "user-aysha",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:31:00",
-      "check_out": "2026-10-14 19:43:00",
+      "check_out": "2026-10-14 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-15",
       "user_id": "user-immanuel",
       "work_date": "2026-10-15",
       "check_in": "2026-10-15 03:30:00",
-      "check_out": "2026-10-14 19:42:00",
+      "check_out": "2026-10-14 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-14",
       "user_id": "user-azeez",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:51:00",
-      "check_out": "2026-10-13 19:31:00",
+      "check_out": "2026-10-13 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-14",
       "user_id": "user-fareed",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:41:00",
-      "check_out": "2026-10-13 19:41:00",
+      "check_out": "2026-10-13 14:11:00",
       "total_minutes": 523,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-14",
       "user_id": "user-afra",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:38:00",
-      "check_out": "2026-10-13 19:38:00",
+      "check_out": "2026-10-13 14:08:00",
       "total_minutes": 514,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-14",
       "user_id": "user-maleeha",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:37:00",
-      "check_out": "2026-10-13 19:49:00",
+      "check_out": "2026-10-13 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-14",
       "user_id": "user-mushrath",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:37:00",
-      "check_out": "2026-10-13 19:37:00",
+      "check_out": "2026-10-13 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-14",
       "user_id": "user-sahil",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:36:00",
-      "check_out": "2026-10-13 19:48:00",
+      "check_out": "2026-10-13 14:18:00",
       "total_minutes": 544,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-14",
       "user_id": "user-aysha",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:36:00",
-      "check_out": "2026-10-13 19:36:00",
+      "check_out": "2026-10-13 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-14",
       "user_id": "user-admin-master",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:35:00",
-      "check_out": "2026-10-13 19:47:00",
+      "check_out": "2026-10-13 14:17:00",
       "total_minutes": 541,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-14",
       "user_id": "user-immanuel",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:35:00",
-      "check_out": "2026-10-13 19:35:00",
+      "check_out": "2026-10-13 14:05:00",
       "total_minutes": 505,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-14",
       "user_id": "user-zafeera",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:34:00",
-      "check_out": "2026-10-13 19:34:00",
+      "check_out": "2026-10-13 14:04:00",
       "total_minutes": 502,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-14",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:32:00",
-      "check_out": "2026-10-13 19:44:00",
+      "check_out": "2026-10-13 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-14",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:31:00",
-      "check_out": "2026-10-13 19:43:00",
+      "check_out": "2026-10-13 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-14",
       "user_id": "user-ameen",
       "work_date": "2026-10-14",
       "check_in": "2026-10-14 03:30:00",
-      "check_out": "2026-10-13 19:42:00",
+      "check_out": "2026-10-13 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-13",
       "user_id": "user-afra",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:51:00",
-      "check_out": "2026-10-12 19:31:00",
+      "check_out": "2026-10-12 14:01:00",
       "total_minutes": 465,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-13",
       "user_id": "user-sahil",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:41:00",
-      "check_out": "2026-10-12 19:41:00",
+      "check_out": "2026-10-12 14:11:00",
       "total_minutes": 523,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-13",
       "user_id": "user-admin-master",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:40:00",
-      "check_out": "2026-10-12 19:40:00",
+      "check_out": "2026-10-12 14:10:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-13",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:37:00",
-      "check_out": "2026-10-12 19:37:00",
+      "check_out": "2026-10-12 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-13",
       "user_id": "user-aysha",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:37:00",
-      "check_out": "2026-10-12 19:49:00",
+      "check_out": "2026-10-12 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-13",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:36:00",
-      "check_out": "2026-10-12 19:36:00",
+      "check_out": "2026-10-12 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-13",
       "user_id": "user-immanuel",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:36:00",
-      "check_out": "2026-10-12 19:48:00",
+      "check_out": "2026-10-12 14:18:00",
       "total_minutes": 544,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-13",
       "user_id": "user-zafeera",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:35:00",
-      "check_out": "2026-10-12 19:47:00",
+      "check_out": "2026-10-12 14:17:00",
       "total_minutes": 541,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-13",
       "user_id": "user-ameen",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:35:00",
-      "check_out": "2026-10-12 19:35:00",
+      "check_out": "2026-10-12 14:05:00",
       "total_minutes": 505,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-13",
       "user_id": "user-fareed",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:34:00",
-      "check_out": "2026-10-12 19:34:00",
+      "check_out": "2026-10-12 14:04:00",
       "total_minutes": 502,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-13",
       "user_id": "user-azeez",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:32:00",
-      "check_out": "2026-10-12 19:44:00",
+      "check_out": "2026-10-12 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-13",
       "user_id": "user-abbas",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:31:00",
-      "check_out": "2026-10-12 19:43:00",
+      "check_out": "2026-10-12 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-13",
       "user_id": "user-maleeha",
       "work_date": "2026-10-13",
       "check_in": "2026-10-13 03:30:00",
-      "check_out": "2026-10-12 19:42:00",
+      "check_out": "2026-10-12 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-12",
       "user_id": "user-admin-master",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:53:00",
-      "check_out": "2026-10-11 19:33:00",
+      "check_out": "2026-10-11 14:03:00",
       "total_minutes": 475,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-12",
       "user_id": "user-immanuel",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:41:00",
-      "check_out": "2026-10-11 19:41:00",
+      "check_out": "2026-10-11 14:11:00",
       "total_minutes": 523,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-12",
       "user_id": "user-zafeera",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:40:00",
-      "check_out": "2026-10-11 19:40:00",
+      "check_out": "2026-10-11 14:10:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-12",
       "user_id": "user-azeez",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:37:00",
-      "check_out": "2026-10-11 19:37:00",
+      "check_out": "2026-10-11 14:07:00",
       "total_minutes": 511,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-12",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:37:00",
-      "check_out": "2026-10-11 19:49:00",
+      "check_out": "2026-10-11 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-12",
       "user_id": "user-ameen",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:36:00",
-      "check_out": "2026-10-11 19:48:00",
+      "check_out": "2026-10-11 14:18:00",
       "total_minutes": 544,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-12",
       "user_id": "user-abbas",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:36:00",
-      "check_out": "2026-10-11 19:36:00",
+      "check_out": "2026-10-11 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-12",
       "user_id": "user-maleeha",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:35:00",
-      "check_out": "2026-10-11 19:35:00",
+      "check_out": "2026-10-11 14:05:00",
       "total_minutes": 505,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-12",
       "user_id": "user-fareed",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:35:00",
-      "check_out": "2026-10-11 19:47:00",
+      "check_out": "2026-10-11 14:17:00",
       "total_minutes": 541,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-12",
       "user_id": "user-sahil",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:34:00",
-      "check_out": "2026-10-11 19:34:00",
+      "check_out": "2026-10-11 14:04:00",
       "total_minutes": 502,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-12",
       "user_id": "user-afra",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:32:00",
-      "check_out": "2026-10-11 19:44:00",
+      "check_out": "2026-10-11 14:14:00",
       "total_minutes": 532,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-12",
       "user_id": "user-mushrath",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:31:00",
-      "check_out": "2026-10-11 19:43:00",
+      "check_out": "2026-10-11 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-12",
       "user_id": "user-aysha",
       "work_date": "2026-10-12",
       "check_in": "2026-10-12 03:30:00",
-      "check_out": "2026-10-11 19:42:00",
+      "check_out": "2026-10-11 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-09",
       "user_id": "user-sahil",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:53:00",
-      "check_out": "2026-10-08 19:33:00",
+      "check_out": "2026-10-08 14:03:00",
       "total_minutes": 475,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-09",
       "user_id": "user-admin-master",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:52:00",
-      "check_out": "2026-10-08 19:32:00",
+      "check_out": "2026-10-08 14:02:00",
       "total_minutes": 470,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-09",
       "user_id": "user-aysha",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:41:00",
-      "check_out": "2026-10-08 19:41:00",
+      "check_out": "2026-10-08 14:11:00",
       "total_minutes": 523,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-09",
       "user_id": "user-immanuel",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:40:00",
-      "check_out": "2026-10-08 19:40:00",
+      "check_out": "2026-10-08 14:10:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-09",
       "user_id": "user-zafeera",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:39:00",
-      "check_out": "2026-10-08 19:39:00",
+      "check_out": "2026-10-08 14:09:00",
       "total_minutes": 517,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-09",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:37:00",
-      "check_out": "2026-10-08 19:49:00",
+      "check_out": "2026-10-08 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-09",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:36:00",
-      "check_out": "2026-10-08 19:48:00",
+      "check_out": "2026-10-08 14:18:00",
       "total_minutes": 544,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-09",
       "user_id": "user-azeez",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:36:00",
-      "check_out": "2026-10-08 19:36:00",
+      "check_out": "2026-10-08 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-09",
       "user_id": "user-ameen",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:35:00",
-      "check_out": "2026-10-08 19:47:00",
+      "check_out": "2026-10-08 14:17:00",
       "total_minutes": 541,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-09",
       "user_id": "user-abbas",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:35:00",
-      "check_out": "2026-10-08 19:35:00",
+      "check_out": "2026-10-08 14:05:00",
       "total_minutes": 505,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-09",
       "user_id": "user-fareed",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:34:00",
-      "check_out": "2026-10-08 19:46:00",
+      "check_out": "2026-10-08 14:16:00",
       "total_minutes": 538,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-09",
       "user_id": "user-maleeha",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:34:00",
-      "check_out": "2026-10-08 19:34:00",
+      "check_out": "2026-10-08 14:04:00",
       "total_minutes": 502,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-09",
       "user_id": "user-afra",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:31:00",
-      "check_out": "2026-10-08 19:43:00",
+      "check_out": "2026-10-08 14:13:00",
       "total_minutes": 529,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-09",
       "user_id": "user-mushrath",
       "work_date": "2026-10-09",
       "check_in": "2026-10-09 03:30:00",
-      "check_out": "2026-10-08 19:42:00",
+      "check_out": "2026-10-08 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-immanuel-2026-10-08",
       "user_id": "user-immanuel",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:53:00",
-      "check_out": "2026-10-07 19:33:00",
+      "check_out": "2026-10-07 14:03:00",
       "total_minutes": 475,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-zafeera-2026-10-08",
       "user_id": "user-zafeera",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:52:00",
-      "check_out": "2026-10-07 19:32:00",
+      "check_out": "2026-10-07 14:02:00",
       "total_minutes": 470,
       "status": "late",
       "notes": "Arrived after grace period",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ashfaq-2026-10-08",
       "user_id": "user-ashfaq",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:41:00",
-      "check_out": "2026-10-07 19:41:00",
+      "check_out": "2026-10-07 14:11:00",
       "total_minutes": 523,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-ameen-2026-10-08",
       "user_id": "user-ameen",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:40:00",
-      "check_out": "2026-10-07 19:40:00",
+      "check_out": "2026-10-07 14:10:00",
       "total_minutes": 520,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-fareed-2026-10-08",
       "user_id": "user-fareed",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:39:00",
-      "check_out": "2026-10-07 19:39:00",
+      "check_out": "2026-10-07 14:09:00",
       "total_minutes": 517,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-azeez-2026-10-08",
       "user_id": "user-azeez",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:37:00",
-      "check_out": "2026-10-07 19:49:00",
+      "check_out": "2026-10-07 14:19:00",
       "total_minutes": 547,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-afra-2026-10-08",
       "user_id": "user-afra",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:36:00",
-      "check_out": "2026-10-07 19:36:00",
+      "check_out": "2026-10-07 14:06:00",
       "total_minutes": 508,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-abbas-2026-10-08",
       "user_id": "user-abbas",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:36:00",
-      "check_out": "2026-10-07 19:48:00",
+      "check_out": "2026-10-07 14:18:00",
       "total_minutes": 544,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-maleeha-2026-10-08",
       "user_id": "user-maleeha",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:35:00",
-      "check_out": "2026-10-07 19:47:00",
+      "check_out": "2026-10-07 14:17:00",
       "total_minutes": 541,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-mushrath-2026-10-08",
       "user_id": "user-mushrath",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:35:00",
-      "check_out": "2026-10-07 19:35:00",
+      "check_out": "2026-10-07 14:05:00",
       "total_minutes": 505,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-aysha-2026-10-08",
       "user_id": "user-aysha",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:34:00",
-      "check_out": "2026-10-07 19:34:00",
+      "check_out": "2026-10-07 14:04:00",
       "total_minutes": 502,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sahil-2026-10-08",
       "user_id": "user-sahil",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:34:00",
-      "check_out": "2026-10-07 19:46:00",
+      "check_out": "2026-10-07 14:16:00",
       "total_minutes": 538,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-admin-master-2026-10-08",
       "user_id": "user-admin-master",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:33:00",
-      "check_out": "2026-10-07 19:45:00",
+      "check_out": "2026-10-07 14:15:00",
       "total_minutes": 535,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "att-user-sumaiya-2026-10-08",
       "user_id": "user-sumaiya",
       "work_date": "2026-10-08",
       "check_in": "2026-10-08 03:30:00",
-      "check_out": "2026-10-07 19:42:00",
+      "check_out": "2026-10-07 14:12:00",
       "total_minutes": 526,
       "status": "present",
       "notes": "Normal shift completed",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     }
   ],
   "work_updates": [
@@ -3017,9 +3017,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "wu-user-azeez-2026-10-19",
@@ -3035,9 +3035,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "wu-user-mushrath-2026-10-19",
@@ -3053,9 +3053,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "wu-user-immanuel-2026-10-19",
@@ -3071,9 +3071,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "wu-user-abbas-2026-10-19",
@@ -3089,9 +3089,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "wu-user-admin-master-2026-10-19",
@@ -3107,9 +3107,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "wu-user-aysha-2026-10-19",
@@ -3125,9 +3125,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:35"
+      "updated_at": "2026-10-25 12:02:54"
     },
     {
       "id": "wu-user-sumaiya-2026-10-19",
@@ -3143,9 +3143,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-afra-2026-10-19",
@@ -3161,9 +3161,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-fareed-2026-10-19",
@@ -3179,9 +3179,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ameen-2026-10-19",
@@ -3197,9 +3197,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-zafeera-2026-10-19",
@@ -3215,9 +3215,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-maleeha-2026-10-19",
@@ -3233,9 +3233,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sahil-2026-10-19",
@@ -3251,9 +3251,9 @@
       "submitted_at": "2026-10-19 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-18 20:15:00",
+      "reviewed_at": "2026-10-18 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-maleeha-2026-10-16",
@@ -3269,9 +3269,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-afra-2026-10-16",
@@ -3287,9 +3287,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-zafeera-2026-10-16",
@@ -3305,9 +3305,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-admin-master-2026-10-16",
@@ -3323,9 +3323,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sahil-2026-10-16",
@@ -3341,9 +3341,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-immanuel-2026-10-16",
@@ -3359,9 +3359,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sumaiya-2026-10-16",
@@ -3377,9 +3377,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-azeez-2026-10-16",
@@ -3395,9 +3395,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-fareed-2026-10-16",
@@ -3413,9 +3413,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-abbas-2026-10-16",
@@ -3431,9 +3431,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ameen-2026-10-16",
@@ -3449,9 +3449,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ashfaq-2026-10-16",
@@ -3467,9 +3467,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-aysha-2026-10-16",
@@ -3485,9 +3485,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-mushrath-2026-10-16",
@@ -3503,9 +3503,9 @@
       "submitted_at": "2026-10-16 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-15 20:15:00",
+      "reviewed_at": "2026-10-15 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ameen-2026-10-15",
@@ -3521,9 +3521,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-aysha-2026-10-15",
@@ -3539,9 +3539,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-immanuel-2026-10-15",
@@ -3557,9 +3557,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-abbas-2026-10-15",
@@ -3575,9 +3575,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-zafeera-2026-10-15",
@@ -3593,9 +3593,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-fareed-2026-10-15",
@@ -3611,9 +3611,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-admin-master-2026-10-15",
@@ -3629,9 +3629,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sumaiya-2026-10-15",
@@ -3647,9 +3647,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-afra-2026-10-15",
@@ -3665,9 +3665,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sahil-2026-10-15",
@@ -3683,9 +3683,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ashfaq-2026-10-15",
@@ -3701,9 +3701,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-maleeha-2026-10-15",
@@ -3719,9 +3719,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-azeez-2026-10-15",
@@ -3737,9 +3737,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-mushrath-2026-10-15",
@@ -3755,9 +3755,9 @@
       "submitted_at": "2026-10-15 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-14 20:15:00",
+      "reviewed_at": "2026-10-14 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ashfaq-2026-10-14",
@@ -3773,9 +3773,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sahil-2026-10-14",
@@ -3791,9 +3791,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-abbas-2026-10-14",
@@ -3809,9 +3809,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-zafeera-2026-10-14",
@@ -3827,9 +3827,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-admin-master-2026-10-14",
@@ -3845,9 +3845,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-mushrath-2026-10-14",
@@ -3863,9 +3863,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-azeez-2026-10-14",
@@ -3881,9 +3881,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-aysha-2026-10-14",
@@ -3899,9 +3899,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-fareed-2026-10-14",
@@ -3917,9 +3917,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sumaiya-2026-10-14",
@@ -3935,9 +3935,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-maleeha-2026-10-14",
@@ -3953,9 +3953,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-immanuel-2026-10-14",
@@ -3971,9 +3971,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-afra-2026-10-14",
@@ -3989,9 +3989,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ameen-2026-10-14",
@@ -4007,9 +4007,9 @@
       "submitted_at": "2026-10-14 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-13 20:15:00",
+      "reviewed_at": "2026-10-13 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-admin-master-2026-10-13",
@@ -4025,9 +4025,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-afra-2026-10-13",
@@ -4043,9 +4043,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-abbas-2026-10-13",
@@ -4061,9 +4061,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-azeez-2026-10-13",
@@ -4079,9 +4079,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-immanuel-2026-10-13",
@@ -4097,9 +4097,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-maleeha-2026-10-13",
@@ -4115,9 +4115,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-zafeera-2026-10-13",
@@ -4133,9 +4133,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-mushrath-2026-10-13",
@@ -4151,9 +4151,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sahil-2026-10-13",
@@ -4169,9 +4169,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-aysha-2026-10-13",
@@ -4187,9 +4187,9 @@
       "submitted_at": "2026-10-13 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-12 20:15:00",
+      "reviewed_at": "2026-10-12 14:45:00",
       "created_at": "2026-10-23 14:54:39",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sahil-2026-10-12",
@@ -4205,9 +4205,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-mushrath-2026-10-12",
@@ -4223,9 +4223,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-fareed-2026-10-12",
@@ -4241,9 +4241,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-aysha-2026-10-12",
@@ -4259,9 +4259,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-azeez-2026-10-12",
@@ -4277,9 +4277,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-zafeera-2026-10-12",
@@ -4295,9 +4295,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-sumaiya-2026-10-12",
@@ -4313,9 +4313,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-afra-2026-10-12",
@@ -4331,9 +4331,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-immanuel-2026-10-12",
@@ -4349,9 +4349,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-admin-master-2026-10-12",
@@ -4367,9 +4367,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-maleeha-2026-10-12",
@@ -4385,9 +4385,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ameen-2026-10-12",
@@ -4403,9 +4403,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-ashfaq-2026-10-12",
@@ -4421,9 +4421,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     },
     {
       "id": "wu-user-abbas-2026-10-12",
@@ -4439,9 +4439,9 @@
       "submitted_at": "2026-10-12 12:00:00",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Good progress. Keep up the momentum.",
-      "reviewed_at": "2026-10-11 20:15:00",
+      "reviewed_at": "2026-10-11 14:45:00",
       "created_at": "2026-10-23 14:54:40",
-      "updated_at": "2026-10-25 11:41:36"
+      "updated_at": "2026-10-25 12:02:55"
     }
   ],
   "leave_requests": [
@@ -4456,7 +4456,7 @@
       "status": "approved",
       "reviewed_by": "user-admin-master",
       "review_comment": "sure",
-      "reviewed_at": "2026-10-24 10:18:49",
+      "reviewed_at": "2026-10-24 04:48:49",
       "created_at": "2026-10-24 15:47:11"
     },
     {
@@ -4484,7 +4484,7 @@
       "status": "approved",
       "reviewed_by": "user-ehsaan",
       "review_comment": "Approved. Please ensure hackathon tasks are delegated.",
-      "reviewed_at": "2026-10-22 16:05:35",
+      "reviewed_at": "2026-10-22 10:35:35",
       "created_at": "2026-10-23 14:54:40"
     },
     {
@@ -4593,7 +4593,7 @@
         "role": "admin"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-25T12:06:43.879Z"
+      "created_at": "2026-10-25 12:06:42"
     },
     {
       "id": "audit-1792929817620-6fndx",
@@ -4607,7 +4607,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-25T12:03:37.620Z"
+      "created_at": "2026-10-25 12:03:37"
     },
     {
       "id": "audit-1792929771749-b1tvy",
@@ -4621,7 +4621,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-25T12:02:51.749Z"
+      "created_at": "2026-10-25 12:02:56"
     },
     {
       "id": "audit-1792928498595-nvtu2",

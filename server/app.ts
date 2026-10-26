@@ -77,7 +77,7 @@ app.get(['/api/health', '/health'], (req, res) => {
   });
 });
 
-app.get(['/api', '/api/'], (req, res) => {
+app.get(['/', '/api', '/api/'], (req, res) => {
   res.json({
     status: 'healthy',
     message: 'BUILDREX API Gateway Operational',
