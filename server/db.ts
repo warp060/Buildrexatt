@@ -61,6 +61,7 @@ function getTodayDateString(): string {
   return `${year}-${month}-${day}`;
 }
 
+import buildrexSeedData from '../data/buildrex.json';
 import { generateSeedDatabase } from './sheetSeedData';
 
 function generateInitialSeed(): DatabaseSchema {
@@ -76,7 +77,6 @@ export function getDb(): DatabaseSchema {
     try {
       const content = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(content);
-      // Ensure local file has the real Google Sheet team (15+ members including Ehsaan) and none of the removed users
       const hasRemovedUsers = parsed.users.some((u: any) => [
         'layeequeahmed602@gmail.com',
         'nmuhammadshees11@gmail.com',
@@ -102,12 +102,12 @@ export function getDb(): DatabaseSchema {
         return dbInstance!;
       }
     } catch {
-      // fallback to re-seeding if corrupted
+      // fallback to bundled dataset
     }
   }
 
-  dbInstance = generateInitialSeed();
-  saveDbLocalOnly(dbInstance);
+  // Fallback to bundled dataset directly (instant 0ms cold start, no disk dependency in serverless)
+  dbInstance = JSON.parse(JSON.stringify(buildrexSeedData)) as DatabaseSchema;
   return dbInstance;
 }
 

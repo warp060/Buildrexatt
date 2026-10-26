@@ -105,6 +105,14 @@ app.use('/admin', adminRoutes);
 app.use('/ai', aiRoutes);
 app.use('/sync', syncRoutes);
 
+// 404 Fallback handler for unmatched API routes
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `API route not found: ${req.method} ${req.originalUrl || req.url}`,
+  });
+});
+
 // Global API error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('API Error:', err);
