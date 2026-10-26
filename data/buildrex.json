@@ -317,6 +317,19 @@
   ],
   "attendance": [
     {
+      "id": "att-1793032517091-6cmib",
+      "user_id": "user-abbas",
+      "work_date": "2026-10-26",
+      "check_in": "2026-10-26T16:35:17.084Z",
+      "check_out": null,
+      "total_minutes": 0,
+      "status": "late",
+      "notes": "Late arrival (checked in after grace window)",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-26T16:35:17.084Z",
+      "updated_at": "2026-10-26T16:35:17.084Z"
+    },
+    {
       "id": "att-1792856719968-8cboq",
       "user_id": "user-abbas",
       "work_date": "2026-10-24",
@@ -4581,6 +4594,63 @@
     }
   ],
   "audit_logs": [
+    {
+      "id": "audit-1793032517094-3gyz8",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "ATTENDANCE_CHECK_IN",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1793032517091-6cmib",
+      "details": {
+        "work_date": "2026-10-26",
+        "check_in": "2026-10-26T16:35:17.084Z",
+        "status": "late"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-26T16:35:17.094Z"
+    },
+    {
+      "id": "audit-1793032509562-zji2u",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-abbas",
+      "details": {
+        "email": "abbas6618532@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-26T16:35:09.562Z"
+    },
+    {
+      "id": "audit-1793031934910-aws0u",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-26T16:25:34.910Z"
+    },
+    {
+      "id": "audit-1793031911812-e6czy",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-abbas",
+      "details": {
+        "email": "abbas6618532@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-26T16:25:11.813Z"
+    },
     {
       "id": "audit-1792930003879-relv2",
       "actor_id": "user-admin-master",

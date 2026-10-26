@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ExternalLink,
 } from 'lucide-react';
+import { BuildrexLogo } from './BuildrexLogo';
 
 interface TeamCredentialsModalProps {
   isOpen: boolean;
@@ -120,10 +121,10 @@ export const TeamCredentialsModal: React.FC<TeamCredentialsModalProps> = ({
       <div className="space-y-4 max-h-[75vh] flex flex-col">
         {/* Header Information Strip */}
         <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/90 text-xs text-slate-600 shrink-0">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="flex items-center gap-2.5">
+            <BuildrexLogo size="xs" variant="badge" glow={false} />
             <span className="font-medium">
-              BUILDREX Official Google Sheet: <span className="font-bold text-slate-900">{credentials.length} members loaded</span>
+              BUILDREX Directory: <span className="font-bold text-slate-900">{credentials.length} members loaded</span>
             </span>
           </div>
           <button

@@ -4,7 +4,6 @@ import { CompanySettings, Department, Holiday, DatabaseStatus } from '../types';
 import { Modal } from '../components/Modal';
 import {
   Sliders,
-  Building2,
   Calendar,
   CheckCircle2,
   AlertCircle,
@@ -23,6 +22,7 @@ import {
 } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
+import { BuildrexLogo } from '../components/BuildrexLogo';
 
 export const AdminSettingsView: React.FC = () => {
   const { showToast } = useToast();
@@ -222,11 +222,20 @@ export const AdminSettingsView: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs">
-        <h1 className="text-xl font-bold tracking-tight text-slate-900">Company Configuration & Rules</h1>
-        <p className="text-xs text-slate-500 mt-0.5">
-          Establish biometric working hours, shift rules, grace periods, and organizational departments
-        </p>
+      <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <BuildrexLogo size="md" variant="badge" glow={true} />
+          <div>
+            <div className="flex items-center gap-1">
+              <h1 className="text-xl font-black tracking-tight text-slate-900 leading-none">BUILDRE</h1>
+              <span className="text-xl font-black tracking-tight bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent leading-none">X</span>
+              <span className="ml-2 text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">Official Brand Active</span>
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              Establish biometric working hours, shift rules, grace periods, and organizational departments
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Attendance & Shift Rules Form */}

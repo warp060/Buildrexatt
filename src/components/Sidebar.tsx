@@ -17,8 +17,8 @@ import {
   Shield,
   Briefcase,
   GraduationCap,
-  Building2,
 } from 'lucide-react';
+import { BuildrexLogo } from './BuildrexLogo';
 
 interface SidebarProps {
   currentTab: string;
@@ -73,13 +73,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header inside Sidebar */}
       <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/20">
-            <Building2 className="w-4 h-4 text-emerald-100" />
-          </div>
+          <BuildrexLogo size="sm" variant="badge" glow={true} />
           <div>
-            <h2 className="text-sm font-extrabold tracking-tight text-slate-900 leading-none">BUILDREX</h2>
-            <span className="text-[10px] text-[#0F5132] font-bold tracking-wider uppercase">
-              Smart Workspace
+            <div className="flex items-center gap-0.5 leading-none">
+              <h2 className="text-sm font-black tracking-tight text-slate-900 leading-none">BUILDRE</h2>
+              <span className="text-sm font-black tracking-tight bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent leading-none">X</span>
+            </div>
+            <span className="text-[9px] font-bold tracking-wider uppercase block mt-1 bg-gradient-to-r from-purple-700 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
+              FOR BUILDERS • BY BUILDERS
             </span>
           </div>
         </div>

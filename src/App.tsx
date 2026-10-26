@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building2 } from 'lucide-react';
+import { BuildrexLogo } from './components/BuildrexLogo';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -62,13 +62,31 @@ const MainWorkspace: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAF9F5] flex flex-col items-center justify-center p-4">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0F5132] to-[#0A3822] flex items-center justify-center text-white shadow-lg shadow-emerald-950/20 ring-1 ring-emerald-900/20 animate-pulse">
-          <Building2 className="w-6 h-6 text-emerald-100" />
+      <div className="min-h-screen bg-[#07070B] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        {/* Ambient neon radial background glow */}
+        <div className="absolute w-96 h-96 rounded-full bg-purple-600/10 blur-3xl pointer-events-none -top-20 -left-20" />
+        <div className="absolute w-96 h-96 rounded-full bg-cyan-600/10 blur-3xl pointer-events-none -bottom-20 -right-20" />
+
+        <div className="relative flex flex-col items-center z-10">
+          <div className="relative animate-pulse">
+            <BuildrexLogo size="xl" variant="badge" glow={true} />
+            <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-purple-500/20 to-cyan-500/20 blur-md -z-10" />
+          </div>
+
+          <div className="mt-6 flex items-center gap-0.5">
+            <h1 className="text-xl font-black tracking-tight text-white leading-none">BUILDRE</h1>
+            <span className="text-xl font-black tracking-tight bg-gradient-to-tr from-purple-400 via-indigo-400 to-cyan-400 bg-clip-text text-transparent leading-none">X</span>
+          </div>
+
+          <span className="mt-1.5 text-[11px] font-bold tracking-widest uppercase bg-gradient-to-r from-purple-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent">
+            FOR BUILDERS • BY BUILDERS
+          </span>
+
+          <div className="mt-5 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+            <span className="text-xs text-slate-400 font-medium">Initializing smart workspace...</span>
+          </div>
         </div>
-        <p className="mt-4 text-xs font-bold text-slate-600 tracking-wider uppercase">
-          Loading BUILDREX Workspace...
-        </p>
       </div>
     );
   }

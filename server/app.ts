@@ -77,7 +77,7 @@ app.get(['/api/health', '/health'], (req, res) => {
   });
 });
 
-app.get(['/', '/api', '/api/'], (req, res) => {
+app.get(['/api', '/api/'], (req, res) => {
   res.json({
     status: 'healthy',
     message: 'BUILDREX API Gateway Operational',
@@ -106,7 +106,7 @@ app.use('/ai', aiRoutes);
 app.use('/sync', syncRoutes);
 
 // 404 Fallback handler for unmatched API routes
-app.use((req, res) => {
+app.use('/api', (req, res) => {
   res.status(404).json({
     success: false,
     message: `API route not found: ${req.method} ${req.originalUrl || req.url}`,

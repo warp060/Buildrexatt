@@ -12,8 +12,8 @@ import {
   Clock,
   Sparkles,
   CheckCheck,
-  Building2,
 } from 'lucide-react';
+import { BuildrexLogo } from './BuildrexLogo';
 import { UserRole } from '../types';
 
 interface NavbarProps {
@@ -103,14 +103,17 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
           </button>
 
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] flex items-center justify-center text-white shadow-sm ring-1 ring-emerald-900/20">
-              <Building2 className="w-4 h-4 text-emerald-100" />
-            </div>
+            <BuildrexLogo size="sm" variant="badge" glow={true} />
             <div className="hidden min-[380px]:block">
-              <span className="text-base font-extrabold tracking-tight text-slate-900 leading-none block">
-                BUILDREX
-              </span>
-              <span className="text-[10px] font-bold text-[#0F5132] tracking-wider uppercase block">
+              <div className="flex items-center gap-0.5 leading-none">
+                <span className="text-base font-black tracking-tight text-slate-900 leading-none">
+                  BUILDRE
+                </span>
+                <span className="text-base font-black tracking-tight bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent leading-none">
+                  X
+                </span>
+              </div>
+              <span className="text-[9px] font-bold bg-gradient-to-r from-purple-700 via-indigo-600 to-cyan-600 bg-clip-text text-transparent tracking-wider uppercase block mt-1">
                 Workforce OS
               </span>
             </div>

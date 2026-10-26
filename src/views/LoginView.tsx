@@ -9,7 +9,6 @@ import {
   EyeOff,
   ShieldCheck,
   Check,
-  Building2,
   Users,
   CheckCircle2,
   Clock,
@@ -21,10 +20,10 @@ import {
   BarChart3,
   Calendar,
   Settings,
-  LayoutDashboard,
   LogOut,
 } from 'lucide-react';
 import { Modal } from '../components/Modal';
+import { BuildrexLogo } from '../components/BuildrexLogo';
 
 export const LoginView: React.FC = () => {
   const { login } = useAuth();
@@ -73,7 +72,7 @@ export const LoginView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#FAF9F5] text-slate-800 font-sans antialiased relative flex items-center justify-center p-4 sm:p-6 lg:p-10 selection:bg-emerald-600 selection:text-white">
+    <div className="min-h-[100dvh] w-full bg-[#FAF9F5] text-slate-800 font-sans antialiased relative flex flex-col justify-center py-6 px-3.5 sm:px-6 lg:px-8 selection:bg-emerald-600 selection:text-white overflow-x-hidden">
       {/* Subtle fine architectural grid pattern on outer background */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.3]"
@@ -84,32 +83,28 @@ export const LoginView: React.FC = () => {
       />
 
       {/* Main Dual-Panel Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch my-auto">
+      <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 items-stretch my-auto">
         {/* LEFT SECTION — Clean Warm Alabaster Panel with SaaS Dashboard Preview */}
-        <div className="lg:col-span-7 bg-[#F3EFE9] border border-[#E6E1D8] rounded-2xl p-5 sm:p-8 shadow-xs flex flex-col justify-center">
-          {/* Brand Eyebrow on Mobile/Tablet */}
-          <div className="flex items-center gap-2.5 mb-5 self-start lg:hidden">
-            <div className="w-8 h-8 rounded-lg bg-[#0F5132] flex items-center justify-center text-white font-bold text-sm shadow-md">
-              <Building2 className="w-4 h-4 text-emerald-200" />
-            </div>
-            <div>
-              <span className="font-extrabold text-slate-900 tracking-tight text-base block leading-none">
-                BUILDREX
-              </span>
-              <span className="text-[10px] font-semibold text-emerald-800 uppercase tracking-widest block mt-0.5">
-                Smart Attendance &amp; Work Management
+        <div className="order-2 lg:order-1 lg:col-span-7 bg-[#F3EFE9] border border-[#E6E1D8] rounded-2xl p-4 sm:p-6 lg:p-8 shadow-xs flex flex-col justify-center">
+          {/* Eyebrow Header */}
+          <div className="flex items-center justify-between pb-3 mb-4 border-b border-[#E6E1D8]/80">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+              <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                Enterprise Workforce OS
               </span>
             </div>
+            <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              Live Biometrics
+            </span>
           </div>
 
           {/* Elevated White SaaS Dashboard Card with mini-sidebar strip */}
-          <div className="w-full bg-white rounded-xl p-5 sm:p-6 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-slate-200/80 flex flex-col sm:flex-row gap-5">
+          <div className="w-full bg-white rounded-xl p-4 sm:p-6 shadow-[0_10px_35px_rgba(0,0,0,0.04)] border border-slate-200/80 flex flex-col sm:flex-row gap-4 sm:gap-5">
             {/* Left Mini Sidebar Strip (Deel/Mercury SaaS style) */}
             <div className="hidden sm:flex flex-col items-center justify-between py-1 px-2 border-r border-slate-100 pr-4">
               <div className="flex flex-col items-center gap-4">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] flex items-center justify-center text-white shadow-2xs">
-                  <Building2 className="w-4 h-4 text-emerald-300" />
-                </div>
+                <BuildrexLogo size="xs" variant="badge" glow={false} />
                 <div className="flex flex-col gap-3 text-slate-400 mt-2">
                   <button type="button" className="p-1.5 rounded-md bg-emerald-50 text-[#0F5132] transition-colors" title="Overview">
                     <Home className="w-4 h-4" />
@@ -143,8 +138,8 @@ export const LoginView: React.FC = () => {
               {/* Dashboard Top Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
-                  <div className="sm:hidden w-8 h-8 rounded-lg bg-[#0F5132] flex items-center justify-center text-white shadow-xs">
-                    <Building2 className="w-4 h-4 text-emerald-200" />
+                  <div className="sm:hidden">
+                    <BuildrexLogo size="xs" variant="badge" glow={false} />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 leading-none">
@@ -353,26 +348,29 @@ export const LoginView: React.FC = () => {
 
         {/* RIGHT SECTION — Sign-In Form Container with Modern Office Background Image */}
         <div
-          className="lg:col-span-5 rounded-2xl overflow-hidden relative shadow-xl border border-white/60 bg-cover bg-center flex items-center justify-center p-5 sm:p-8 min-h-[560px] lg:min-h-[600px]"
+          className="order-1 lg:order-2 lg:col-span-5 rounded-2xl overflow-hidden relative shadow-xl border border-white/60 bg-cover bg-center flex items-center justify-center p-3.5 xs:p-5 sm:p-7 lg:p-8 min-h-[480px] sm:min-h-[560px] lg:min-h-[600px]"
           style={{ backgroundImage: `url(${loginBg})` }}
         >
           {/* Subtle soft office photo depth diffusion */}
-          <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[1px] pointer-events-none" />
+          <div className="absolute inset-0 bg-slate-900/15 sm:bg-slate-900/10 backdrop-blur-[1px] pointer-events-none" />
 
           {/* Frosted Glass Sign-In Card Floating On Office Background */}
-          <div className="relative z-10 w-full max-w-[410px] bg-white/35 backdrop-blur-2xl border border-white/60 rounded-xl p-6 sm:p-8 shadow-[0_25px_60px_rgba(0,0,0,0.22),inset_0_1px_2px_rgba(255,255,255,0.7)] ring-1 ring-black/5">
+          <div className="relative z-10 w-full max-w-[420px] bg-white/80 sm:bg-white/45 backdrop-blur-2xl border border-white/80 sm:border-white/60 rounded-xl sm:rounded-2xl p-4.5 xs:p-6 sm:p-7 lg:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.18),inset_0_1px_2px_rgba(255,255,255,0.7)] ring-1 ring-black/5">
             {/* Header with BUILDREX logo */}
             <div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#0F5132] flex items-center justify-center text-white font-bold text-sm shadow-md ring-1 ring-emerald-900/20">
-                  <Building2 className="w-4 h-4 text-emerald-200" />
-                </div>
+              <div className="flex items-center gap-3">
+                <BuildrexLogo size="md" variant="badge" glow={true} />
                 <div>
-                  <h2 className="text-base font-black tracking-tight text-slate-900 leading-none">
-                    BUILDREX
-                  </h2>
-                  <span className="text-[9px] font-semibold text-emerald-800 tracking-wider uppercase block mt-0.5">
-                    Smart Attendance &amp; Work Management
+                  <div className="flex items-center gap-0.5 leading-none">
+                    <h2 className="text-lg font-black tracking-tight text-slate-900 leading-none">
+                      BUILDRE
+                    </h2>
+                    <span className="text-lg font-black tracking-tight bg-gradient-to-tr from-purple-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent leading-none">
+                      X
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold tracking-wider uppercase block mt-1 bg-gradient-to-r from-purple-700 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
+                    FOR BUILDERS • BY BUILDERS
                   </span>
                 </div>
               </div>
@@ -409,9 +407,9 @@ export const LoginView: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="sarah.chen@buildrex.com"
-                    className="w-full pl-9 pr-3.5 py-2.5 text-xs border border-white/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#0F5132] text-slate-900 placeholder:text-slate-500 bg-white/45 hover:bg-white/60 focus:bg-white/80 backdrop-blur-md transition-all shadow-xs"
+                    className="w-full pl-9 pr-3.5 py-2.5 sm:py-2 text-sm sm:text-xs min-h-[44px] sm:min-h-[40px] border border-white/80 sm:border-white/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#0F5132] text-slate-900 placeholder:text-slate-500 bg-white/60 sm:bg-white/45 hover:bg-white/75 sm:hover:bg-white/60 focus:bg-white/90 backdrop-blur-md transition-all shadow-xs"
                   />
-                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
               </div>
 
@@ -424,7 +422,7 @@ export const LoginView: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsForgotModalOpen(true)}
-                    className="text-[11px] font-semibold text-emerald-900 hover:text-emerald-950 transition-colors cursor-pointer"
+                    className="text-[11px] font-semibold text-emerald-900 hover:text-emerald-950 transition-colors cursor-pointer py-0.5"
                   >
                     Forgot Password?
                   </button>
@@ -436,13 +434,14 @@ export const LoginView: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full pl-9 pr-10 py-2.5 text-xs border border-white/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#0F5132] text-slate-900 placeholder:text-slate-500 bg-white/45 hover:bg-white/60 focus:bg-white/80 backdrop-blur-md transition-all shadow-xs"
+                    className="w-full pl-9 pr-11 py-2.5 sm:py-2 text-sm sm:text-xs min-h-[44px] sm:min-h-[40px] border border-white/80 sm:border-white/70 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-700/25 focus:border-[#0F5132] text-slate-900 placeholder:text-slate-500 bg-white/60 sm:bg-white/45 hover:bg-white/75 sm:hover:bg-white/60 focus:bg-white/90 backdrop-blur-md transition-all shadow-xs"
                   />
-                  <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors cursor-pointer p-0.5"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors cursor-pointer p-2 rounded-md hover:bg-black/5"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -453,17 +452,17 @@ export const LoginView: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2.5 flex justify-center items-center gap-2 py-2.5 px-4 text-xs font-bold rounded-lg text-white bg-[#0F5132]/95 hover:bg-[#0B3D25] active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-emerald-950/25 cursor-pointer backdrop-blur-xs"
+                className="w-full mt-3 flex justify-center items-center gap-2 py-3 sm:py-2.5 min-h-[46px] sm:min-h-[42px] text-sm sm:text-xs font-bold rounded-lg text-white bg-[#0F5132]/95 hover:bg-[#0B3D25] active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-emerald-950/25 cursor-pointer backdrop-blur-xs"
               >
-                <span>{isLoading ? 'Authenticating...' : 'Sign In'}</span>
+                <span>{isLoading ? 'Authenticating...' : 'Sign In to Workspace'}</span>
                 <ArrowRight className="w-4 h-4 text-emerald-200" />
               </button>
             </form>
 
             {/* Enterprise Security Footnote */}
-            <div className="mt-5 pt-4 border-t border-slate-900/10 flex items-center justify-between text-[11px] text-slate-600 font-medium">
+            <div className="mt-5 pt-3.5 border-t border-slate-900/10 flex flex-col xs:flex-row items-center justify-between gap-2 text-[10px] sm:text-[11px] text-slate-600 font-medium text-center xs:text-left">
               <span className="flex items-center gap-1.5 font-medium text-slate-700">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#0F5132]" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#0F5132] shrink-0" />
                 <span>Enterprise 256-bit Encrypted</span>
               </span>
               <span className="font-semibold text-slate-500">
