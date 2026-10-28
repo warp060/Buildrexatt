@@ -4,6 +4,7 @@ import { LeaveRequest, AttendanceCorrection } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { useToast } from '../context/ToastContext';
+import { formatClockTime } from '../utils/time';
 import {
   CalendarDays,
   Clock,
@@ -54,8 +55,8 @@ export const AdminApprovalsView: React.FC = () => {
     }
   }, []);
 
-  const fetchLeaves = useCallback(async () => {
-    setIsLoadingLeaves(true);
+  const fetchLeaves = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoadingLeaves(true);
     try {
       const res = await api.getAdminLeaveRequests({
         status: leaveStatusFilter !== 'all' ? leaveStatusFilter : undefined,
@@ -64,12 +65,12 @@ export const AdminApprovalsView: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      setIsLoadingLeaves(false);
+      if (!isSilent) setIsLoadingLeaves(false);
     }
   }, [leaveStatusFilter]);
 
-  const fetchCorrections = useCallback(async () => {
-    setIsLoadingCorrections(true);
+  const fetchCorrections = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoadingCorrections(true);
     try {
       const res = await api.getAdminCorrections({
         status: corrStatusFilter !== 'all' ? corrStatusFilter : undefined,
@@ -78,21 +79,36 @@ export const AdminApprovalsView: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      setIsLoadingCorrections(false);
+      if (!isSilent) setIsLoadingCorrections(false);
     }
   }, [corrStatusFilter]);
 
   useEffect(() => {
     fetchLeaves();
-  }, [fetchLeaves]);
-
-  useEffect(() => {
     fetchCorrections();
-  }, [fetchCorrections]);
-
-  useEffect(() => {
     fetchPendingCounts();
-  }, [fetchPendingCounts]);
+
+    const interval = setInterval(() => {
+      if (!isReviewModalOpen) {
+        fetchLeaves(true);
+        fetchCorrections(true);
+        fetchPendingCounts();
+      }
+    }, 8000);
+
+    const handleFocus = () => {
+      if (!isReviewModalOpen) {
+        fetchLeaves(true);
+        fetchCorrections(true);
+        fetchPendingCounts();
+      }
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchLeaves, fetchCorrections, fetchPendingCounts, isReviewModalOpen]);
 
   const handleOpenReview = (type: 'leave' | 'correction', item: any, dec: 'approved' | 'rejected') => {
     setReviewType(type);
@@ -360,9 +376,9 @@ export const AdminApprovalsView: React.FC = () => {
                         {item.work_date}
                       </td>
                       <td className="py-3 px-4 font-mono text-slate-600 whitespace-nowrap">
-                        {new Date(item.requested_check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatClockTime(item.requested_check_in)}
                         {' - '}
-                        {new Date(item.requested_check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {formatClockTime(item.requested_check_out)}
                       </td>
                       <td className="py-3 px-4 text-slate-600 max-w-xs truncate">
                         {item.reason}
@@ -438,7 +454,7 @@ export const AdminApprovalsView: React.FC = () => {
               </p>
             ) : (
               <p className="text-slate-600">
-                Adjustment on {selectedItem?.work_date} to hours {new Date(selectedItem?.requested_check_in || 0).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(selectedItem?.requested_check_out || 0).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}. Reason: "{selectedItem?.reason}"
+                Adjustment on {selectedItem?.work_date} to hours {formatClockTime(selectedItem?.requested_check_in)} - {formatClockTime(selectedItem?.requested_check_out)}. Reason: "{selectedItem?.reason}"
               </p>
             )}
           </div>

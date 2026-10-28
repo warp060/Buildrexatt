@@ -88,3 +88,20 @@ export function formatWorkingDurationDetailed(totalMinutes: number): string {
   }
   return `${h}h ${String(m).padStart(2, '0')}m (${decimalHours} hrs)`;
 }
+
+/**
+ * Formats a timestamp into friendly date and time (e.g. "Oct 27, 07:06 PM" or "07:06 PM")
+ */
+export function formatDateTime(val?: string | null): string {
+  if (!val) return '--';
+  const d = parseAttendanceDate(val);
+  if (!d) return '--';
+  return d.toLocaleString([], {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+}
+

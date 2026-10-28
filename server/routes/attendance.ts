@@ -6,6 +6,7 @@ import {
   calculateAttendanceStatus,
   enrichAttendance,
   logAudit,
+  createNotification,
 } from '../db';
 import { authenticate, requireRole, AuthenticatedRequest } from '../auth';
 import { AttendanceRecord } from '../types';
@@ -62,6 +63,20 @@ router.post('/check-in', authenticate, (req: AuthenticatedRequest, res: Response
   db.attendance.unshift(newRecord);
   saveDb(db);
 
+  // Notify admins and manager in real-time
+  const recipients = db.users.filter(
+    (u) => u.role === 'admin' || (req.user!.manager_id && u.id === req.user!.manager_id)
+  );
+  recipients.forEach((recipient) => {
+    createNotification(
+      recipient.id,
+      'Attendance Clock-In',
+      `${req.user!.name} checked in for ${today} (${status === 'late' ? 'Late Arrival' : 'On Time'}).`,
+      status === 'late' ? 'warning' : 'info',
+      '/admin/attendance'
+    );
+  });
+
   logAudit(
     { id: req.user!.id, name: req.user!.name },
     'ATTENDANCE_CHECK_IN',
@@ -110,8 +125,9 @@ router.post('/check-out', authenticate, (req: AuthenticatedRequest, res: Respons
 
   const now = new Date();
   const nowIso = now.toISOString();
-  const checkInTime = new Date(record.check_in);
-  const diffMs = now.getTime() - checkInTime.getTime();
+  const checkInIso = record.check_in.includes('T') ? record.check_in : record.check_in.replace(' ', 'T') + 'Z';
+  const checkInTime = new Date(checkInIso);
+  const diffMs = Math.max(0, now.getTime() - checkInTime.getTime());
   const totalMinutes = Math.max(1, Math.round(diffMs / (1000 * 60)));
 
   record.check_out = nowIso;
@@ -126,6 +142,20 @@ router.post('/check-out', authenticate, (req: AuthenticatedRequest, res: Respons
   }
 
   saveDb(db);
+
+  // Notify admins and manager in real-time
+  const checkoutRecipients = db.users.filter(
+    (u) => u.role === 'admin' || (req.user!.manager_id && u.id === req.user!.manager_id)
+  );
+  checkoutRecipients.forEach((recipient) => {
+    createNotification(
+      recipient.id,
+      'Attendance Clock-Out',
+      `${req.user!.name} checked out. Recorded duration: ${(totalMinutes / 60).toFixed(1)} hrs.`,
+      'info',
+      '/admin/attendance'
+    );
+  });
 
   logAudit(
     { id: req.user!.id, name: req.user!.name },
@@ -227,54 +257,60 @@ router.get('/history', authenticate, (req: AuthenticatedRequest, res: Response):
   });
 });
 
-// GET /api/admin/attendance
-router.get('/admin/attendance', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+// GET /api/admin/attendance and /api/attendance/admin/attendance
+router.get(['/admin/attendance', '/admin', '/attendance'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const { date, start_date, end_date, department_id, role, status, user_id, search, page, limit } = req.query;
 
   let records = [...db.attendance];
 
-  if (date) {
+  if (date && date !== 'undefined' && date !== 'null') {
     records = records.filter((a) => a.work_date === date);
   }
-  if (start_date) {
+  if (start_date && start_date !== 'undefined' && start_date !== 'null') {
     records = records.filter((a) => a.work_date >= (start_date as string));
   }
-  if (end_date) {
+  if (end_date && end_date !== 'undefined' && end_date !== 'null') {
     records = records.filter((a) => a.work_date <= (end_date as string));
   }
-  if (status && status !== 'all') {
+  if (status && status !== 'all' && status !== 'undefined' && status !== 'null') {
     records = records.filter((a) => a.status === status);
   }
-  if (user_id) {
+  if (user_id && user_id !== 'undefined' && user_id !== 'null') {
     records = records.filter((a) => a.user_id === user_id);
   }
 
   let enriched = records.map(enrichAttendance);
 
-  if (department_id && department_id !== 'all') {
+  if (department_id && department_id !== 'all' && department_id !== 'undefined' && department_id !== 'null') {
     enriched = enriched.filter((a) => {
       const u = db.users.find((user) => user.id === a.user_id);
       return u?.department_id === department_id;
     });
   }
 
-  if (role && role !== 'all') {
+  if (role && role !== 'all' && role !== 'undefined' && role !== 'null') {
     enriched = enriched.filter((a) => a.role === role);
   }
 
-  if (search) {
+  if (search && search !== 'undefined' && search !== 'null') {
     const q = (search as string).toLowerCase().trim();
-    enriched = enriched.filter(
-      (a) =>
-        a.user_name?.toLowerCase().includes(q) ||
-        a.employee_code?.toLowerCase().includes(q) ||
-        a.department_name?.toLowerCase().includes(q)
-    );
+    if (q) {
+      enriched = enriched.filter(
+        (a) =>
+          a.user_name?.toLowerCase().includes(q) ||
+          a.employee_code?.toLowerCase().includes(q) ||
+          a.department_name?.toLowerCase().includes(q)
+      );
+    }
   }
 
   // Sort descending by date, then check-in
-  enriched.sort((a, b) => b.check_in.localeCompare(a.check_in));
+  enriched.sort((a, b) => {
+    const dateComp = (b.work_date || '').localeCompare(a.work_date || '');
+    if (dateComp !== 0) return dateComp;
+    return (b.check_in || '').localeCompare(a.check_in || '');
+  });
 
   const pageSize = Number(limit) || 20;
   const currentPage = Number(page) || 1;
@@ -291,7 +327,7 @@ router.get('/admin/attendance', authenticate, requireRole('admin'), (req: Authen
 });
 
 // GET /api/admin/attendance/:id
-router.get('/admin/attendance/:id', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.get(['/admin/attendance/:id', '/attendance/:id'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const record = db.attendance.find((a) => a.id === req.params.id);
 
@@ -307,7 +343,7 @@ router.get('/admin/attendance/:id', authenticate, requireRole('admin'), (req: Au
 });
 
 // PATCH /api/admin/attendance/:id (manual adjustment by administrator)
-router.patch('/admin/attendance/:id', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.patch(['/admin/attendance/:id', '/attendance/:id'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const record = db.attendance.find((a) => a.id === req.params.id);
 

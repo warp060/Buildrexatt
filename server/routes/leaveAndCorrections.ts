@@ -82,15 +82,17 @@ router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void 
   db.leave_requests.unshift(newLeave);
   saveDb(db);
 
-  // Notify admin
-  const admins = db.users.filter((u) => u.role === 'admin');
-  admins.forEach((admin) => {
+  // Notify admins and manager
+  const recipients = db.users.filter(
+    (u) => u.role === 'admin' || (req.user!.manager_id && u.id === req.user!.manager_id)
+  );
+  recipients.forEach((recipient) => {
     createNotification(
-      admin.id,
+      recipient.id,
       'New Leave Request',
       `${req.user!.name} requested ${newLeave.days_count} day(s) ${newLeave.leave_type} leave (${start_date} to ${end_date}).`,
       'info',
-      '/admin/leave-requests'
+      '/admin/approvals'
     );
   });
 
@@ -117,7 +119,7 @@ router.get('/admin/list', authenticate, requireRole('admin'), (req: Authenticate
 
   let list = db.leave_requests.map(enrichLeave);
 
-  if (status && status !== 'all') {
+  if (status && status !== 'all' && status !== 'undefined' && status !== 'null') {
     list = list.filter((l) => l.status === status);
   }
 
@@ -186,8 +188,8 @@ router.patch('/admin/:id/review', authenticate, requireRole('admin'), (req: Auth
 
 // ================= ATTENDANCE CORRECTIONS =================
 
-// GET /api/attendance/correction-requests/my
-router.get('/corrections/my', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+// GET /api/leave-requests/corrections/my and /api/attendance/correction-requests/my
+router.get(['/corrections/my', '/attendance/correction-requests/my'], authenticate, (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const corrections = db.attendance_corrections
     .filter((c) => c.user_id === req.user!.id)
@@ -197,8 +199,8 @@ router.get('/corrections/my', authenticate, (req: AuthenticatedRequest, res: Res
   res.json({ success: true, records: corrections });
 });
 
-// POST /api/attendance/correction-requests
-router.post('/corrections', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+// POST /api/leave-requests/corrections and /api/attendance/correction-requests
+router.post(['/corrections', '/attendance/correction-requests'], authenticate, (req: AuthenticatedRequest, res: Response): void => {
   const { attendance_id, work_date, requested_check_in, requested_check_out, reason } = req.body;
 
   if (!work_date || !requested_check_in || !requested_check_out || !reason) {
@@ -227,15 +229,17 @@ router.post('/corrections', authenticate, (req: AuthenticatedRequest, res: Respo
   db.attendance_corrections.unshift(newCorrection);
   saveDb(db);
 
-  // Notify admin
-  const admins = db.users.filter((u) => u.role === 'admin');
-  admins.forEach((admin) => {
+  // Notify admins and manager
+  const corrRecipients = db.users.filter(
+    (u) => u.role === 'admin' || (req.user!.manager_id && u.id === req.user!.manager_id)
+  );
+  corrRecipients.forEach((recipient) => {
     createNotification(
-      admin.id,
+      recipient.id,
       'Attendance Correction Submitted',
       `${req.user!.name} submitted a correction for ${work_date}.`,
       'warning',
-      '/admin/leave-requests'
+      '/admin/approvals'
     );
   });
 
@@ -255,14 +259,14 @@ router.post('/corrections', authenticate, (req: AuthenticatedRequest, res: Respo
   });
 });
 
-// GET /api/admin/attendance-corrections
-router.get('/admin/corrections', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+// GET /api/leave-requests/admin/corrections and /api/admin/attendance-corrections
+router.get(['/admin/corrections', '/admin/attendance-corrections'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const { status, limit, page } = req.query;
 
   let list = db.attendance_corrections.map(enrichCorrection);
 
-  if (status && status !== 'all') {
+  if (status && status !== 'all' && status !== 'undefined' && status !== 'null') {
     list = list.filter((c) => c.status === status);
   }
 
@@ -281,8 +285,8 @@ router.get('/admin/corrections', authenticate, requireRole('admin'), (req: Authe
   });
 });
 
-// PATCH /api/admin/attendance-corrections/:id/review
-router.patch('/admin/corrections/:id/review', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+// PATCH /api/leave-requests/admin/corrections/:id/review and /api/admin/attendance-corrections/:id/review
+router.patch(['/admin/corrections/:id/review', '/admin/attendance-corrections/:id/review'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const corr = db.attendance_corrections.find((c) => c.id === req.params.id);
 

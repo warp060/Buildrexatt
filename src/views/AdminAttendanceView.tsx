@@ -4,7 +4,7 @@ import { AttendanceRecord, Department } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { Search, Filter, Edit, CheckCircle2, AlertCircle, RefreshCw, Clock } from 'lucide-react';
-import { formatClockTime, formatLiveTimer, getElapsedSeconds } from '../utils/time';
+import { formatClockTime, formatLiveTimer, getElapsedSeconds, parseAttendanceDate } from '../utils/time';
 
 import { useToast } from '../context/ToastContext';
 
@@ -39,8 +39,8 @@ export const AdminAttendanceView: React.FC = () => {
   const [editFeedback, setEditFeedback] = useState<{ success?: boolean; message?: string }>({});
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const fetchRecords = useCallback(async () => {
-    setIsLoading(true);
+  const fetchRecords = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     try {
       const [attRes, deptsRes] = await Promise.all([
         api.getAdminAttendance({
@@ -64,18 +64,33 @@ export const AdminAttendanceView: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   }, [search, statusFilter, roleFilter, deptFilter, filterDate]);
 
   useEffect(() => {
     fetchRecords();
-  }, [fetchRecords]);
+    const interval = setInterval(() => {
+      if (!isEditModalOpen) {
+        fetchRecords(true);
+      }
+    }, 8000);
+    const handleFocus = () => {
+      if (!isEditModalOpen) fetchRecords(true);
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchRecords, isEditModalOpen]);
 
   const handleOpenEdit = (rec: AttendanceRecord) => {
     setSelectedRecord(rec);
-    setEditCheckIn(rec.check_in ? rec.check_in.slice(11, 16) : '09:00');
-    setEditCheckOut(rec.check_out ? rec.check_out.slice(11, 16) : '18:00');
+    const dIn = parseAttendanceDate(rec.check_in);
+    setEditCheckIn(dIn ? `${String(dIn.getHours()).padStart(2, '0')}:${String(dIn.getMinutes()).padStart(2, '0')}` : '09:00');
+    const dOut = parseAttendanceDate(rec.check_out);
+    setEditCheckOut(dOut ? `${String(dOut.getHours()).padStart(2, '0')}:${String(dOut.getMinutes()).padStart(2, '0')}` : '18:00');
     setEditStatus(rec.status);
     setEditNotes(rec.notes || '');
     setEditFeedback({});
@@ -97,8 +112,10 @@ export const AdminAttendanceView: React.FC = () => {
 
     try {
       const date = selectedRecord.work_date;
-      const newIn = `${date}T${editCheckIn}:00Z`;
-      const newOut = editCheckOut ? `${date}T${editCheckOut}:00Z` : null;
+      const localIn = new Date(`${date}T${editCheckIn}:00`);
+      const newIn = !isNaN(localIn.getTime()) ? localIn.toISOString() : `${date}T${editCheckIn}:00.000Z`;
+      const localOut = editCheckOut ? new Date(`${date}T${editCheckOut}:00`) : null;
+      const newOut = localOut && !isNaN(localOut.getTime()) ? localOut.toISOString() : null;
 
       const res = await api.updateAdminAttendance(selectedRecord.id, {
         check_in: newIn,
@@ -133,7 +150,7 @@ export const AdminAttendanceView: React.FC = () => {
         </div>
 
         <button
-          onClick={fetchRecords}
+          onClick={() => fetchRecords(false)}
           className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors self-start sm:self-auto"
         >
           <RefreshCw className="w-3.5 h-3.5" />

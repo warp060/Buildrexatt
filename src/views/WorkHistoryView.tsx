@@ -3,6 +3,7 @@ import { api } from '../api';
 import { WorkUpdate } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Search, Filter, Calendar, Clock, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
+import { formatClockTime } from '../utils/time';
 
 export const WorkHistoryView: React.FC = () => {
   const [updates, setUpdates] = useState<WorkUpdate[]>([]);
@@ -114,6 +115,12 @@ export const WorkHistoryView: React.FC = () => {
                       <span className="text-xs text-slate-600 font-medium truncate">{u.project_details}</span>
                       <span className="text-slate-300">·</span>
                       <span className="text-[11px] font-mono text-slate-500 tabular-nums">{u.hours_spent} hrs</span>
+                      {u.submitted_at && (
+                        <>
+                          <span className="text-slate-300">·</span>
+                          <span className="text-[11px] font-mono text-slate-500 tabular-nums">Logged {formatClockTime(u.submitted_at)}</span>
+                        </>
+                      )}
                     </div>
                     <p className="text-xs text-slate-500 line-clamp-1 whitespace-pre-line">
                       {u.tasks_completed}

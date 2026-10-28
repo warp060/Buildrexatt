@@ -375,16 +375,38 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
 /**
  * Helper to convert ISO string to MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)
+ * Idempotent and timezone-neutral: never mutates or shifts timestamps.
  */
 function toSqlDateTime(isoStr: string | null | undefined): string | null {
   if (!isoStr) return null;
+  const s = String(isoStr).trim();
+  if (!s) return null;
+  if (/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}/.test(s)) {
+    return s.replace('T', ' ').slice(0, 19);
+  }
   try {
-    const d = new Date(isoStr);
+    const d = new Date(s);
     if (isNaN(d.getTime())) return null;
     return d.toISOString().slice(0, 19).replace('T', ' ');
   } catch {
     return null;
   }
+}
+
+/**
+ * Normalizes MySQL DATETIME or ISO strings to a standardized UTC ISO string (e.g. YYYY-MM-DDTHH:mm:ss.000Z)
+ */
+function toIsoDateTime(val: any): string | null {
+  if (!val) return null;
+  const s = String(val).trim();
+  if (!s) return null;
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(s)) {
+    return s.replace(' ', 'T') + '.000Z';
+  }
+  if (s.includes('T') && !s.endsWith('Z') && !/[+-]\d{2}:\d{2}$/.test(s)) {
+    return s + 'Z';
+  }
+  return s;
 }
 
 /**
@@ -506,14 +528,14 @@ export async function loadAllFromTiDB(): Promise<{
         id: r.id,
         user_id: r.user_id,
         work_date: r.work_date,
-        check_in: r.check_in,
-        check_out: r.check_out || null,
+        check_in: toIsoDateTime(r.check_in) || r.check_in,
+        check_out: toIsoDateTime(r.check_out),
         total_minutes: r.total_minutes || 0,
         status: r.status,
         notes: r.notes || undefined,
         ip_address: r.ip_address || '127.0.0.1',
-        created_at: r.created_at,
-        updated_at: r.updated_at,
+        created_at: toIsoDateTime(r.created_at) || r.created_at,
+        updated_at: toIsoDateTime(r.updated_at) || r.updated_at,
       })),
       work_updates: workUpdatesRows.map((r: any) => ({
         id: r.id,
@@ -526,12 +548,12 @@ export async function loadAllFromTiDB(): Promise<{
         next_day_plan: r.next_day_plan || '',
         hours_spent: Number(r.hours_spent) || 8,
         status: r.status,
-        submitted_at: r.submitted_at || null,
+        submitted_at: toIsoDateTime(r.submitted_at),
         reviewed_by: r.reviewed_by || null,
         review_comment: r.review_comment || null,
-        reviewed_at: r.reviewed_at || null,
-        created_at: r.created_at,
-        updated_at: r.updated_at,
+        reviewed_at: toIsoDateTime(r.reviewed_at),
+        created_at: toIsoDateTime(r.created_at) || r.created_at,
+        updated_at: toIsoDateTime(r.updated_at) || r.updated_at,
       })),
       leave_requests: leaveRows.map((r: any) => ({
         id: r.id,
@@ -544,22 +566,22 @@ export async function loadAllFromTiDB(): Promise<{
         status: r.status,
         reviewed_by: r.reviewed_by || null,
         review_comment: r.review_comment || null,
-        reviewed_at: r.reviewed_at || null,
-        created_at: r.created_at,
+        reviewed_at: toIsoDateTime(r.reviewed_at),
+        created_at: toIsoDateTime(r.created_at) || r.created_at,
       })),
       attendance_corrections: correctionRows.map((r: any) => ({
         id: r.id,
         user_id: r.user_id,
         attendance_id: r.attendance_id,
         work_date: r.work_date || null,
-        requested_check_in: r.requested_check_in,
-        requested_check_out: r.requested_check_out,
+        requested_check_in: toIsoDateTime(r.requested_check_in) || r.requested_check_in,
+        requested_check_out: toIsoDateTime(r.requested_check_out) || r.requested_check_out,
         reason: r.reason,
         status: r.status,
         reviewed_by: r.reviewed_by || null,
         review_comment: r.review_comment || null,
-        reviewed_at: r.reviewed_at || null,
-        created_at: r.created_at,
+        reviewed_at: toIsoDateTime(r.reviewed_at),
+        created_at: toIsoDateTime(r.created_at) || r.created_at,
       })),
       notifications: notifRows.map((r: any) => ({
         id: r.id,

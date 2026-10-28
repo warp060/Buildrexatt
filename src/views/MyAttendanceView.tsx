@@ -4,7 +4,7 @@ import { AttendanceRecord } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { useToast } from '../context/ToastContext';
-import { formatClockTime, formatLiveTimer, getElapsedSeconds } from '../utils/time';
+import { formatClockTime, formatLiveTimer, getElapsedSeconds, parseAttendanceDate } from '../utils/time';
 import {
   Clock,
   Filter,
@@ -165,16 +165,10 @@ export const MyAttendanceView: React.FC = () => {
     if (att) {
       setSelectedAttendance(att);
       setCorrDate(att.work_date);
-      setCorrCheckIn(
-        new Date(att.check_in).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
-      );
-      if (att.check_out) {
-        setCorrCheckOut(
-          new Date(att.check_out).toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
-        );
-      } else {
-        setCorrCheckOut('18:00');
-      }
+      const dIn = parseAttendanceDate(att.check_in);
+      setCorrCheckIn(dIn ? `${String(dIn.getHours()).padStart(2, '0')}:${String(dIn.getMinutes()).padStart(2, '0')}` : '09:00');
+      const dOut = parseAttendanceDate(att.check_out);
+      setCorrCheckOut(dOut ? `${String(dOut.getHours()).padStart(2, '0')}:${String(dOut.getMinutes()).padStart(2, '0')}` : '18:00');
     } else {
       setSelectedAttendance(null);
       setCorrDate(todayIsoDate);
@@ -214,8 +208,10 @@ export const MyAttendanceView: React.FC = () => {
     setCorrFeedback({});
 
     try {
-      const reqIn = `${corrDate}T${corrCheckIn}:00Z`;
-      const reqOut = `${corrDate}T${corrCheckOut}:00Z`;
+      const localIn = new Date(`${corrDate}T${corrCheckIn}:00`);
+      const reqIn = !isNaN(localIn.getTime()) ? localIn.toISOString() : `${corrDate}T${corrCheckIn}:00.000Z`;
+      const localOut = new Date(`${corrDate}T${corrCheckOut}:00`);
+      const reqOut = !isNaN(localOut.getTime()) ? localOut.toISOString() : `${corrDate}T${corrCheckOut}:00.000Z`;
 
       const res = await api.submitCorrectionRequest({
         attendance_id: selectedAttendance?.id || 'manual-entry',
@@ -327,11 +323,8 @@ export const MyAttendanceView: React.FC = () => {
               <span className="bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
                 Check In:{' '}
                 <strong className="text-slate-800 font-mono font-bold">
-                  {todayAttendance.record
-                    ? new Date(todayAttendance.record.check_in).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
+                  {todayAttendance.record?.check_in
+                    ? formatClockTime(todayAttendance.record.check_in)
                     : '--:--'}
                 </strong>
               </span>
@@ -339,10 +332,7 @@ export const MyAttendanceView: React.FC = () => {
                 Check Out:{' '}
                 <strong className="text-slate-800 font-mono font-bold">
                   {todayAttendance.record?.check_out
-                    ? new Date(todayAttendance.record.check_out).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
+                    ? formatClockTime(todayAttendance.record.check_out)
                     : '--:--'}
                 </strong>
               </span>

@@ -57,6 +57,7 @@ router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void 
     }
 
     // Update existing record
+    const wasNeedsRevision = update.status === 'needs_revision';
     update.tasks_completed = tasks_completed || update.tasks_completed;
     update.project_details = project_details || update.project_details;
     update.accomplishments = accomplishments !== undefined ? accomplishments : update.accomplishments;
@@ -65,8 +66,13 @@ router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void 
     update.hours_spent = hours_spent ? Number(hours_spent) : update.hours_spent;
     update.status = status;
     update.updated_at = nowIso;
-    if (status === 'submitted' && !update.submitted_at) {
+    if (status === 'submitted') {
       update.submitted_at = nowIso;
+      if (wasNeedsRevision) {
+        update.reviewed_by = null;
+        update.review_comment = null;
+        update.reviewed_at = null;
+      }
     }
   } else {
     // Create new record
@@ -92,6 +98,25 @@ router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void 
   }
 
   saveDb(db);
+
+  // Notify admins and manager when report is submitted
+  if (status === 'submitted') {
+    const recipients = db.users.filter(
+      (u) => u.role === 'admin' || (req.user!.manager_id && u.id === req.user!.manager_id)
+    );
+    const notifTitle = update.review_comment ? 'Work Update Re-submitted' : 'Daily Work Update Submitted';
+    const notifMsg = `${req.user!.name} ${update.review_comment ? 're-submitted revised' : 'submitted'} daily work report for ${targetDate}.`;
+
+    recipients.forEach((recipient) => {
+      createNotification(
+        recipient.id,
+        notifTitle,
+        notifMsg,
+        'info',
+        '/admin/work-updates'
+      );
+    });
+  }
 
   logAudit(
     { id: req.user!.id, name: req.user!.name },
@@ -183,33 +208,42 @@ router.get('/admin/list', authenticate, requireRole('admin'), (req: Authenticate
 
   let list = db.work_updates.map(enrichWorkUpdate);
 
-  if (date) {
+  if (date && date !== 'undefined' && date !== 'null') {
     list = list.filter((w) => w.work_date === date);
   }
-  if (status && status !== 'all') {
+  if (status && status !== 'all' && status !== 'undefined' && status !== 'null') {
     list = list.filter((w) => w.status === status);
   }
-  if (role && role !== 'all') {
+  if (role && role !== 'all' && role !== 'undefined' && role !== 'null') {
     list = list.filter((w) => w.role === role);
   }
-  if (department_id && department_id !== 'all') {
+  if (department_id && department_id !== 'all' && department_id !== 'undefined' && department_id !== 'null') {
     list = list.filter((w) => {
       const u = db.users.find((user) => user.id === w.user_id);
       return u?.department_id === department_id;
     });
   }
-  if (search) {
+  if (search && search !== 'undefined' && search !== 'null') {
     const q = (search as string).toLowerCase().trim();
-    list = list.filter(
-      (w) =>
-        w.user_name?.toLowerCase().includes(q) ||
-        w.employee_code?.toLowerCase().includes(q) ||
-        w.project_details.toLowerCase().includes(q) ||
-        w.tasks_completed.toLowerCase().includes(q)
-    );
+    if (q) {
+      list = list.filter(
+        (w) =>
+          w.user_name?.toLowerCase().includes(q) ||
+          w.employee_code?.toLowerCase().includes(q) ||
+          w.project_details.toLowerCase().includes(q) ||
+          w.tasks_completed.toLowerCase().includes(q)
+      );
+    }
   }
 
-  list.sort((a, b) => b.work_date.localeCompare(a.work_date));
+  // Sort descending by work_date, then newest submitted_at/created_at first
+  list.sort((a, b) => {
+    const dateComp = (b.work_date || '').localeCompare(a.work_date || '');
+    if (dateComp !== 0) return dateComp;
+    const timeA = a.submitted_at || a.created_at || '';
+    const timeB = b.submitted_at || b.created_at || '';
+    return timeB.localeCompare(timeA);
+  });
 
   const pageSize = Number(limit) || 20;
   const currentPage = Number(page) || 1;

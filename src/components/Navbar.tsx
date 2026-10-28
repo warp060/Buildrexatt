@@ -14,15 +14,16 @@ import {
   CheckCheck,
 } from 'lucide-react';
 import { BuildrexLogo } from './BuildrexLogo';
-import { UserRole } from '../types';
+import { UserRole, NotificationItem } from '../types';
 
 interface NavbarProps {
   onToggleMobileSidebar: () => void;
   currentSectionTitle: string;
+  onNavigateTab?: (tabId: string) => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSectionTitle }) => {
-  const { user, logout, notifications, unreadCount, markNotificationRead, markAllNotificationsRead } = useAuth();
+export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSectionTitle, onNavigateTab }) => {
+  const { user, logout, notifications, unreadCount, markNotificationRead, markAllNotificationsRead, fetchNotifications } = useAuth();
   const { showToast } = useToast();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -60,6 +61,27 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleNotificationClick = (n: NotificationItem) => {
+    markNotificationRead(n.id);
+    setShowNotifications(false);
+
+    if (onNavigateTab && n.link) {
+      const link = n.link.toLowerCase();
+      let targetTab = '';
+      if (link.includes('admin/attendance')) targetTab = 'admin-attendance';
+      else if (link.includes('admin/work-updates')) targetTab = 'admin-work-updates';
+      else if (link.includes('admin/leave-requests') || link.includes('admin/approvals')) targetTab = 'admin-approvals';
+      else if (link.includes('admin/audit-logs')) targetTab = 'admin-audit-logs';
+      else if (link.includes('my-attendance')) targetTab = 'my-attendance';
+      else if (link.includes('work-updates')) targetTab = 'work-updates';
+      else if (link.includes('leave-requests')) targetTab = 'leave-requests';
+
+      if (targetTab) {
+        onNavigateTab(targetTab);
+      }
+    }
+  };
 
   const getRoleLabel = (role?: UserRole) => {
     if (role === 'admin') return 'Administrator';
@@ -155,8 +177,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
           <div className="relative" ref={notifRef}>
             <button
               onClick={() => {
-                setShowNotifications(!showNotifications);
+                const next = !showNotifications;
+                setShowNotifications(next);
                 setShowProfileMenu(false);
+                if (next) {
+                  fetchNotifications();
+                }
               }}
               className="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all cursor-pointer border border-slate-200/60 bg-white/70 shadow-2xs"
               aria-label="View notifications"
@@ -204,7 +230,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
                     notifications.map((n) => (
                       <div
                         key={n.id}
-                        onClick={() => markNotificationRead(n.id)}
+                        onClick={() => handleNotificationClick(n)}
                         className={`p-2.5 text-left rounded-lg hover:bg-slate-50 transition-colors cursor-pointer my-0.5 ${
                           !n.read_at ? 'bg-emerald-50/60 border border-emerald-100/90' : ''
                         }`}

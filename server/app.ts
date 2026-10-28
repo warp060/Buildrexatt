@@ -88,6 +88,7 @@ app.get(['/api', '/api/'], (req, res) => {
 // API Routes mounted with /api prefix
 app.use('/api/auth', authRoutes);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/admin', attendanceRoutes); // For /api/admin/attendance endpoints
 app.use('/api/work-updates', workUpdatesRoutes);
 app.use('/api/leave-requests', leaveAndCorrectionsRoutes);
 app.use('/api', leaveAndCorrectionsRoutes); // For /api/attendance/correction-requests
@@ -95,15 +96,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api', adminRoutes); // For /api/departments, /api/notifications
 app.use('/api/ai', aiRoutes);
 app.use('/api/sync', syncRoutes);
-
-// Duplicate mounts without /api prefix for compatibility
-app.use('/auth', authRoutes);
-app.use('/attendance', attendanceRoutes);
-app.use('/work-updates', workUpdatesRoutes);
-app.use('/leave-requests', leaveAndCorrectionsRoutes);
-app.use('/admin', adminRoutes);
-app.use('/ai', aiRoutes);
-app.use('/sync', syncRoutes);
 
 // 404 Fallback handler for unmatched API routes
 app.use('/api', (req, res) => {

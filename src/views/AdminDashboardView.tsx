@@ -56,8 +56,8 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
   }>>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchDashboardData = useCallback(async () => {
-    setIsLoading(true);
+  const fetchDashboardData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     try {
       const res = await api.getDashboardStats();
       if (res.success) {
@@ -71,12 +71,21 @@ export const AdminDashboardView: React.FC<AdminDashboardViewProps> = ({ onNaviga
     } catch (err) {
       console.error(err);
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     fetchDashboardData();
+    const interval = setInterval(() => {
+      fetchDashboardData(true);
+    }, 8000);
+    const handleFocus = () => fetchDashboardData(true);
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, [fetchDashboardData]);
 
   const todayStr = new Date().toLocaleDateString('en-US', {

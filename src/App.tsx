@@ -149,6 +149,7 @@ const MainWorkspace: React.FC = () => {
       <Navbar
         onToggleMobileSidebar={() => setIsMobileSidebarOpen(true)}
         currentSectionTitle={SECTION_TITLES[currentTab] || 'Workspace'}
+        onNavigateTab={(tab) => setCurrentTab(tab)}
       />
 
       {/* Main Body with Sidebar + Content */}

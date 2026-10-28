@@ -22,9 +22,11 @@ import {
   Printer,
   ChevronRight,
   Bot,
+  RefreshCw,
 } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
+import { formatClockTime, formatDateTime } from '../utils/time';
 
 export const AdminWorkUpdatesView: React.FC = () => {
   const { showToast } = useToast();
@@ -60,8 +62,8 @@ export const AdminWorkUpdatesView: React.FC = () => {
   const [isCopiedDigest, setIsCopiedDigest] = useState(false);
   const [aiStatus, setAiStatus] = useState<AiStatus | null>(null);
 
-  const fetchUpdates = useCallback(async () => {
-    setIsLoading(true);
+  const fetchUpdates = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     try {
       const [wuRes, deptRes, statusRes] = await Promise.all([
         api.getAdminWorkUpdates({
@@ -89,13 +91,26 @@ export const AdminWorkUpdatesView: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   }, [search, statusFilter, deptFilter, roleFilter, dateFilter]);
 
   useEffect(() => {
     fetchUpdates();
-  }, [fetchUpdates]);
+    const interval = setInterval(() => {
+      if (!isReviewModalOpen && !isDigestModalOpen) {
+        fetchUpdates(true);
+      }
+    }, 8000);
+    const handleFocus = () => {
+      if (!isReviewModalOpen && !isDigestModalOpen) fetchUpdates(true);
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchUpdates, isReviewModalOpen, isDigestModalOpen]);
 
   const handleOpenReview = (wu: WorkUpdate) => {
     setSelectedUpdate(wu);
@@ -213,8 +228,16 @@ export const AdminWorkUpdatesView: React.FC = () => {
           </p>
         </div>
 
-        {/* Gemini Executive Digest Trigger */}
+        {/* Action Triggers */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => fetchUpdates(false)}
+            className="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Refresh</span>
+          </button>
+
           <button
             onClick={() => handleGenerateDigest()}
             disabled={isGeneratingDigest}
@@ -376,9 +399,7 @@ export const AdminWorkUpdatesView: React.FC = () => {
                       {u.hours_spent}h
                     </td>
                     <td className="py-3 px-4 font-mono text-slate-500 whitespace-nowrap">
-                      {u.submitted_at
-                        ? new Date(u.submitted_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        : 'Draft'}
+                      {u.submitted_at ? formatClockTime(u.submitted_at) : 'Draft'}
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       <StatusBadge status={u.status} type="work_update" />
@@ -483,7 +504,7 @@ export const AdminWorkUpdatesView: React.FC = () => {
 
             <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-slate-500">
               <span>Time reported: <strong className="text-slate-800 font-mono">{selectedUpdate?.hours_spent} hours</strong></span>
-              <span>Submitted: <strong className="text-slate-800 font-mono">{selectedUpdate?.submitted_at ? new Date(selectedUpdate.submitted_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Draft'}</strong></span>
+              <span>Submitted: <strong className="text-slate-800 font-mono">{selectedUpdate?.submitted_at ? formatDateTime(selectedUpdate.submitted_at) : 'Draft'}</strong></span>
             </div>
           </div>
 

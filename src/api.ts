@@ -18,6 +18,23 @@ import {
 
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 
+export function toQueryString(params: Record<string, any> = {}): string {
+  const cleanParams: Record<string, string> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value !== '' &&
+      value !== 'undefined' &&
+      value !== 'null' &&
+      value !== 'all'
+    ) {
+      cleanParams[key] = String(value);
+    }
+  }
+  return new URLSearchParams(cleanParams).toString();
+}
+
 // Helper for fetch with credentials and error handling
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem('buildrex_jwt');
@@ -109,7 +126,7 @@ export const api = {
     }>('/api/attendance/today'),
 
   getAttendanceHistory: (params: { start_date?: string; end_date?: string; status?: string; page?: number; limit?: number } = {}) => {
-    const query = new URLSearchParams(params as any).toString();
+    const query = toQueryString(params);
     return request<{
       success: boolean;
       total: number;
@@ -127,18 +144,18 @@ export const api = {
   },
 
   getAdminAttendance: (params: Record<string, any> = {}) => {
-    const query = new URLSearchParams(params).toString();
+    const query = toQueryString(params);
     return request<{
       success: boolean;
       total: number;
       page: number;
       page_size: number;
       records: AttendanceRecord[];
-    }>(`/api/admin/attendance?${query}`);
+    }>(`/api/attendance/admin/attendance?${query}`);
   },
 
   updateAdminAttendance: (id: string, data: Partial<AttendanceRecord>) =>
-    request<{ success: boolean; message: string; record: AttendanceRecord }>(`/api/admin/attendance/${id}`, {
+    request<{ success: boolean; message: string; record: AttendanceRecord }>(`/api/attendance/admin/attendance/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
@@ -160,7 +177,7 @@ export const api = {
     }),
 
   getMyWorkUpdates: (params: { status?: string; page?: number; limit?: number } = {}) => {
-    const query = new URLSearchParams(params as any).toString();
+    const query = toQueryString(params);
     return request<{ success: boolean; total: number; page: number; records: WorkUpdate[] }>(
       `/api/work-updates/my?${query}`
     );
@@ -172,7 +189,7 @@ export const api = {
     ),
 
   getAdminWorkUpdates: (params: Record<string, any> = {}) => {
-    const query = new URLSearchParams(params).toString();
+    const query = toQueryString(params);
     return request<{ success: boolean; total: number; page: number; records: WorkUpdate[] }>(
       `/api/work-updates/admin/list?${query}`
     );
@@ -195,7 +212,7 @@ export const api = {
     }),
 
   getAdminLeaveRequests: (params: { status?: string; page?: number; limit?: number } = {}) => {
-    const query = new URLSearchParams(params as any).toString();
+    const query = toQueryString(params);
     return request<{ success: boolean; total: number; page: number; records: LeaveRequest[] }>(
       `/api/leave-requests/admin/list?${query}`
     );
@@ -212,7 +229,7 @@ export const api = {
 
   // Attendance Corrections
   getMyCorrections: () =>
-    request<{ success: boolean; records: AttendanceCorrection[] }>('/api/attendance/correction-requests/my'),
+    request<{ success: boolean; records: AttendanceCorrection[] }>('/api/leave-requests/corrections/my'),
 
   submitCorrectionRequest: (data: {
     attendance_id?: string;
@@ -222,7 +239,7 @@ export const api = {
     reason: string;
   }) =>
     request<{ success: boolean; message: string; record: AttendanceCorrection }>(
-      '/api/attendance/correction-requests',
+      '/api/leave-requests/corrections',
       {
         method: 'POST',
         body: JSON.stringify(data),
@@ -230,15 +247,15 @@ export const api = {
     ),
 
   getAdminCorrections: (params: { status?: string; page?: number; limit?: number } = {}) => {
-    const query = new URLSearchParams(params as any).toString();
+    const query = toQueryString(params);
     return request<{ success: boolean; total: number; page: number; records: AttendanceCorrection[] }>(
-      `/api/admin/attendance-corrections?${query}`
+      `/api/leave-requests/admin/corrections?${query}`
     );
   },
 
   reviewCorrectionRequest: (id: string, data: { status: 'approved' | 'rejected'; review_comment?: string }) =>
     request<{ success: boolean; message: string; record: AttendanceCorrection }>(
-      `/api/admin/attendance-corrections/${id}/review`,
+      `/api/leave-requests/admin/corrections/${id}/review`,
       {
         method: 'PATCH',
         body: JSON.stringify(data),
@@ -258,7 +275,7 @@ export const api = {
     }>('/api/admin/dashboard-stats'),
 
   getAdminUsers: (params: Record<string, any> = {}) => {
-    const query = new URLSearchParams(params).toString();
+    const query = toQueryString(params);
     return request<{ success: boolean; total: number; users: User[] }>(`/api/admin/users?${query}`);
   },
 
@@ -281,7 +298,7 @@ export const api = {
     }),
 
   getAttendanceReport: (params: Record<string, any> = {}) => {
-    const query = new URLSearchParams(params).toString();
+    const query = toQueryString(params);
     return request<{
       success: boolean;
       summary: {
@@ -296,7 +313,7 @@ export const api = {
   },
 
   getWorkUpdatesReport: (params: Record<string, any> = {}) => {
-    const query = new URLSearchParams(params).toString();
+    const query = toQueryString(params);
     return request<{
       success: boolean;
       summary: {
@@ -325,7 +342,7 @@ export const api = {
     }),
 
   getAuditLogs: (params: { page?: number; limit?: number } = {}) => {
-    const query = new URLSearchParams(params as any).toString();
+    const query = toQueryString(params);
     return request<{ success: boolean; total: number; page: number; logs: AuditLogItem[] }>(
       `/api/admin/audit-logs?${query}`
     );
