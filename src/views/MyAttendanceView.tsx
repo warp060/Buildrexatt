@@ -345,10 +345,10 @@ export const MyAttendanceView: React.FC = () => {
               <button
                 onClick={handleCheckIn}
                 disabled={isActionLoading}
-                className="w-full md:w-52 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-xs text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/25 disabled:opacity-50 cursor-pointer"
+                className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/25 disabled:opacity-50 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" />
-                {isActionLoading ? 'Processing...' : 'Punch In Now'}
+                <span>{isActionLoading ? 'Processing...' : 'Present In — Start Your Day'}</span>
               </button>
             )}
 
@@ -356,10 +356,10 @@ export const MyAttendanceView: React.FC = () => {
               <button
                 onClick={handleCheckOut}
                 disabled={isActionLoading}
-                className="w-full md:w-52 flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl font-bold text-xs text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-rose-600/25 disabled:opacity-50 cursor-pointer"
+                className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-rose-600/25 disabled:opacity-50 cursor-pointer"
               >
                 <Square className="w-4 h-4 fill-current" />
-                {isActionLoading ? 'Processing...' : 'Punch Out Now'}
+                <span>{isActionLoading ? 'Processing...' : 'Present Out — Complete Your Day'}</span>
               </button>
             )}
 

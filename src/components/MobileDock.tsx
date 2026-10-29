@@ -4,7 +4,6 @@ import {
   LayoutDashboard,
   Clock,
   FileCheck2,
-  CalendarDays,
   User,
   Users,
   ShieldCheck,
@@ -22,7 +21,7 @@ export const MobileDock: React.FC<MobileDockProps> = ({ currentTab, setCurrentTa
 
   const employeeItems = [
     { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
-    { id: 'my-attendance', label: 'Clock', icon: Clock },
+    { id: 'my-attendance', label: 'Present', icon: Clock },
     { id: 'work-updates', label: 'Report', icon: FileCheck2 },
     { id: 'work-history', label: 'History', icon: History },
     { id: 'profile', label: 'Profile', icon: User },

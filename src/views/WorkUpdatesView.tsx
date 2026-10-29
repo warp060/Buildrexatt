@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
-import { WorkUpdate, PolishedReportResult, AiStatus } from '../types';
+import { WorkUpdate } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
-import { Modal } from '../components/Modal';
 import { useToast } from '../context/ToastContext';
 import {
   FileCheck2,
@@ -13,10 +12,6 @@ import {
   Calendar,
   Clock,
   MessageSquare,
-  Sparkles,
-  KeyRound,
-  Copy,
-  Check,
   ChevronDown,
   ChevronUp,
   ListPlus,
@@ -50,25 +45,9 @@ export const WorkUpdatesView: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ success?: boolean; message?: string }>({});
 
-  // Gemini AI States
-  const [isPolishing, setIsPolishing] = useState(false);
-  const [isPolishModalOpen, setIsPolishModalOpen] = useState(false);
-  const [polishedResult, setPolishedResult] = useState<PolishedReportResult | null>(null);
-  const [aiStatus, setAiStatus] = useState<AiStatus | null>(null);
-  const [isCopied, setIsCopied] = useState(false);
-
-  // Gemini API Key config
-  const [showKeyDrawer, setShowKeyDrawer] = useState(false);
-  const [customApiKey, setCustomApiKey] = useState('');
-  const [isSavingKey, setIsSavingKey] = useState(false);
-  const [keySaveMessage, setKeySaveMessage] = useState('');
-
   const fetchTodayRecord = async () => {
     try {
-      const [recordRes, statusRes] = await Promise.all([
-        api.getTodayWorkUpdate(),
-        api.getAiStatus().catch(() => null),
-      ]);
+      const recordRes = await api.getTodayWorkUpdate();
 
       if (recordRes.success && recordRes.record) {
         setExistingRecord(recordRes.record);
@@ -82,10 +61,6 @@ export const WorkUpdatesView: React.FC = () => {
         if (recordRes.record.blockers || recordRes.record.next_day_plan) {
           setShowAdvanced(true);
         }
-      }
-
-      if (statusRes && statusRes.success) {
-        setAiStatus(statusRes.status);
       }
     } catch (err) {
       console.error(err);
@@ -102,77 +77,6 @@ export const WorkUpdatesView: React.FC = () => {
       if (!trimmed) return '- ';
       return `${trimmed}\n- `;
     });
-  };
-
-  const handlePolishReport = async () => {
-    if (!projectDetails.trim() && !tasksCompleted.trim()) {
-      setFeedback({
-        success: false,
-        message: 'Please write a brief summary of tasks first before polishing with AI.',
-      });
-      showToast('Add tasks or project notes first to polish with AI', 'warning');
-      return;
-    }
-
-    setIsPolishing(true);
-    setFeedback({});
-
-    try {
-      const res = await api.polishWorkReport({
-        project_details: projectDetails || 'General Tasks & Operations',
-        tasks_completed: tasksCompleted,
-        accomplishments,
-        blockers,
-        next_day_plan: nextDayPlan,
-      });
-
-      if (res.success && res.data) {
-        setPolishedResult(res.data);
-        setIsPolishModalOpen(true);
-        showToast('AI polished your daily deliverables', 'success');
-      }
-    } catch (err: any) {
-      setFeedback({ success: false, message: err.message || 'Failed to polish work report with AI.' });
-      showToast(err.message || 'AI Polish failed', 'error');
-    } finally {
-      setIsPolishing(false);
-    }
-  };
-
-  const handleApplyPolished = () => {
-    if (!polishedResult) return;
-    setProjectDetails(polishedResult.project_details);
-    setTasksCompleted(polishedResult.tasks_completed);
-    setAccomplishments(polishedResult.accomplishments);
-    setBlockers(polishedResult.blockers);
-    setNextDayPlan(polishedResult.next_day_plan);
-    if (polishedResult.blockers || polishedResult.next_day_plan) {
-      setShowAdvanced(true);
-    }
-    setIsPolishModalOpen(false);
-    showToast('Applied AI polished enhancements to form', 'success');
-  };
-
-  const handleSaveApiKey = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!customApiKey.trim()) return;
-    setIsSavingKey(true);
-    setKeySaveMessage('');
-    try {
-      const res = await api.setGeminiApiKey(customApiKey.trim());
-      if (res.success) {
-        setAiStatus(res.status);
-        setKeySaveMessage('✅ API Key configured! Live Gemini 2.5 Flash is now active.');
-        showToast('Gemini API key configured successfully', 'success');
-        setCustomApiKey('');
-        setTimeout(() => setShowKeyDrawer(false), 2000);
-      }
-    } catch (err: any) {
-      setKeySaveMessage(`❌ ${err.message || 'Failed to save API key'}`);
-      showToast(err.message || 'Failed to save key', 'error');
-    } finally {
-      setIsSavingKey(false);
-    }
   };
 
   const handleSave = async (status: 'draft' | 'submitted') => {
@@ -228,7 +132,7 @@ export const WorkUpdatesView: React.FC = () => {
 
   return (
     <div className="space-y-4 max-w-3xl mx-auto">
-      {/* Header Banner - Compact & Clean */}
+      {/* Header Banner - Clean & Simple */}
       <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
@@ -240,32 +144,15 @@ export const WorkUpdatesView: React.FC = () => {
             )}
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Quick 60-second summary of your daily achievements and sprint tasks
+            Record your genuine daily accomplishments, sprint tasks, and blockers
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          {/* Compact AI Polish Button */}
-          <button
-            type="button"
-            disabled={isPolishing || (!projectDetails.trim() && !tasksCompleted.trim())}
-            onClick={handlePolishReport}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200/80 rounded-xl transition-all disabled:opacity-40 cursor-pointer shadow-2xs"
-            title="Polish with Gemini AI"
-          >
-            <Sparkles className={`w-3.5 h-3.5 text-violet-600 ${isPolishing ? 'animate-spin' : ''}`} />
-            <span>{isPolishing ? 'Polishing...' : 'Polish with AI'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowKeyDrawer(!showKeyDrawer)}
-            className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl border border-slate-200 transition-colors cursor-pointer"
-            title="Configure Gemini API Key"
-          >
-            <KeyRound className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        {existingRecord && (
+          <div className="text-xs text-slate-400 font-medium">
+            Reporting Date: <span className="text-slate-700 font-semibold">{existingRecord.work_date}</span>
+          </div>
+        )}
       </div>
 
       {/* Review Feedback Alert (if supervisor commented) */}
@@ -307,43 +194,7 @@ export const WorkUpdatesView: React.FC = () => {
         </div>
       )}
 
-      {/* Gemini API Key Drawer (collapsible) */}
-      {showKeyDrawer && (
-        <div className="p-4 bg-white rounded-2xl border border-indigo-100 shadow-2xs space-y-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <KeyRound className="w-4 h-4 text-indigo-600" />
-              <h3 className="text-xs font-bold text-slate-900">Google Gemini API Key</h3>
-            </div>
-            <span className="text-[10px] text-slate-400 font-mono">
-              {aiStatus?.hasApiKey ? 'Live Google GenAI' : 'Heuristic Engine Active'}
-            </span>
-          </div>
-
-          <form onSubmit={handleSaveApiKey} className="flex gap-2">
-            <input
-              type="password"
-              placeholder="Paste AIzaSy... key"
-              value={customApiKey}
-              onChange={(e) => setCustomApiKey(e.target.value)}
-              className="flex-1 px-3 py-1.5 text-xs font-mono border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
-            />
-            <button
-              type="submit"
-              disabled={isSavingKey || !customApiKey.trim()}
-              className="px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl disabled:opacity-50 transition-colors cursor-pointer"
-            >
-              {isSavingKey ? 'Saving...' : 'Save'}
-            </button>
-          </form>
-
-          {keySaveMessage && (
-            <p className="text-[11px] text-indigo-700 font-medium">{keySaveMessage}</p>
-          )}
-        </div>
-      )}
-
-      {/* Short & Sweet Work Update Form */}
+      {/* Work Update Form */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
         {/* Top Control Bar: Date & Quick Hours Selector */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3.5 border-b border-slate-100">
@@ -544,124 +395,6 @@ export const WorkUpdatesView: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* AI Polish Modal Preview */}
-      <Modal
-        isOpen={isPolishModalOpen}
-        onClose={() => setIsPolishModalOpen(false)}
-        title="Gemini AI Report Enhancements"
-        subtitle="Review professionalized deliverables, structured action verbs, and impact phrasing"
-        maxWidth="max-w-2xl"
-      >
-        {polishedResult && (
-          <div className="space-y-4">
-            {/* Meta indicator */}
-            <div className="p-3 bg-violet-50/80 rounded-xl border border-violet-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-violet-600" />
-                <span className="text-xs font-bold text-violet-900">
-                  {polishedResult.summary || 'Deliverables structured and enhanced'}
-                </span>
-              </div>
-              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-violet-200/70 text-violet-800">
-                {polishedResult.model}
-              </span>
-            </div>
-
-            <p className="text-[11px] text-slate-500 italic">
-              ✨ {polishedResult.polish_notes}
-            </p>
-
-            {/* Enhanced Sections */}
-            <div className="space-y-3 text-xs">
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                  Project Focus
-                </span>
-                <p className="font-semibold text-slate-900">{polishedResult.project_details}</p>
-              </div>
-
-              <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                  Tasks Completed (Action Verb Standard)
-                </span>
-                <p className="font-mono text-slate-800 whitespace-pre-line leading-relaxed bg-white p-2.5 rounded border border-slate-200">
-                  {polishedResult.tasks_completed}
-                </p>
-              </div>
-
-              {(polishedResult.accomplishments || polishedResult.blockers) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {polishedResult.accomplishments && (
-                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                        Key Accomplishments
-                      </span>
-                      <p className="text-slate-800 leading-relaxed">{polishedResult.accomplishments}</p>
-                    </div>
-                  )}
-
-                  {polishedResult.blockers && (
-                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                        Challenges / Blockers
-                      </span>
-                      <p className="text-slate-800 leading-relaxed">{polishedResult.blockers}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {polishedResult.next_day_plan && (
-                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    Next Day Plan
-                  </span>
-                  <p className="font-mono text-slate-800 whitespace-pre-line leading-relaxed bg-white p-2.5 rounded border border-slate-200">
-                    {polishedResult.next_day_plan}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Modal Actions */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-              <button
-                type="button"
-                onClick={() => setIsPolishModalOpen(false)}
-                className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-              >
-                Keep Current Notes
-              </button>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const text = `Project: ${polishedResult.project_details}\n\nTasks:\n${polishedResult.tasks_completed}\n\nAccomplishments:\n${polishedResult.accomplishments}\n\nBlockers:\n${polishedResult.blockers}\n\nPlan:\n${polishedResult.next_day_plan}`;
-                    navigator.clipboard.writeText(text);
-                    setIsCopied(true);
-                    setTimeout(() => setIsCopied(false), 2000);
-                  }}
-                  className="px-3 py-1.5 text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
-                >
-                  {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{isCopied ? 'Copied' : 'Copy All'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleApplyPolished}
-                  className="px-4 py-1.5 text-xs font-semibold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 rounded-lg shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Apply to Form</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </Modal>
     </div>
   );
 };

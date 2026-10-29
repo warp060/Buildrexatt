@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const employeeNavItems = [
     { id: 'dashboard', label: 'Overview', icon: LayoutDashboard, badge: null },
-    { id: 'my-attendance', label: 'Biometric Clock', icon: Clock, badge: 'Live' },
+    { id: 'my-attendance', label: 'Click to Present', icon: Clock, badge: 'Live' },
     { id: 'work-updates', label: 'Daily Work Report', icon: FileCheck2, badge: null },
     { id: 'work-history', label: 'Work History', icon: History, badge: null },
     { id: 'leave-requests', label: 'Leave & Requests', icon: CalendarDays, badge: null },

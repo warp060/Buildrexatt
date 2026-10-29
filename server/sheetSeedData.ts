@@ -500,142 +500,15 @@ function buildWorkUpdates(users: User[], nowIso: string): WorkUpdate[] {
 // ────────────────────────────────────────────────
 export function generateSeedDatabase() {
   const nowIso = new Date().toISOString();
-  const today = getTodayDateString();
 
   const departments = buildDepartments(nowIso);
   const users = buildUsers(nowIso);
-  const attendance = buildAttendance(users, today, nowIso);
-  const work_updates = buildWorkUpdates(users, nowIso);
-
-  const leave_requests: LeaveRequest[] = [
-    {
-      id: 'leave-1',
-      user_id: 'user-maleeha',
-      leave_type: 'sick',
-      start_date: '2026-10-22',
-      end_date: '2026-10-23',
-      days_count: 2,
-      reason: 'Medical appointment and recovery',
-      status: 'pending',
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: nowIso,
-    },
-    {
-      id: 'leave-2',
-      user_id: 'user-sahil',
-      leave_type: 'casual',
-      start_date: '2026-10-25',
-      end_date: '2026-10-26',
-      days_count: 2,
-      reason: 'Family function',
-      status: 'approved',
-      reviewed_by: 'user-ehsaan',
-      review_comment: 'Approved. Please ensure hackathon tasks are delegated.',
-      reviewed_at: nowIso,
-      created_at: nowIso,
-    },
-    {
-      id: 'leave-3',
-      user_id: 'user-abbas',
-      leave_type: 'casual',
-      start_date: '2026-10-28',
-      end_date: '2026-10-28',
-      days_count: 1,
-      reason: 'Personal work in hometown',
-      status: 'pending',
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: nowIso,
-    },
-  ];
-
-  const attendance_corrections: AttendanceCorrection[] = [
-    {
-      id: 'corr-1',
-      user_id: 'user-ameen',
-      attendance_id: 'att-user-ameen-sample',
-      work_date: '2026-10-15',
-      requested_check_in: '2026-10-15T08:58:00Z',
-      requested_check_out: '2026-10-15T18:10:00Z',
-      reason: 'Forgot to check out — was in a media editing session until late',
-      status: 'pending',
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: nowIso,
-    },
-  ];
-
-  const notifications: NotificationItem[] = [
-    {
-      id: 'notif-1',
-      user_id: 'user-ehsaan',
-      title: 'New Leave Request',
-      message: 'Maleeha Affaf (BRX-INT-15) submitted a Sick Leave request for Oct 22-23.',
-      type: 'info',
-      read_at: null,
-      link: '/admin/leave-requests',
-      created_at: nowIso,
-    },
-    {
-      id: 'notif-2',
-      user_id: 'user-ehsaan',
-      title: 'Attendance Correction Pending',
-      message: 'Muhammad Ameen J (BRX-INT-14) requested an attendance correction for Oct 15.',
-      type: 'warning',
-      read_at: null,
-      link: '/admin/leave-requests',
-      created_at: nowIso,
-    },
-    {
-      id: 'notif-3',
-      user_id: 'user-abbas',
-      title: 'Welcome to BUILDREX Portal',
-      message: 'Your attendance & work management profile is active. Submit your daily report by 6:00 PM.',
-      type: 'info',
-      read_at: null,
-      link: '/dashboard',
-      created_at: nowIso,
-    },
-    {
-      id: 'notif-4',
-      user_id: 'user-emad',
-      title: 'New Leave Request',
-      message: 'Mohammed Abbas R Y (BRX-INT-18) submitted a Casual Leave request for Oct 28.',
-      type: 'info',
-      read_at: null,
-      link: '/admin/leave-requests',
-      created_at: nowIso,
-    },
-  ];
-
-  const audit_logs: AuditLogItem[] = [
-    {
-      id: 'audit-1',
-      actor_id: 'user-admin-master',
-      actor_name: 'Buildrex Admin',
-      action: 'SYSTEM_INITIALIZATION',
-      entity_type: 'SYSTEM',
-      entity_id: 'BUILDREX-SYSTEM',
-      details: { version: '2.0.0', initialized_tables: 10, total_users: users.length },
-      ip_address: '127.0.0.1',
-      created_at: nowIso,
-    },
-    {
-      id: 'audit-2',
-      actor_id: 'user-ehsaan',
-      actor_name: 'G Mohamed Ehsaan',
-      action: 'APPROVE_LEAVE',
-      entity_type: 'LEAVE_REQUEST',
-      entity_id: 'leave-2',
-      details: { user: 'Sahil', days: 2, type: 'casual' },
-      ip_address: '127.0.0.1',
-      created_at: nowIso,
-    },
-  ];
+  const attendance: AttendanceRecord[] = [];
+  const work_updates: WorkUpdate[] = [];
+  const leave_requests: LeaveRequest[] = [];
+  const attendance_corrections: AttendanceCorrection[] = [];
+  const notifications: NotificationItem[] = [];
+  const audit_logs: AuditLogItem[] = [];
 
   const company_settings: CompanySettings = {
     id: 1,

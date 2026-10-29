@@ -29,7 +29,7 @@ import { AdminAuditLogsView } from './views/AdminAuditLogsView';
 const SECTION_TITLES: Record<string, string> = {
   // Employee
   dashboard: 'Executive Hub',
-  'my-attendance': 'Biometric Clock',
+  'my-attendance': 'Click to Present',
   'work-updates': 'Daily Work Report',
   'work-history': 'Work Update Archives',
   'leave-requests': 'Leave & Approvals',
