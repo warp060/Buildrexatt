@@ -125,8 +125,9 @@ export const AdminUsersView: React.FC = () => {
       return;
     }
 
+    const cleanEmail = formEmail.trim().toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!isEditMode && (!formEmail || !emailRegex.test(formEmail))) {
+    if (!isEditMode && (!cleanEmail || !emailRegex.test(cleanEmail))) {
       setFormFeedback({ success: false, message: 'Please enter a valid work email address.' });
       showToast('Please enter a valid work email address', 'warning');
       return;

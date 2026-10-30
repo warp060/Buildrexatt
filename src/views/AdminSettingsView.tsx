@@ -19,12 +19,17 @@ import {
   HardDrive,
   Cpu,
   Terminal,
+  Users,
 } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
 import { BuildrexLogo } from '../components/BuildrexLogo';
 
-export const AdminSettingsView: React.FC = () => {
+interface AdminSettingsViewProps {
+  onNavigateTab?: (tab: string) => void;
+}
+
+export const AdminSettingsView: React.FC<AdminSettingsViewProps> = ({ onNavigateTab }) => {
   const { showToast } = useToast();
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -501,11 +506,27 @@ export const AdminSettingsView: React.FC = () => {
         {/* Live Table Records Breakdown */}
         {dbStatus?.tableCounts && (
           <div className="mb-5 p-3.5 rounded-lg bg-slate-50 border border-slate-200/70">
-            <span className="text-[11px] font-bold text-slate-700 block mb-2">Relational Table Row Counts (TiDB Cloud)</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+              <span className="text-[11px] font-bold text-slate-700">Relational Table Row Counts (TiDB Cloud)</span>
+              {onNavigateTab && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('admin-users')}
+                  className="text-[11px] font-semibold text-emerald-800 hover:text-emerald-950 flex items-center gap-1 cursor-pointer bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 transition-colors self-start sm:self-auto"
+                >
+                  <Users className="w-3 h-3 text-emerald-700" />
+                  <span>Go to Team Directory &rarr;</span>
+                </button>
+              )}
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center">
-              <div className="bg-white p-2 rounded border border-slate-200">
+              <div
+                className={`bg-white p-2 rounded border border-slate-200 ${onNavigateTab ? 'cursor-pointer hover:border-emerald-400 hover:shadow-2xs transition-all' : ''}`}
+                onClick={() => onNavigateTab && onNavigateTab('admin-users')}
+                title={onNavigateTab ? 'Click to open Team Directory' : undefined}
+              >
                 <span className="text-[10px] text-slate-400 block font-medium">Users</span>
-                <span className="text-xs font-bold text-slate-800">{dbStatus.tableCounts.users ?? 0}</span>
+                <span className="text-xs font-bold text-emerald-800">{dbStatus.tableCounts.users ?? 0}</span>
               </div>
               <div className="bg-white p-2 rounded border border-slate-200">
                 <span className="text-[10px] text-slate-400 block font-medium">Attendance</span>

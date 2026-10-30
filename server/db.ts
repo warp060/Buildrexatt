@@ -77,16 +77,6 @@ export function getDb(): DatabaseSchema {
     try {
       const content = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(content);
-      const hasRemovedUsers = parsed.users.some((u: any) => [
-        'layeequeahmed602@gmail.com',
-        'nmuhammadshees11@gmail.com',
-        'syedmdaakif007@gmail.com',
-        'sajidahmedrs10@gmail.com',
-        'muzammilaamirmuzzu@gmail.com',
-        'vmohammedsaad@gmail.com',
-        'mohammedaffan1506@gmail.com',
-      ].includes(u.email));
-
       const adminCount = parsed.users.filter((u: any) => u.role === 'admin').length;
       const hasOnlyAdminBrx = adminCount === 1 && parsed.users.some((u: any) => u.email === 'adminbrx@gmail.com' && u.role === 'admin');
 
@@ -95,8 +85,7 @@ export function getDb(): DatabaseSchema {
         Array.isArray(parsed.users) &&
         parsed.users.length >= 15 &&
         parsed.users.some((u: any) => u.email === 'ehsaanehsaan61@gmail.com') &&
-        hasOnlyAdminBrx &&
-        !hasRemovedUsers
+        hasOnlyAdminBrx
       ) {
         dbInstance = parsed;
         return dbInstance!;
@@ -190,20 +179,10 @@ export async function initDatabase(): Promise<{ engine: 'tidb' | 'json'; message
       isTiDBActive = true;
       const tidbData = await loadAllFromTiDB();
       const hasRealSheetUsers = tidbData && tidbData.users.some((u) => u.email === 'ehsaanehsaan61@gmail.com');
-      const hasRemovedFromTiDB = tidbData && tidbData.users.some((u) => [
-        'layeequeahmed602@gmail.com',
-        'nmuhammadshees11@gmail.com',
-        'syedmdaakif007@gmail.com',
-        'sajidahmedrs10@gmail.com',
-        'muzammilaamirmuzzu@gmail.com',
-        'vmohammedsaad@gmail.com',
-        'mohammedaffan1506@gmail.com',
-      ].includes(u.email));
-
       const tidbAdminCount = tidbData ? tidbData.users.filter((u) => u.role === 'admin').length : 0;
       const hasOnlyAdminBrxInTiDB = tidbAdminCount === 1 && (tidbData ? tidbData.users.some((u) => u.email === 'adminbrx@gmail.com' && u.role === 'admin') : false);
 
-      if (tidbData && tidbData.users.length >= 15 && hasRealSheetUsers && hasOnlyAdminBrxInTiDB && !hasRemovedFromTiDB) {
+      if (tidbData && tidbData.users.length >= 15 && hasRealSheetUsers && hasOnlyAdminBrxInTiDB) {
         dbInstance = tidbData;
         saveDbLocalOnly(dbInstance);
         console.log(`[Database] ☁️ Loaded ${dbInstance.users.length} users and ${dbInstance.attendance.length} attendance rows from TiDB Cloud.`);

@@ -54,7 +54,10 @@ export function authenticate(req: AuthenticatedRequest, res: Response, next: Nex
   }
 
   const db = getDb();
-  const user = db.users.find((u) => u.id === payload.id);
+  let user = db.users.find((u) => u.id === payload.id);
+  if (!user && (payload as any).email) {
+    user = db.users.find((u) => u.email.toLowerCase().trim() === (payload as any).email.toLowerCase().trim());
+  }
 
   if (!user || user.status === 'inactive') {
     res.status(401).json({ success: false, message: 'User account is inactive or not found.' });

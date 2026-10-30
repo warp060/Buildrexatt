@@ -130,7 +130,7 @@ const MainWorkspace: React.FC = () => {
       case 'admin-reports':
         return <AdminReportsView />;
       case 'admin-settings':
-        return <AdminSettingsView />;
+        return <AdminSettingsView onNavigateTab={(tab) => setCurrentTab(tab)} />;
       case 'admin-audit-logs':
         return <AdminAuditLogsView />;
 

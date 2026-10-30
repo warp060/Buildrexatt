@@ -3050,6 +3050,50 @@
   ],
   "audit_logs": [
     {
+      "id": "audit-1793375849684-uviab",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:57:33"
+    },
+    {
+      "id": "audit-1793375835019-4av61",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "CREATE_USER",
+      "entity_type": "USER",
+      "entity_id": "user-1793375835014-8qam",
+      "details": {
+        "code": "BRX-INT-23",
+        "email": "rohan.sharma@buildrex.com",
+        "initial_password": "Rohan@Brx26",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:57:20"
+    },
+    {
+      "id": "audit-1793375834777-g81zj",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:57:20"
+    },
+    {
       "id": "audit-1793374704030-dsu4i",
       "actor_id": "user-1793374511317-18jw",
       "actor_name": "Aisha Testing",
