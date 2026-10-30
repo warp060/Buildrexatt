@@ -25,6 +25,7 @@ export const TEAM_PASSWORDS: Record<string, string> = {
   'ehsaanehsaan61@gmail.com': 'Ehsaan@Brx26',
   'faisalzafeera@gmail.com': 'Zafeera@Brx26',
   'sujiimmi@gmail.com': 'Immanuel@Brx26',
+  'hafizfareedvlr@gmail.com': 'Fareed@Brx26',
   'Hafizfareedvlr@gmail.com': 'Fareed@Brx26',
   'jmuhammadameen19@gmail.com': 'Ameen@Brx26',
   'affafmaleeha@gmail.com': 'Maleeha@Brx26',
@@ -37,6 +38,7 @@ export const TEAM_PASSWORDS: Record<string, string> = {
   'azeezmohammed560@gmail.com': 'Azeez@Brx26',
   'afrafameena1208@gmail.com': 'Afra@Brx26',
   'emadurrahmank2008@gmail.com': 'Emad@Brx26',
+  'saffiyaharmeen7@gmail.com': 'Saffiyaharmeen@Brx26',
 };
 
 function hashPw(plain: string): string {
@@ -375,6 +377,22 @@ function buildUsers(nowIso: string): User[] {
       joining_date: '2026-09-28',
       status: 'active',
       created_at: '2026-09-25T21:16:47Z',
+      updated_at: nowIso,
+    },
+    {
+      id: 'user-1793287370582-karo',
+      employee_code: 'BRX-INT-017',
+      name: 'SAFFIYA HARMEEN',
+      email: 'saffiyaharmeen7@gmail.com',
+      password_hash: hashPw(TEAM_PASSWORDS['saffiyaharmeen7@gmail.com']),
+      role: 'intern',
+      department_id: 'dept-tech',
+      manager_id: null,
+      position: 'Frontend intern',
+      phone: '8925073575',
+      joining_date: '2026-10-28',
+      status: 'active',
+      created_at: '2026-10-29T15:22:50.582Z',
       updated_at: nowIso,
     },
   ];
