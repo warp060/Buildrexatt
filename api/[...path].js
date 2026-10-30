@@ -72191,13 +72191,13 @@ var buildrex_default = {
       user_id: "user-abbas",
       work_date: "2026-10-30",
       check_in: "2026-10-30T04:40:20.000Z",
-      check_out: null,
-      total_minutes: 0,
+      check_out: "2026-10-30T06:20:19.909Z",
+      total_minutes: 100,
       status: "late",
       notes: "Late arrival (checked in after grace window)",
       ip_address: "127.0.0.1",
       created_at: "2026-10-30T04:40:18.000Z",
-      updated_at: "2026-10-30T04:40:18.000Z"
+      updated_at: "2026-10-30T06:20:19.909Z"
     },
     {
       id: "att-1793282100000-abbas",
@@ -74632,6 +74632,26 @@ var buildrex_default = {
   ],
   notifications: [
     {
+      id: "notif-1793341219934-f6bw",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Mohammed Abbas R Y checked out. Recorded duration: 1.7 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30T06:20:19.934Z"
+    },
+    {
+      id: "notif-1793341219929-cz6i",
+      user_id: "user-emad",
+      title: "Attendance Clock-Out",
+      message: "Mohammed Abbas R Y checked out. Recorded duration: 1.7 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30T06:20:19.929Z"
+    },
+    {
       id: "notif-1793339682210-d7bp",
       user_id: "user-abbas",
       title: "Work Update Reviewed",
@@ -74883,6 +74903,50 @@ var buildrex_default = {
     }
   ],
   audit_logs: [
+    {
+      id: "audit-1793342373627-jup0e",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-30T06:39:33.627Z"
+    },
+    {
+      id: "audit-1793341272784-d7ta6",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-30T06:21:12.784Z"
+    },
+    {
+      id: "audit-1793341219945-b9kwx",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793335220617-sbdv4",
+      details: {
+        work_date: "2026-10-30",
+        check_out: "2026-10-30T06:20:19.909Z",
+        total_minutes: 100,
+        status: "late"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-30T06:20:19.945Z"
+    },
     {
       id: "audit-1793340446270-iekbb",
       actor_id: "user-abbas",

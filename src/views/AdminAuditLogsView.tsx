@@ -6,11 +6,12 @@ import { Shield, Search, RefreshCw, FileText } from 'lucide-react';
 export const AdminAuditLogsView: React.FC = () => {
   const [logs, setLogs] = useState<AuditLogItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedLog, setSelectedLog] = useState<AuditLogItem | null>(null);
 
-  const fetchLogs = useCallback(async () => {
-    setIsLoading(true);
+  const fetchLogs = useCallback(async (isSilent = false) => {
+    if (!isSilent) setIsLoading(true);
     try {
       const res = await api.getAuditLogs({ limit: 100 });
       if (res.success) {
@@ -19,7 +20,7 @@ export const AdminAuditLogsView: React.FC = () => {
     } catch (err) {
       console.error(err);
     } finally {
-      setIsLoading(false);
+      if (!isSilent) setIsLoading(false);
     }
   }, []);
 
@@ -49,11 +50,16 @@ export const AdminAuditLogsView: React.FC = () => {
         </div>
 
         <button
-          onClick={fetchLogs}
-          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors self-start sm:self-auto"
+          onClick={async () => {
+            setIsRefreshing(true);
+            await fetchLogs(true);
+            setIsRefreshing(false);
+          }}
+          disabled={isRefreshing}
+          className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg transition-all self-start sm:self-auto cursor-pointer disabled:opacity-60"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Refresh Audit Trail
+          <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#0B1F3A]' : ''}`} />
+          <span>{isRefreshing ? 'Refreshing...' : 'Refresh Audit Trail'}</span>
         </button>
       </div>
 
