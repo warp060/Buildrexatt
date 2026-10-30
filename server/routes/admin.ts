@@ -15,6 +15,7 @@ import {
 import { verifyConnection, getPool, TiDBConfig } from '../tidb';
 import { authenticate, requireRole, AuthenticatedRequest } from '../auth';
 import { User, Department, DashboardStats } from '../types';
+import { getMemberPassword } from './googleSheetSync';
 
 const router = Router();
 
@@ -179,52 +180,118 @@ router.post('/users', authenticate, requireRole('admin'), async (req: Authentica
     joining_date,
   } = req.body;
 
-  if (!name || !email || !role) {
+  if (!name || !name.trim() || !email || !email.trim() || !role) {
     res.status(400).json({ success: false, message: 'Name, email, and role are required.' });
     return;
   }
 
+  const cleanName = name.trim();
+  const cleanEmail = email.toLowerCase().trim();
   const db = getDb();
 
   // Validate duplicate email
   const existingEmail = db.users.find(
-    (u) => u.email.toLowerCase().trim() === email.toLowerCase().trim()
+    (u) => u.email.toLowerCase().trim() === cleanEmail
   );
   if (existingEmail) {
-    res.status(400).json({ success: false, message: 'A user with this email address already exists.' });
+    res.status(400).json({
+      success: false,
+      message: `A user with email ${cleanEmail} already exists (${existingEmail.name} - ${existingEmail.employee_code}).`,
+    });
     return;
   }
 
   // Validate or auto-generate employee_code
-  let code = employee_code ? employee_code.trim().toUpperCase() : '';
+  let code = (employee_code || '').trim().toUpperCase();
+
+  const isCodeTaken = (candidate: string) => {
+    const cleanCand = candidate.toUpperCase();
+    const strippedCand = cleanCand.replace(/-0+/, '-');
+    return db.users.some((u) => {
+      const uCode = u.employee_code.toUpperCase();
+      return uCode === cleanCand || uCode.replace(/-0+/, '-') === strippedCand;
+    });
+  };
+
   if (!code) {
-    const prefix = role === 'intern' ? 'BRX-INT-' : 'BRX-';
-    const nextNum = db.users.length + 1;
-    code = `${prefix}${String(nextNum).padStart(3, '0')}`;
+    if (role === 'intern') {
+      const internNums = db.users
+        .map((u) => {
+          const m = u.employee_code.match(/INT-(\d+)/i);
+          return m ? parseInt(m[1], 10) : 0;
+        })
+        .filter((n) => !isNaN(n) && n > 0);
+      const maxNum = internNums.length > 0 ? Math.max(...internNums) : 22;
+      let nextNum = Math.max(maxNum + 1, 23);
+      code = `BRX-INT-${String(nextNum).padStart(2, '0')}`;
+      while (isCodeTaken(code)) {
+        nextNum++;
+        code = `BRX-INT-${String(nextNum).padStart(2, '0')}`;
+      }
+    } else if (role === 'employee') {
+      const empNums = db.users
+        .map((u) => {
+          const m = u.employee_code.match(/EMP-(\d+)/i);
+          return m ? parseInt(m[1], 10) : 0;
+        })
+        .filter((n) => !isNaN(n) && n > 0);
+      const maxNum = empNums.length > 0 ? Math.max(...empNums) : 10;
+      let nextNum = Math.max(maxNum + 1, 11);
+      code = `BRX-EMP-${String(nextNum).padStart(2, '0')}`;
+      while (isCodeTaken(code)) {
+        nextNum++;
+        code = `BRX-EMP-${String(nextNum).padStart(2, '0')}`;
+      }
+    } else {
+      // admin
+      let nextNum = db.users.filter((u) => u.role === 'admin').length;
+      code = `BRX-ADM-${String(nextNum).padStart(2, '0')}`;
+      while (isCodeTaken(code)) {
+        nextNum++;
+        code = `BRX-ADM-${String(nextNum).padStart(2, '0')}`;
+      }
+    }
+  } else {
+    // If user provided a raw number (e.g. '23'), format it with standard prefix
+    if (/^\d+$/.test(code)) {
+      const prefix = role === 'intern' ? 'BRX-INT-' : role === 'admin' ? 'BRX-ADM-' : 'BRX-EMP-';
+      code = `${prefix}${String(code).padStart(2, '0')}`;
+    }
+
+    if (isCodeTaken(code)) {
+      const conflictingUser = db.users.find(
+        (u) =>
+          u.employee_code.toUpperCase() === code ||
+          u.employee_code.toUpperCase().replace(/-0+/, '-') === code.replace(/-0+/, '-')
+      );
+      res.status(400).json({
+        success: false,
+        message: `Employee code "${code}" is already in use by ${conflictingUser?.name || 'another team member'}. Leave blank to auto-generate next available code.`,
+      });
+      return;
+    }
   }
 
-  const existingCode = db.users.find((u) => u.employee_code === code);
-  if (existingCode) {
-    res.status(400).json({ success: false, message: 'Employee code already in use.' });
-    return;
-  }
+  // Password: Use provided custom password or auto-generate <FirstName>@Brx26 matching Team Credentials
+  const plainPassword = (password && password.trim().length >= 6)
+    ? password.trim()
+    : getMemberPassword(cleanEmail, cleanName);
 
-  const pass = password && password.length >= 6 ? password : 'Buildrex@2026';
-  const passwordHash = await bcrypt.hash(pass, 10);
+  const passwordHash = await bcrypt.hash(plainPassword, 10);
   const nowIso = new Date().toISOString();
 
   const newUser: User = {
     id: `user-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
     employee_code: code,
-    name: name.trim(),
-    email: email.toLowerCase().trim(),
+    name: cleanName,
+    email: cleanEmail,
     password_hash: passwordHash,
     role,
     department_id: department_id || null,
     manager_id: manager_id || null,
     position: position ? position.trim() : (role === 'intern' ? 'Associate Intern' : 'Team Member'),
     phone: phone ? phone.trim() : '',
-    joining_date: joining_date || getTodayStr(),
+    joining_date: (joining_date && joining_date.trim()) ? joining_date.trim() : getTodayStr(),
     status: 'active',
     created_at: nowIso,
     updated_at: nowIso,
@@ -238,13 +305,13 @@ router.post('/users', authenticate, requireRole('admin'), async (req: Authentica
     'CREATE_USER',
     'USER',
     newUser.id,
-    { email: newUser.email, code: newUser.employee_code, role: newUser.role },
+    { email: newUser.email, code: newUser.employee_code, role: newUser.role, initial_password: plainPassword },
     req.ip || '127.0.0.1'
   );
 
   res.status(201).json({
     success: true,
-    message: `Account created successfully for ${newUser.name} (${newUser.employee_code}).`,
+    message: `Account created successfully for ${newUser.name} (${newUser.employee_code}). Password: ${plainPassword}`,
     user: sanitizeUser(enrichUser(newUser)),
   });
 });

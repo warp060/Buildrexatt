@@ -33,6 +33,7 @@ export const AdminUsersView: React.FC = () => {
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [formCode, setFormCode] = useState('');
+  const [formPassword, setFormPassword] = useState('');
   const [formRole, setFormRole] = useState<UserRole>('employee');
   const [formDeptId, setFormDeptId] = useState('');
   const [formPosition, setFormPosition] = useState('');
@@ -81,6 +82,7 @@ export const AdminUsersView: React.FC = () => {
     setFormName('');
     setFormEmail('');
     setFormCode('');
+    setFormPassword('');
     setFormRole('intern');
     setFormDeptId(departments[0]?.id || '');
     setFormPosition('Innovation Intern');
@@ -151,6 +153,7 @@ export const AdminUsersView: React.FC = () => {
           name: formName.trim(),
           email: formEmail.trim().toLowerCase(),
           employee_code: formCode.trim() || undefined,
+          password: formPassword.trim() || undefined,
           role: formRole,
           department_id: formDeptId || null,
           position: formPosition.trim(),
@@ -230,7 +233,7 @@ export const AdminUsersView: React.FC = () => {
             </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            22 organization members synchronized from official BUILDREX Google Sheet with individual security credentials
+            {users.length} organization members registered in BUILDREX system with individual security credentials
           </p>
         </div>
 
@@ -280,7 +283,7 @@ export const AdminUsersView: React.FC = () => {
               </span>
             </h2>
             <p className="text-xs text-emerald-800/80 mt-0.5">
-              Securely view, copy generated passwords for all 22 Google Sheet team members, or test direct 1-click account access.
+              Securely view, copy generated passwords for all {users.length} team members, or test direct 1-click account access.
             </p>
           </div>
         </div>
@@ -291,7 +294,7 @@ export const AdminUsersView: React.FC = () => {
           className="px-4 py-2.5 rounded-lg border border-emerald-300 bg-white hover:bg-emerald-50 text-emerald-950 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs group shrink-0 active:scale-[0.98]"
         >
           <Users className="w-4 h-4 text-emerald-700 group-hover:scale-110 transition-transform" />
-          <span>View All 22 Team Member Passwords &amp; Direct Access</span>
+          <span>View Team Passwords &amp; Direct Access ({users.length})</span>
         </button>
       </div>
 
@@ -489,7 +492,7 @@ export const AdminUsersView: React.FC = () => {
                 value={formCode}
                 disabled={isEditMode}
                 onChange={(e) => setFormCode(e.target.value)}
-                placeholder="Leave blank for auto ID"
+                placeholder={formRole === 'intern' ? 'Leave blank for auto ID (e.g. BRX-INT-23)' : formRole === 'employee' ? 'Leave blank for auto ID (e.g. BRX-EMP-11)' : 'Leave blank for auto ID'}
                 className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A] disabled:bg-slate-50"
               />
             </div>
@@ -497,7 +500,17 @@ export const AdminUsersView: React.FC = () => {
               <label className="block text-xs font-semibold text-slate-700 mb-1">System Role</label>
               <select
                 value={formRole}
-                onChange={(e) => setFormRole(e.target.value as UserRole)}
+                onChange={(e) => {
+                  const newRole = e.target.value as UserRole;
+                  setFormRole(newRole);
+                  if (!isEditMode) {
+                    if (newRole === 'intern' && formPosition === 'Team Member') {
+                      setFormPosition('Innovation Intern');
+                    } else if (newRole === 'employee' && formPosition === 'Innovation Intern') {
+                      setFormPosition('Team Member');
+                    }
+                  }
+                }}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A] bg-white text-slate-800"
               >
                 <option value="intern">Intern</option>
@@ -570,8 +583,30 @@ export const AdminUsersView: React.FC = () => {
           </div>
 
           {!isEditMode && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Initial Password <span className="font-normal text-slate-400">(Optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={formPassword}
+                  onChange={(e) => setFormPassword(e.target.value)}
+                  placeholder="Auto (e.g. Name@Brx26)"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
+                />
+              </div>
+              <div className="flex flex-col justify-end">
+                <p className="text-[11px] text-slate-600 bg-emerald-50/80 p-2.5 rounded-lg border border-emerald-200">
+                  Login Password: <span className="font-mono font-bold text-emerald-950">{formPassword.trim() || (formName.trim() ? `${formName.trim().replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase() + formName.trim().replace(/[^a-zA-Z]/g, '').slice(1).toLowerCase()}@Brx26` : '<FirstName>@Brx26')}</span>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!isEditMode && (
             <p className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-              Note: The default password for newly provisioned accounts is <span className="font-mono font-semibold">Buildrex@2026</span>. The user will be required to change it on login.
+              Note: Account is activated immediately upon creation. Credentials can be directly accessed or copied from the <span className="font-semibold text-slate-800">Team Passwords &amp; Direct Access</span> modal.
             </p>
           )}
 

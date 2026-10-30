@@ -81,8 +81,9 @@ export function getMemberPassword(email: string, name: string): string {
   if (TEAM_PASSWORDS[normEmail]) {
     return TEAM_PASSWORDS[normEmail];
   }
-  const firstName = name.replace(/[^a-zA-Z]/g, '').trim();
-  const cap = firstName.length > 0 ? firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase() : 'Team';
+  const firstWord = (name || '').trim().split(/[\s._-]+/)[0] || '';
+  const cleanFirst = firstWord.replace(/[^a-zA-Z]/g, '');
+  const cap = cleanFirst.length > 0 ? cleanFirst.charAt(0).toUpperCase() + cleanFirst.slice(1).toLowerCase() : 'Team';
   return `${cap}@Brx26`;
 }
 

@@ -3050,6 +3050,79 @@
   ],
   "audit_logs": [
     {
+      "id": "audit-1793374704030-dsu4i",
+      "actor_id": "user-1793374511317-18jw",
+      "actor_name": "Aisha Testing",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-1793374511317-18jw",
+      "details": {
+        "email": "aisha.test@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:38:28"
+    },
+    {
+      "id": "audit-1793374511322-nlkzr",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "CREATE_USER",
+      "entity_type": "USER",
+      "entity_id": "user-1793374511317-18jw",
+      "details": {
+        "code": "BRX-INT-23",
+        "email": "aisha.test@buildrex.com",
+        "initial_password": "Aishatesting@Brx26",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:35:13"
+    },
+    {
+      "id": "audit-1793374511140-6pkp0",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:35:13"
+    },
+    {
+      "id": "audit-1793372834487-dn341",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "CREATE_USER",
+      "entity_type": "USER",
+      "entity_id": "user-1793372834483-yajd",
+      "details": {
+        "code": "BRX-INT-018",
+        "email": "testnewmember@buildrex.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:07:20"
+    },
+    {
+      "id": "audit-1793372834228-i45k1",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 15:07:20"
+    },
+    {
       "id": "audit-1793366352906-gxa5g",
       "actor_id": "user-1793287370582-karo",
       "actor_name": "SAFFIYA HARMEEN",
@@ -3061,7 +3134,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-30T13:19:12.906Z"
+      "created_at": "2026-10-30 13:19:39"
     },
     {
       "id": "audit-1793366352758-7hxnp",
@@ -3075,7 +3148,7 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-30T13:19:12.758Z"
+      "created_at": "2026-10-30 13:19:39"
     },
     {
       "id": "audit-1793341272784-d7ta6",
