@@ -59,17 +59,33 @@
   ],
   "users": [
     {
-      "id": "user-abbas",
-      "employee_code": "BRX-INT-18",
-      "name": "Mohammed Abbas R Y",
-      "email": "abbas6618532@gmail.com",
-      "password_hash": "$2b$10$s9jZB.U4QNHz7EhyhyzeiOy5o3uc0afpQh72kve0Zpi9ZMgd30.2G",
-      "role": "intern",
+      "id": "user-ehsaan",
+      "employee_code": "BRX-COO-02",
+      "name": "G Mohamed Ehsaan",
+      "email": "ehsaanehsaan61@gmail.com",
+      "password_hash": "$2b$10$uKqlKYrbUaQ20RmcQG6akuSHQZOviGemEJNCA6DVvGpZLlL.EXSte",
+      "role": "employee",
+      "department_id": "dept-ops",
+      "manager_id": null,
+      "position": "Chief Operating Officer",
+      "phone": "9894484534",
+      "joining_date": "2026-07-23",
+      "status": "active",
+      "created_at": "2026-10-23 14:54:38",
+      "updated_at": "2026-10-23 14:54:38"
+    },
+    {
+      "id": "user-emad",
+      "employee_code": "BRX-CTO-04",
+      "name": "Mohamed Emad Ur Rahman",
+      "email": "emadurrahmank2008@gmail.com",
+      "password_hash": "$2b$10$5Dg9JUvfKUD4RepNc6ISWu3jaB3p9uvOE84V2UG.p/pwF.sFIiBU2",
+      "role": "employee",
       "department_id": "dept-tech",
-      "manager_id": "user-emad",
-      "position": "Full Stack Intern",
-      "phone": "6369906810",
-      "joining_date": "2026-09-06",
+      "manager_id": null,
+      "position": "CTO",
+      "phone": "6380559119",
+      "joining_date": "2026-09-23",
       "status": "active",
       "created_at": "2026-10-23 14:54:38",
       "updated_at": "2026-10-23 14:54:38"
@@ -171,33 +187,17 @@
       "updated_at": "2026-10-23 14:54:38"
     },
     {
-      "id": "user-ehsaan",
-      "employee_code": "BRX-COO-02",
-      "name": "G Mohamed Ehsaan",
-      "email": "ehsaanehsaan61@gmail.com",
-      "password_hash": "$2b$10$uKqlKYrbUaQ20RmcQG6akuSHQZOviGemEJNCA6DVvGpZLlL.EXSte",
-      "role": "employee",
-      "department_id": "dept-ops",
-      "manager_id": null,
-      "position": "Chief Operating Officer",
-      "phone": "9894484534",
-      "joining_date": "2026-07-23",
-      "status": "active",
-      "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-23 14:54:38"
-    },
-    {
-      "id": "user-emad",
-      "employee_code": "BRX-CTO-04",
-      "name": "Mohamed Emad Ur Rahman",
-      "email": "emadurrahmank2008@gmail.com",
-      "password_hash": "$2b$10$5Dg9JUvfKUD4RepNc6ISWu3jaB3p9uvOE84V2UG.p/pwF.sFIiBU2",
-      "role": "employee",
+      "id": "user-abbas",
+      "employee_code": "BRX-INT-18",
+      "name": "Mohammed Abbas R Y",
+      "email": "abbas6618532@gmail.com",
+      "password_hash": "$2b$10$s9jZB.U4QNHz7EhyhyzeiOy5o3uc0afpQh72kve0Zpi9ZMgd30.2G",
+      "role": "intern",
       "department_id": "dept-tech",
-      "manager_id": null,
-      "position": "CTO",
-      "phone": "6380559119",
-      "joining_date": "2026-09-23",
+      "manager_id": "user-emad",
+      "position": "Full Stack Intern",
+      "phone": "6369906810",
+      "joining_date": "2026-09-06",
       "status": "active",
       "created_at": "2026-10-23 14:54:38",
       "updated_at": "2026-10-23 14:54:38"
@@ -214,6 +214,22 @@
       "position": "Team Leader",
       "phone": "8778477488",
       "joining_date": "2026-07-31",
+      "status": "active",
+      "created_at": "2026-10-23 14:54:38",
+      "updated_at": "2026-10-23 14:54:38"
+    },
+    {
+      "id": "user-zafeera",
+      "employee_code": "BRX-EMP-05",
+      "name": "Zafeera",
+      "email": "faisalzafeera@gmail.com",
+      "password_hash": "$2b$10$3NTaVYBFFYvHGB16szUQJ.zjN6ANUF0xtotB76fm8zqaILXhhgUau",
+      "role": "employee",
+      "department_id": "dept-ops",
+      "manager_id": "user-ehsaan",
+      "position": "Operations Manager",
+      "phone": "8300879846",
+      "joining_date": "2026-07-08",
       "status": "active",
       "created_at": "2026-10-23 14:54:38",
       "updated_at": "2026-10-23 14:54:38"
@@ -299,22 +315,6 @@
       "updated_at": "2026-10-23 14:54:38"
     },
     {
-      "id": "user-zafeera",
-      "employee_code": "BRX-EMP-05",
-      "name": "Zafeera",
-      "email": "faisalzafeera@gmail.com",
-      "password_hash": "$2b$10$3NTaVYBFFYvHGB16szUQJ.zjN6ANUF0xtotB76fm8zqaILXhhgUau",
-      "role": "employee",
-      "department_id": "dept-ops",
-      "manager_id": "user-ehsaan",
-      "position": "Operations Manager",
-      "phone": "8300879846",
-      "joining_date": "2026-07-08",
-      "status": "active",
-      "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-10-23 14:54:38"
-    },
-    {
       "id": "user-1793287370582-karo",
       "employee_code": "BRX-INT-017",
       "name": "SAFFIYA HARMEEN",
@@ -327,236 +327,93 @@
       "phone": "8925073575",
       "joining_date": "2026-10-28",
       "status": "active",
-      "created_at": "2026-10-29T15:22:50.582Z",
-      "updated_at": "2026-10-29T15:22:50.582Z"
+      "created_at": "2026-10-29 15:22:51",
+      "updated_at": "2026-10-29 15:22:51"
     }
   ],
   "attendance": [
     {
-      "id": "att-1793288156894-842bu",
+      "id": "att-1793335220617-sbdv4",
       "user_id": "user-abbas",
-      "work_date": "2026-10-29",
-      "check_in": "2026-10-29T15:35:56.893Z",
+      "work_date": "2026-10-30",
+      "check_in": "2026-10-30T04:40:20.000Z",
       "check_out": null,
       "total_minutes": 0,
       "status": "late",
       "notes": "Late arrival (checked in after grace window)",
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:35:56.893Z",
-      "updated_at": "2026-10-29T15:35:56.893Z"
-    }
-  ],
-  "work_updates": [
+      "created_at": "2026-10-30T04:40:18.000Z",
+      "updated_at": "2026-10-30T04:40:18.000Z"
+    },
     {
-      "id": "wu-1793288192941-a2pxc",
+      "id": "att-1793282100000-abbas",
       "user_id": "user-abbas",
       "work_date": "2026-10-29",
-      "tasks_completed": "i have done buildrex website",
-      "project_details": "Development",
-      "accomplishments": "i have done buildrex website",
-      "blockers": "",
-      "next_day_plan": "i will  deploy from netlify",
-      "hours_spent": 8,
-      "status": "reviewed",
-      "submitted_at": "2026-10-29T15:36:32.941Z",
-      "reviewed_by": "user-admin-master",
-      "review_comment": "Excellent work today, Mohammed. The tasks on Development are clear, well-structured, and demonstrate strong adherence to engineering standards. Keep up the great velocity!",
-      "reviewed_at": "2026-10-29T15:38:34.322Z",
-      "created_at": "2026-10-29T15:36:32.941Z",
-      "updated_at": "2026-10-29T15:38:34.322Z"
-    }
-  ],
-  "leave_requests": [
+      "check_in": "2026-10-29T13:45:00.000Z",
+      "check_out": "2026-10-29T13:59:00.000Z",
+      "total_minutes": 14,
+      "status": "late",
+      "notes": "Late arrival (checked in after grace window)",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T04:59:16.000Z",
+      "updated_at": "2026-10-30T04:59:16.000Z"
+    },
     {
-      "id": "leave-1793288234562-4ekv0",
-      "user_id": "user-abbas",
-      "leave_type": "emergency",
-      "start_date": "2026-10-29",
-      "end_date": "2026-10-29",
-      "days_count": 1,
-      "reason": "i want to atten my brother marriiage function",
-      "status": "approved",
-      "reviewed_by": "user-admin-master",
-      "review_comment": "sure",
-      "reviewed_at": "2026-10-29T15:39:00.724Z",
-      "created_at": "2026-10-29T15:37:14.562Z"
+      "id": "att-1793282100000-azeez",
+      "user_id": "user-azeez",
+      "work_date": "2026-10-29",
+      "check_in": "2026-10-29T13:45:00.000Z",
+      "check_out": "2026-10-29T13:59:00.000Z",
+      "total_minutes": 14,
+      "status": "late",
+      "notes": "Late arrival (checked in after grace window)",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T04:59:16.000Z",
+      "updated_at": "2026-10-30T04:59:16.000Z"
     }
   ],
+  "work_updates": [],
+  "leave_requests": [],
   "attendance_corrections": [],
   "notifications": [
     {
-      "id": "notif-1793288340739-elke",
-      "user_id": "user-abbas",
-      "title": "Leave Request Approved",
-      "message": "Your leave request for 2026-10-29 to 2026-10-29 has been approved. Note: sure",
-      "type": "success",
-      "read_at": null,
-      "link": "/leave-requests",
-      "created_at": "2026-10-29T15:39:00.739Z"
-    },
-    {
-      "id": "notif-1793288314329-qggz",
-      "user_id": "user-abbas",
-      "title": "Work Update Reviewed",
-      "message": "Your work update for 2026-10-29 was approved and marked Reviewed.",
-      "type": "success",
-      "read_at": null,
-      "link": "/work-updates",
-      "created_at": "2026-10-29T15:38:34.329Z"
-    },
-    {
-      "id": "notif-1793288234586-om0w",
-      "user_id": "user-emad",
-      "title": "New Leave Request",
-      "message": "Mohammed Abbas R Y requested 1 day(s) emergency leave (2026-10-29 to 2026-10-29).",
-      "type": "info",
-      "read_at": null,
-      "link": "/admin/approvals",
-      "created_at": "2026-10-29T15:37:14.586Z"
-    },
-    {
-      "id": "notif-1793288234576-6oub",
+      "id": "notif-1793335220641-at89",
       "user_id": "user-admin-master",
-      "title": "New Leave Request",
-      "message": "Mohammed Abbas R Y requested 1 day(s) emergency leave (2026-10-29 to 2026-10-29).",
-      "type": "info",
-      "read_at": null,
-      "link": "/admin/approvals",
-      "created_at": "2026-10-29T15:37:14.576Z"
-    },
-    {
-      "id": "notif-1793288192957-jdid",
-      "user_id": "user-emad",
-      "title": "Daily Work Update Submitted",
-      "message": "Mohammed Abbas R Y submitted daily work report for 2026-10-29.",
-      "type": "info",
-      "read_at": null,
-      "link": "/admin/work-updates",
-      "created_at": "2026-10-29T15:36:32.957Z"
-    },
-    {
-      "id": "notif-1793288192949-s7yw",
-      "user_id": "user-admin-master",
-      "title": "Daily Work Update Submitted",
-      "message": "Mohammed Abbas R Y submitted daily work report for 2026-10-29.",
-      "type": "info",
-      "read_at": null,
-      "link": "/admin/work-updates",
-      "created_at": "2026-10-29T15:36:32.949Z"
-    },
-    {
-      "id": "notif-1793288156903-ogf1",
-      "user_id": "user-emad",
       "title": "Attendance Clock-In",
-      "message": "Mohammed Abbas R Y checked in for 2026-10-29 (Late Arrival).",
+      "message": "Mohammed Abbas R Y checked in for 2026-10-30 (Late Arrival).",
       "type": "warning",
       "read_at": null,
       "link": "/admin/attendance",
-      "created_at": "2026-10-29T15:35:56.903Z"
+      "created_at": "2026-10-30 04:40:18"
     },
     {
-      "id": "notif-1793288156899-6aab",
-      "user_id": "user-admin-master",
+      "id": "notif-1793335220632-ficj",
+      "user_id": "user-emad",
       "title": "Attendance Clock-In",
-      "message": "Mohammed Abbas R Y checked in for 2026-10-29 (Late Arrival).",
+      "message": "Mohammed Abbas R Y checked in for 2026-10-30 (Late Arrival).",
       "type": "warning",
       "read_at": null,
       "link": "/admin/attendance",
-      "created_at": "2026-10-29T15:35:56.899Z"
+      "created_at": "2026-10-30 04:40:18"
     }
   ],
   "audit_logs": [
     {
-      "id": "audit-1793288340748-b2673",
-      "actor_id": "user-admin-master",
-      "actor_name": "Buildrex Admin",
-      "action": "APPROVE_LEAVE_REQUEST",
-      "entity_type": "LEAVE_REQUEST",
-      "entity_id": "leave-1793288234562-4ekv0",
-      "details": {
-        "status": "approved",
-        "review_comment": "sure",
-        "target_user": "user-abbas"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:39:00.748Z"
-    },
-    {
-      "id": "audit-1793288314333-fx9mc",
-      "actor_id": "user-admin-master",
-      "actor_name": "Buildrex Admin",
-      "action": "REVIEW_WORK_UPDATE",
-      "entity_type": "WORK_UPDATE",
-      "entity_id": "wu-1793288192941-a2pxc",
-      "details": {
-        "status": "reviewed",
-        "review_comment": "Excellent work today, Mohammed. The tasks on Development are clear, well-structured, and demonstrate strong adherence to engineering standards. Keep up the great velocity!",
-        "target_user": "user-abbas"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:38:34.333Z"
-    },
-    {
-      "id": "audit-1793288274738-6tu7q",
-      "actor_id": "user-admin-master",
-      "actor_name": "Buildrex Admin",
+      "id": "audit-1793336500991-loled",
+      "actor_id": "user-azeez",
+      "actor_name": "Mohammad Azeez.N",
       "action": "USER_LOGIN",
       "entity_type": "USER",
-      "entity_id": "user-admin-master",
+      "entity_id": "user-azeez",
       "details": {
-        "email": "adminbrx@gmail.com",
-        "role": "admin"
+        "email": "azeezmohammed560@gmail.com",
+        "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:37:54.738Z"
+      "created_at": "2026-10-30T05:01:40.991Z"
     },
     {
-      "id": "audit-1793288234595-eekdz",
-      "actor_id": "user-abbas",
-      "actor_name": "Mohammed Abbas R Y",
-      "action": "CREATE_LEAVE_REQUEST",
-      "entity_type": "LEAVE_REQUEST",
-      "entity_id": "leave-1793288234562-4ekv0",
-      "details": {
-        "start_date": "2026-10-29",
-        "end_date": "2026-10-29",
-        "days": 1,
-        "leave_type": "emergency"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:37:14.595Z"
-    },
-    {
-      "id": "audit-1793288192969-k8z4i",
-      "actor_id": "user-abbas",
-      "actor_name": "Mohammed Abbas R Y",
-      "action": "WORK_UPDATE_SUBMITTED",
-      "entity_type": "WORK_UPDATE",
-      "entity_id": "wu-1793288192941-a2pxc",
-      "details": {
-        "work_date": "2026-10-29",
-        "status": "submitted"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:36:32.970Z"
-    },
-    {
-      "id": "audit-1793288156914-d03cl",
-      "actor_id": "user-abbas",
-      "actor_name": "Mohammed Abbas R Y",
-      "action": "ATTENDANCE_CHECK_IN",
-      "entity_type": "ATTENDANCE",
-      "entity_id": "att-1793288156894-842bu",
-      "details": {
-        "work_date": "2026-10-29",
-        "check_in": "2026-10-29T15:35:56.893Z",
-        "status": "late"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:35:56.914Z"
-    },
-    {
-      "id": "audit-1793288151753-zuka2",
+      "id": "audit-1793336500775-g4a0k",
       "actor_id": "user-abbas",
       "actor_name": "Mohammed Abbas R Y",
       "action": "USER_LOGIN",
@@ -567,7 +424,64 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T15:35:51.754Z"
+      "created_at": "2026-10-30T05:01:40.775Z"
+    },
+    {
+      "id": "audit-1793336484324-88bex",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T05:01:24.324Z"
+    },
+    {
+      "id": "audit-1793335294237-ssh5p",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 04:41:33"
+    },
+    {
+      "id": "audit-1793335220648-qx696",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "ATTENDANCE_CHECK_IN",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1793335220617-sbdv4",
+      "details": {
+        "check_in": "2026-10-30T04:40:20.616Z",
+        "status": "late",
+        "work_date": "2026-10-30"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 04:40:19"
+    },
+    {
+      "id": "audit-1793335213626-49wp5",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-abbas",
+      "details": {
+        "email": "abbas6618532@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30 04:40:14"
     }
   ],
   "company_settings": {

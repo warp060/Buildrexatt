@@ -503,7 +503,34 @@ export function generateSeedDatabase() {
 
   const departments = buildDepartments(nowIso);
   const users = buildUsers(nowIso);
-  const attendance: AttendanceRecord[] = [];
+  const attendance: AttendanceRecord[] = [
+    {
+      id: 'att-1793282100000-azeez',
+      user_id: 'user-azeez',
+      work_date: '2026-10-29',
+      check_in: '2026-10-29T13:45:00.000Z',
+      check_out: '2026-10-29T13:59:00.000Z',
+      total_minutes: 14,
+      status: 'late',
+      notes: 'Late arrival (checked in after grace window)',
+      ip_address: '127.0.0.1',
+      created_at: '2026-10-29T13:45:00.000Z',
+      updated_at: '2026-10-29T13:59:00.000Z',
+    },
+    {
+      id: 'att-1793282100000-abbas',
+      user_id: 'user-abbas',
+      work_date: '2026-10-29',
+      check_in: '2026-10-29T13:45:00.000Z',
+      check_out: '2026-10-29T13:59:00.000Z',
+      total_minutes: 14,
+      status: 'late',
+      notes: 'Late arrival (checked in after grace window)',
+      ip_address: '127.0.0.1',
+      created_at: '2026-10-29T13:45:00.000Z',
+      updated_at: '2026-10-29T13:59:00.000Z',
+    },
+  ];
   const work_updates: WorkUpdate[] = [];
   const leave_requests: LeaveRequest[] = [];
   const attendance_corrections: AttendanceCorrection[] = [];
