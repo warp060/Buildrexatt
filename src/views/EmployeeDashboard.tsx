@@ -14,6 +14,7 @@ import {
   Zap,
   Award,
   History,
+  CheckCircle,
 } from 'lucide-react';
 
 interface EmployeeDashboardProps {
@@ -28,6 +29,11 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
     is_submitted: boolean;
   }>({ record: null, is_submitted: false });
 
+  const [todayAttendance, setTodayAttendance] = useState<{
+    record: AttendanceRecord | null;
+    status_summary: 'Not Started' | 'Checked In' | 'Checked Out';
+  }>({ record: null, status_summary: 'Not Started' });
+
   const [recentAttendance, setRecentAttendance] = useState<AttendanceRecord[]>([]);
   const [recentUpdates, setRecentUpdates] = useState<WorkUpdate[]>([]);
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
@@ -36,17 +42,25 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
   // Fetch all dashboard data
   const loadDashboardData = useCallback(async () => {
     try {
-      const [todayWuRes, historyRes, wuRes, leaveRes] = await Promise.all([
+      const [todayWuRes, historyRes, wuRes, leaveRes, todayAttRes] = await Promise.all([
         api.getTodayWorkUpdate(),
         api.getAttendanceHistory({ limit: 5 }),
         api.getMyWorkUpdates({ limit: 4 }),
         api.getMyLeaveRequests(),
+        api.getTodayAttendance().catch(() => null),
       ]);
 
       if (todayWuRes.success) {
         setTodayWorkUpdate({
           record: todayWuRes.record,
           is_submitted: todayWuRes.is_submitted,
+        });
+      }
+
+      if (todayAttRes && todayAttRes.success) {
+        setTodayAttendance({
+          record: todayAttRes.record,
+          status_summary: todayAttRes.status_summary,
         });
       }
 
@@ -132,11 +146,31 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
         <div className="relative z-10 flex items-center gap-3">
           <button
             onClick={() => onNavigateTab('my-attendance')}
-            className="flex items-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-[#0F5132] bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90 transition-all cursor-pointer group shadow-2xs"
+            className={`flex items-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold transition-all cursor-pointer group shadow-2xs ${
+              todayAttendance.status_summary === 'Checked In'
+                ? 'text-emerald-900 bg-emerald-100 hover:bg-emerald-200/80 border border-emerald-300'
+                : todayAttendance.status_summary === 'Checked Out'
+                ? 'text-slate-700 bg-slate-100 hover:bg-slate-200/80 border border-slate-200'
+                : 'text-[#0F5132] bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200/90'
+            }`}
           >
-            <Clock className="w-4 h-4 text-[#0F5132]" />
-            <span>Click to Present</span>
-            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            {todayAttendance.status_summary === 'Checked In' ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 pulse-dot shrink-0" />
+                <span>Working Active · Present Out →</span>
+              </>
+            ) : todayAttendance.status_summary === 'Checked Out' ? (
+              <>
+                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Session Complete for Today</span>
+              </>
+            ) : (
+              <>
+                <Clock className="w-4 h-4 text-[#0F5132]" />
+                <span>Click to Present</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -311,14 +345,34 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
                 className="w-full p-3 rounded-xl border border-slate-200/90 hover:border-emerald-300 hover:bg-emerald-50/40 transition-all flex items-center justify-between group cursor-pointer text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#0F5132] flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Clock className="w-4 h-4" />
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform ${
+                    todayAttendance.status_summary === 'Checked In'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : todayAttendance.status_summary === 'Checked Out'
+                      ? 'bg-slate-100 text-slate-700'
+                      : 'bg-emerald-50 text-[#0F5132]'
+                  }`}>
+                    {todayAttendance.status_summary === 'Checked Out' ? (
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <Clock className="w-4 h-4" />
+                    )}
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-900 group-hover:text-[#0F5132] transition-colors">
-                      Click to Present
+                      {todayAttendance.status_summary === 'Checked In'
+                        ? 'Working Session Active'
+                        : todayAttendance.status_summary === 'Checked Out'
+                        ? 'Session Completed Today'
+                        : 'Click to Present'}
                     </p>
-                    <p className="text-[10px] text-slate-400">Timestamp check-in &amp; check-out</p>
+                    <p className="text-[10px] text-slate-400">
+                      {todayAttendance.status_summary === 'Checked In'
+                        ? `Checked in at ${todayAttendance.record?.check_in ? formatClockTime(todayAttendance.record.check_in) : ''} · Tap to present out`
+                        : todayAttendance.status_summary === 'Checked Out'
+                        ? 'Completed shift recorded'
+                        : 'Timestamp check-in & check-out'}
+                    </p>
                   </div>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0F5132] group-hover:translate-x-0.5 transition-all" />

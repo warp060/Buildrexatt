@@ -41,6 +41,7 @@ export const MyAttendanceView: React.FC = () => {
     record: AttendanceRecord | null;
     status_summary: 'Not Started' | 'Checked In' | 'Checked Out';
   }>({ record: null, status_summary: 'Not Started' });
+  const [isTodayLoading, setIsTodayLoading] = useState(true);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -80,6 +81,8 @@ export const MyAttendanceView: React.FC = () => {
       }
     } catch (err) {
       console.error('Error fetching today attendance', err);
+    } finally {
+      setIsTodayLoading(false);
     }
   }, []);
 
@@ -106,6 +109,25 @@ export const MyAttendanceView: React.FC = () => {
   useEffect(() => {
     fetchAttendance();
     loadTodayAttendance();
+
+    // Auto-sync attendance state across devices (e.g. desktop <-> mobile) every 6s and on window focus/visibility
+    const interval = setInterval(() => {
+      loadTodayAttendance();
+    }, 6000);
+
+    const handleSync = () => {
+      loadTodayAttendance();
+      fetchAttendance();
+    };
+
+    window.addEventListener('focus', handleSync);
+    document.addEventListener('visibilitychange', handleSync);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleSync);
+      document.removeEventListener('visibilitychange', handleSync);
+    };
   }, [fetchAttendance, loadTodayAttendance]);
 
   // Live timer tick when Checked In and active
@@ -132,6 +154,7 @@ export const MyAttendanceView: React.FC = () => {
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
       showToast(err.message, 'error');
+      await loadTodayAttendance();
     } finally {
       setIsActionLoading(false);
     }
@@ -148,6 +171,7 @@ export const MyAttendanceView: React.FC = () => {
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
       showToast(err.message, 'error');
+      await loadTodayAttendance();
     } finally {
       setIsActionLoading(false);
     }
@@ -294,15 +318,22 @@ export const MyAttendanceView: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-400">Current Status:</span>
-            <StatusBadge
-              status={
-                todayAttendance.status_summary === 'Checked In'
-                  ? 'present'
-                  : todayAttendance.status_summary === 'Checked Out'
-                  ? 'present'
-                  : 'absent'
-              }
-            />
+            {isTodayLoading ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500 animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                Syncing status...
+              </span>
+            ) : (
+              <StatusBadge
+                status={
+                  todayAttendance.status_summary === 'Checked In'
+                    ? 'present'
+                    : todayAttendance.status_summary === 'Checked Out'
+                    ? 'present'
+                    : 'absent'
+                }
+              />
+            )}
           </div>
         </div>
 
@@ -310,7 +341,9 @@ export const MyAttendanceView: React.FC = () => {
           {/* Live Timer Counter */}
           <div className="text-center md:text-left">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              {todayAttendance.status_summary === 'Checked In'
+              {isTodayLoading
+                ? 'Syncing today\'s session...'
+                : todayAttendance.status_summary === 'Checked In'
                 ? '⚡ Active Working Session'
                 : todayAttendance.status_summary === 'Checked Out'
                 ? '✓ Completed Working Duration'
@@ -341,7 +374,12 @@ export const MyAttendanceView: React.FC = () => {
 
           {/* Action Button */}
           <div className="w-full md:w-auto flex flex-col items-center">
-            {todayAttendance.status_summary === 'Not Started' && (
+            {isTodayLoading ? (
+              <div className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-slate-500 bg-slate-100 border border-slate-200 animate-pulse">
+                <Clock className="w-4 h-4 animate-spin text-slate-400" />
+                <span>Checking attendance status...</span>
+              </div>
+            ) : todayAttendance.status_summary === 'Not Started' ? (
               <button
                 onClick={handleCheckIn}
                 disabled={isActionLoading}
@@ -350,9 +388,7 @@ export const MyAttendanceView: React.FC = () => {
                 <Play className="w-4 h-4 fill-current" />
                 <span>{isActionLoading ? 'Processing...' : 'Present In — Start Your Day'}</span>
               </button>
-            )}
-
-            {todayAttendance.status_summary === 'Checked In' && (
+            ) : todayAttendance.status_summary === 'Checked In' ? (
               <button
                 onClick={handleCheckOut}
                 disabled={isActionLoading}
@@ -361,9 +397,7 @@ export const MyAttendanceView: React.FC = () => {
                 <Square className="w-4 h-4 fill-current" />
                 <span>{isActionLoading ? 'Processing...' : 'Present Out — Complete Your Day'}</span>
               </button>
-            )}
-
-            {todayAttendance.status_summary === 'Checked Out' && (
+            ) : (
               <div className="text-center p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs">
                 <div className="flex items-center gap-1.5 justify-center">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />

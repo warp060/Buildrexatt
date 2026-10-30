@@ -374,6 +374,24 @@
   ],
   "work_updates": [
     {
+      "id": "wu-1793339600133-mgsmn",
+      "user_id": "user-abbas",
+      "work_date": "2026-10-30",
+      "tasks_completed": "uwe iuheaf ouih eoihoieiva oi evoij oiqe uoiqe",
+      "project_details": "Development",
+      "accomplishments": "uwe iuheaf ouih eoihoieiva oi evoij oiqe uoiqe",
+      "blockers": "",
+      "next_day_plan": "",
+      "hours_spent": 8,
+      "status": "reviewed",
+      "submitted_at": "2026-10-30T05:53:20.133Z",
+      "reviewed_by": "user-admin-master",
+      "review_comment": "Excellent work today, Mohammed. The tasks on Development are clear, well-structured, and demonstrate strong adherence to engineering standards. Keep up the great velocity!",
+      "reviewed_at": "2026-10-30T05:54:42.191Z",
+      "created_at": "2026-10-30T05:53:20.133Z",
+      "updated_at": "2026-10-30T05:54:42.191Z"
+    },
+    {
       "id": "wu-1793288192941-a2pxc",
       "user_id": "user-abbas",
       "work_date": "2026-10-29",
@@ -2760,6 +2778,36 @@
   ],
   "notifications": [
     {
+      "id": "notif-1793339682210-d7bp",
+      "user_id": "user-abbas",
+      "title": "Work Update Reviewed",
+      "message": "Your work update for 2026-10-30 was approved and marked Reviewed.",
+      "type": "success",
+      "read_at": null,
+      "link": "/work-updates",
+      "created_at": "2026-10-30T05:54:42.210Z"
+    },
+    {
+      "id": "notif-1793339600150-ulne",
+      "user_id": "user-admin-master",
+      "title": "Daily Work Update Submitted",
+      "message": "Mohammed Abbas R Y submitted daily work report for 2026-10-30.",
+      "type": "info",
+      "read_at": "2026-10-30T05:53:58.288Z",
+      "link": "/admin/work-updates",
+      "created_at": "2026-10-30T05:53:20.150Z"
+    },
+    {
+      "id": "notif-1793339600143-yzjs",
+      "user_id": "user-emad",
+      "title": "Daily Work Update Submitted",
+      "message": "Mohammed Abbas R Y submitted daily work report for 2026-10-30.",
+      "type": "info",
+      "read_at": null,
+      "link": "/admin/work-updates",
+      "created_at": "2026-10-30T05:53:20.143Z"
+    },
+    {
       "id": "notif-1792856929969-c5ap",
       "user_id": "user-abbas",
       "title": "Leave Request Approved",
@@ -2981,6 +3029,119 @@
     }
   ],
   "audit_logs": [
+    {
+      "id": "audit-1793340446270-iekbb",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-abbas",
+      "details": {
+        "email": "abbas6618532@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T06:07:26.270Z"
+    },
+    {
+      "id": "audit-1793340383248-xj4pm",
+      "actor_id": "user-azeez",
+      "actor_name": "Mohammad Azeez.N",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-azeez",
+      "details": {
+        "email": "azeezmohammed560@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T06:06:23.249Z"
+    },
+    {
+      "id": "audit-1793340366303-9mj00",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-abbas",
+      "details": {
+        "email": "abbas6618532@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T06:06:06.303Z"
+    },
+    {
+      "id": "audit-1793339723310-1hmz2",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-abbas",
+      "details": {
+        "email": "abbas6618532@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T05:55:23.310Z"
+    },
+    {
+      "id": "audit-1793339682227-7jm1n",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "REVIEW_WORK_UPDATE",
+      "entity_type": "WORK_UPDATE",
+      "entity_id": "wu-1793339600133-mgsmn",
+      "details": {
+        "status": "reviewed",
+        "review_comment": "Excellent work today, Mohammed. The tasks on Development are clear, well-structured, and demonstrate strong adherence to engineering standards. Keep up the great velocity!",
+        "target_user": "user-abbas"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T05:54:42.228Z"
+    },
+    {
+      "id": "audit-1793339629469-hudd0",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T05:53:49.469Z"
+    },
+    {
+      "id": "audit-1793339600160-lbmjl",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "WORK_UPDATE_SUBMITTED",
+      "entity_type": "WORK_UPDATE",
+      "entity_id": "wu-1793339600133-mgsmn",
+      "details": {
+        "work_date": "2026-10-30",
+        "status": "submitted"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T05:53:20.160Z"
+    },
+    {
+      "id": "audit-1793339571585-g6wsq",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-abbas",
+      "details": {
+        "email": "abbas6618532@gmail.com",
+        "role": "intern"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T05:52:51.585Z"
+    },
     {
       "id": "audit-1793339198977-x7veo",
       "actor_id": "user-azeez",
