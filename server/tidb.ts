@@ -394,6 +394,24 @@ function toSqlDateTime(isoStr: string | null | undefined): string | null {
 }
 
 /**
+ * Helper to format/sanitize DATE values as YYYY-MM-DD for MySQL DATE columns.
+ */
+function toSqlDate(dateStr: string | null | undefined): string {
+  if (!dateStr) return new Date().toISOString().split('T')[0];
+  const s = String(dateStr).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    return s.slice(0, 10);
+  }
+  try {
+    const d = new Date(s);
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().split('T')[0];
+    }
+  } catch {}
+  return new Date().toISOString().split('T')[0];
+}
+
+/**
  * Normalizes MySQL DATETIME or ISO strings to a standardized UTC ISO string (e.g. YYYY-MM-DDTHH:mm:ss.000Z)
  */
 function toIsoDateTime(val: any): string | null {
@@ -692,10 +710,10 @@ export async function syncAllToTiDB(data: {
         u.manager_id || null,
         u.position || null,
         u.phone || null,
-        u.joining_date,
+        toSqlDate(u.joining_date),
         u.status,
       ]),
-      'name=VALUES(name), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), status=VALUES(status)'
+      'name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status)'
     );
 
     // 3. Attendance
@@ -705,7 +723,7 @@ export async function syncAllToTiDB(data: {
       data.attendance.map((a) => [
         a.id,
         a.user_id,
-        a.work_date,
+        toSqlDate(a.work_date),
         toSqlDateTime(a.check_in),
         toSqlDateTime(a.check_out),
         a.total_minutes || 0,
@@ -723,7 +741,7 @@ export async function syncAllToTiDB(data: {
       data.work_updates.map((w) => [
         w.id,
         w.user_id,
-        w.work_date,
+        toSqlDate(w.work_date),
         w.tasks_completed,
         w.project_details,
         w.accomplishments || null,
@@ -747,8 +765,8 @@ export async function syncAllToTiDB(data: {
         l.id,
         l.user_id,
         l.leave_type,
-        l.start_date,
-        l.end_date,
+        toSqlDate(l.start_date),
+        toSqlDate(l.end_date),
         l.days_count,
         l.reason,
         l.status,
@@ -767,7 +785,7 @@ export async function syncAllToTiDB(data: {
         c.id,
         c.user_id,
         c.attendance_id,
-        c.work_date || null,
+        toSqlDate(c.work_date),
         toSqlDateTime(c.requested_check_in),
         toSqlDateTime(c.requested_check_out),
         c.reason,
@@ -828,7 +846,7 @@ export async function syncAllToTiDB(data: {
         `INSERT INTO holidays (id, name, date, description)
          VALUES (?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE name=VALUES(name), description=VALUES(description)`,
-        [h.id, h.name, h.date, h.description || null]
+        [h.id, h.name, toSqlDate(h.date), h.description || null]
       );
     }
 

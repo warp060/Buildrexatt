@@ -77,15 +77,12 @@ export function getDb(): DatabaseSchema {
     try {
       const content = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(content);
-      const adminCount = parsed.users.filter((u: any) => u.role === 'admin').length;
-      const hasOnlyAdminBrx = adminCount === 1 && parsed.users.some((u: any) => u.email === 'adminbrx@gmail.com' && u.role === 'admin');
 
       if (
         parsed &&
         Array.isArray(parsed.users) &&
-        parsed.users.length >= 15 &&
-        parsed.users.some((u: any) => u.email === 'ehsaanehsaan61@gmail.com') &&
-        hasOnlyAdminBrx
+        parsed.users.length > 0 &&
+        Array.isArray(parsed.departments)
       ) {
         dbInstance = parsed;
         return dbInstance!;
@@ -147,14 +144,15 @@ async function runSerializedTiDBSync(data: DatabaseSchema): Promise<void> {
   }
 }
 
-export function saveDb(data: DatabaseSchema): void {
+export async function saveDb(data: DatabaseSchema): Promise<void> {
   saveDbLocalOnly(data);
 
-  // If TiDB Cloud is connected, synchronize asynchronously via serialized queue
   if (isTiDBActive) {
-    runSerializedTiDBSync(data).catch((err) => {
-      console.warn('[TiDB] Background sync queue error:', err.message);
-    });
+    try {
+      await syncAllToTiDB(data);
+    } catch (err: any) {
+      console.warn('[TiDB] sync error in saveDb:', err.message);
+    }
   }
 }
 
@@ -179,23 +177,18 @@ export async function initDatabase(): Promise<{ engine: 'tidb' | 'json'; message
       isTiDBActive = true;
       const tidbData = await loadAllFromTiDB();
       const hasRealSheetUsers = tidbData && tidbData.users.some((u) => u.email === 'ehsaanehsaan61@gmail.com');
-      const tidbAdminCount = tidbData ? tidbData.users.filter((u) => u.role === 'admin').length : 0;
-      const hasOnlyAdminBrxInTiDB = tidbAdminCount === 1 && (tidbData ? tidbData.users.some((u) => u.email === 'adminbrx@gmail.com' && u.role === 'admin') : false);
-
-      if (tidbData && tidbData.users.length >= 15 && hasRealSheetUsers && hasOnlyAdminBrxInTiDB) {
+      if (tidbData && tidbData.users && tidbData.users.length > 0) {
         dbInstance = tidbData;
         saveDbLocalOnly(dbInstance);
         console.log(`[Database] ☁️ Loaded ${dbInstance.users.length} users and ${dbInstance.attendance.length} attendance rows from TiDB Cloud.`);
         return { engine: 'tidb', message: 'Connected to TiDB Cloud and loaded active dataset.' };
       } else {
-        // TiDB tables empty, legacy dummy data, removed users, or multiple admins: purge and re-sync
-        console.log('[Database] ☁️ Purging and synchronizing TiDB Cloud with 16 users (adminbrx@gmail.com exclusive admin)...');
-        await clearAllTiDBTables();
+        console.log('[Database] ☁️ TiDB tables empty. Initializing initial seed dataset...');
         dbInstance = generateInitialSeed();
         saveDbLocalOnly(dbInstance);
         await syncAllToTiDB(dbInstance);
-        console.log('[Database] ✅ TiDB Cloud synchronized with 16 users and 1 exclusive admin.');
-        return { engine: 'tidb', message: 'Connected to TiDB Cloud and seeded exclusive admin dataset.' };
+        console.log('[Database] ✅ TiDB Cloud seeded initial dataset.');
+        return { engine: 'tidb', message: 'Connected to TiDB Cloud and seeded initial dataset.' };
       }
     } else {
       isTiDBActive = false;

@@ -26,7 +26,7 @@ router.get('/my', authenticate, (req: AuthenticatedRequest, res: Response): void
 });
 
 // POST /api/leave-requests
-router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.post('/', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { leave_type, start_date, end_date, reason } = req.body;
 
   if (!leave_type || !start_date || !end_date || !reason) {
@@ -80,7 +80,7 @@ router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void 
   };
 
   db.leave_requests.unshift(newLeave);
-  saveDb(db);
+  await saveDb(db);
 
   // Notify admins and manager
   const recipients = db.users.filter(
@@ -139,7 +139,7 @@ router.get('/admin/list', authenticate, requireRole('admin'), (req: Authenticate
 });
 
 // PATCH /api/admin/leave-requests/:id/review
-router.patch('/admin/:id/review', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const leave = db.leave_requests.find((l) => l.id === req.params.id);
 
@@ -160,7 +160,7 @@ router.patch('/admin/:id/review', authenticate, requireRole('admin'), (req: Auth
   leave.review_comment = review_comment || null;
   leave.reviewed_at = nowIso;
 
-  saveDb(db);
+  await saveDb(db);
 
   createNotification(
     leave.user_id,
@@ -200,7 +200,7 @@ router.get(['/corrections/my', '/attendance/correction-requests/my'], authentica
 });
 
 // POST /api/leave-requests/corrections and /api/attendance/correction-requests
-router.post(['/corrections', '/attendance/correction-requests'], authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.post(['/corrections', '/attendance/correction-requests'], authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { attendance_id, work_date, requested_check_in, requested_check_out, reason } = req.body;
 
   if (!work_date || !requested_check_in || !requested_check_out || !reason) {
@@ -227,7 +227,7 @@ router.post(['/corrections', '/attendance/correction-requests'], authenticate, (
   };
 
   db.attendance_corrections.unshift(newCorrection);
-  saveDb(db);
+  await saveDb(db);
 
   // Notify admins and manager
   const corrRecipients = db.users.filter(
@@ -286,7 +286,7 @@ router.get(['/admin/corrections', '/admin/attendance-corrections'], authenticate
 });
 
 // PATCH /api/leave-requests/admin/corrections/:id/review and /api/admin/attendance-corrections/:id/review
-router.patch(['/admin/corrections/:id/review', '/admin/attendance-corrections/:id/review'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.patch(['/admin/corrections/:id/review', '/admin/attendance-corrections/:id/review'], authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const corr = db.attendance_corrections.find((c) => c.id === req.params.id);
 
@@ -341,7 +341,7 @@ router.patch(['/admin/corrections/:id/review', '/admin/attendance-corrections/:i
     }
   }
 
-  saveDb(db);
+  await saveDb(db);
 
   createNotification(
     corr.user_id,

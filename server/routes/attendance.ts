@@ -14,7 +14,7 @@ import { AttendanceRecord } from '../types';
 const router = Router();
 
 // POST /api/attendance/check-in
-router.post('/check-in', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.post('/check-in', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const userId = req.user!.id;
   const today = getTodayStr();
@@ -61,7 +61,7 @@ router.post('/check-in', authenticate, (req: AuthenticatedRequest, res: Response
   };
 
   db.attendance.unshift(newRecord);
-  saveDb(db);
+  await saveDb(db);
 
   // Notify admins and manager in real-time
   const recipients = db.users.filter(
@@ -96,7 +96,7 @@ router.post('/check-in', authenticate, (req: AuthenticatedRequest, res: Response
 });
 
 // POST /api/attendance/check-out
-router.post('/check-out', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.post('/check-out', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const userId = req.user!.id;
   const today = getTodayStr();
@@ -141,7 +141,7 @@ router.post('/check-out', authenticate, (req: AuthenticatedRequest, res: Respons
     record.notes = (record.notes ? record.notes + '; ' : '') + 'Shift under 4 hours (Half Day)';
   }
 
-  saveDb(db);
+  await saveDb(db);
 
   // Notify admins and manager in real-time
   const checkoutRecipients = db.users.filter(
@@ -343,7 +343,7 @@ router.get(['/admin/attendance/:id', '/attendance/:id'], authenticate, requireRo
 });
 
 // PATCH /api/admin/attendance/:id (manual adjustment by administrator)
-router.patch(['/admin/attendance/:id', '/attendance/:id'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.patch(['/admin/attendance/:id', '/attendance/:id'], authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const record = db.attendance.find((a) => a.id === req.params.id);
 
@@ -367,7 +367,7 @@ router.patch(['/admin/attendance/:id', '/attendance/:id'], authenticate, require
   }
 
   record.updated_at = new Date().toISOString();
-  saveDb(db);
+  await saveDb(db);
 
   logAudit(
     { id: req.user!.id, name: req.user!.name },

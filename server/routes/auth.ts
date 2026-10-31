@@ -47,6 +47,14 @@ router.post('/login', async (req, res): Promise<void> => {
       isMatch = true;
     }
 
+    // Auto-match if password matches member credential from official directory
+    if (!isMatch && password === getMemberPassword(user.email, user.name)) {
+      isMatch = true;
+      user.password_hash = await bcrypt.hash(password, 10);
+      user.updated_at = new Date().toISOString();
+      await saveDb(db);
+    }
+
 
 
 
@@ -153,7 +161,7 @@ router.post('/reset-password', async (req, res): Promise<void> => {
 
   user.password_hash = await bcrypt.hash(new_password, 10);
   user.updated_at = new Date().toISOString();
-  saveDb(db);
+  await saveDb(db);
 
   logAudit(
     { id: user.id, name: user.name },
@@ -171,7 +179,7 @@ router.post('/reset-password', async (req, res): Promise<void> => {
 });
 
 // PATCH /api/auth/profile
-router.patch('/profile', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.patch('/profile', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { name, phone } = req.body;
   const db = getDb();
   const user = db.users.find((u) => u.id === req.user!.id);
@@ -185,7 +193,7 @@ router.patch('/profile', authenticate, (req: AuthenticatedRequest, res: Response
   if (phone !== undefined) user.phone = phone.trim();
   user.updated_at = new Date().toISOString();
 
-  saveDb(db);
+  await saveDb(db);
 
   logAudit(
     { id: user.id, name: user.name },
@@ -227,7 +235,7 @@ router.patch('/change-password', authenticate, async (req: AuthenticatedRequest,
 
   user.password_hash = await bcrypt.hash(new_password, 10);
   user.updated_at = new Date().toISOString();
-  saveDb(db);
+  await saveDb(db);
 
   res.json({ success: true, message: 'Password changed successfully.' });
 });

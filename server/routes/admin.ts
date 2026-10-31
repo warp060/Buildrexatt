@@ -298,7 +298,7 @@ router.post('/users', authenticate, requireRole('admin'), async (req: Authentica
   };
 
   db.users.push(newUser);
-  saveDb(db);
+  await saveDb(db);
 
   logAudit(
     { id: req.user!.id, name: req.user!.name },
@@ -317,7 +317,7 @@ router.post('/users', authenticate, requireRole('admin'), async (req: Authentica
 });
 
 // PATCH /api/admin/users/:id
-router.patch('/users/:id', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.patch('/users/:id', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const user = db.users.find((u) => u.id === req.params.id);
 
@@ -338,7 +338,7 @@ router.patch('/users/:id', authenticate, requireRole('admin'), (req: Authenticat
   if (joining_date) user.joining_date = joining_date;
   user.updated_at = new Date().toISOString();
 
-  saveDb(db);
+  await saveDb(db);
 
   logAudit(
     { id: req.user!.id, name: req.user!.name },
@@ -370,7 +370,7 @@ router.post('/users/:id/reset-password', authenticate, requireRole('admin'), asy
   const pass = new_password && new_password.length >= 6 ? new_password : 'Buildrex@2026';
   user.password_hash = await bcrypt.hash(pass, 10);
   user.updated_at = new Date().toISOString();
-  saveDb(db);
+  await saveDb(db);
 
   logAudit(
     { id: req.user!.id, name: req.user!.name },
@@ -486,7 +486,7 @@ router.get('/departments', authenticate, (req: AuthenticatedRequest, res: Respon
 });
 
 // POST /api/admin/departments
-router.post('/departments', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.post('/departments', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const { name, code, description, manager_id } = req.body;
   if (!name || !code) {
     res.status(400).json({ success: false, message: 'Department name and code are required.' });
@@ -504,13 +504,13 @@ router.post('/departments', authenticate, requireRole('admin'), (req: Authentica
   };
 
   db.departments.push(newDept);
-  saveDb(db);
+  await saveDb(db);
 
   res.status(201).json({ success: true, department: newDept });
 });
 
 // PATCH /api/admin/settings
-router.patch('/settings', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.patch('/settings', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const {
     company_name,
@@ -533,7 +533,7 @@ router.patch('/settings', authenticate, requireRole('admin'), (req: Authenticate
   if (allow_breaks !== undefined) db.company_settings.allow_breaks = Boolean(allow_breaks);
   db.company_settings.updated_at = new Date().toISOString();
 
-  saveDb(db);
+  await saveDb(db);
 
   logAudit(
     { id: req.user!.id, name: req.user!.name },
@@ -580,19 +580,19 @@ router.get('/notifications', authenticate, (req: AuthenticatedRequest, res: Resp
   res.json({ success: true, notifications: userNotifs });
 });
 
-router.patch('/notifications/:id/read', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.patch('/notifications/:id/read', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const notif = db.notifications.find((n) => n.id === req.params.id && n.user_id === req.user!.id);
 
   if (notif) {
     notif.read_at = new Date().toISOString();
-    saveDb(db);
+    await saveDb(db);
   }
 
   res.json({ success: true });
 });
 
-router.post('/notifications/read-all', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.post('/notifications/read-all', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const nowIso = new Date().toISOString();
   db.notifications.forEach((n) => {
@@ -600,7 +600,7 @@ router.post('/notifications/read-all', authenticate, (req: AuthenticatedRequest,
       n.read_at = nowIso;
     }
   });
-  saveDb(db);
+  await saveDb(db);
 
   res.json({ success: true });
 });

@@ -54,25 +54,32 @@ app.use((req, res, next) => {
 });
 
 // Database lazy initialization singleton
-let dbInitStarted = false;
+let dbInitPromise: Promise<any> | null = null;
 
 export function ensureDbInitialized(): Promise<any> {
   // Ensure local in-memory dataset is available instantly (0ms)
   getDb();
 
-  if (!dbInitStarted) {
-    dbInitStarted = true;
-    return initDatabase().catch((err: any) => {
+  if (!dbInitPromise) {
+    dbInitPromise = initDatabase().catch((err: any) => {
       console.warn('[Database] Background init notice:', err?.message);
+      dbInitPromise = null;
       return { engine: 'json', message: err?.message };
     });
   }
-  return Promise.resolve();
+  return dbInitPromise;
 }
 
-// Background trigger without blocking serverless function cold start
-app.use((req, res, next) => {
-  ensureDbInitialized().catch(() => {});
+// Await database initialization for all API requests to prevent cold start race conditions
+app.use(async (req, res, next) => {
+  const isApi = (req.originalUrl || req.url || '').startsWith('/api');
+  if (isApi) {
+    try {
+      await ensureDbInitialized();
+    } catch (err: any) {
+      console.warn('[Database] API init wait notice:', err?.message);
+    }
+  }
   next();
 });
 

@@ -69348,7 +69348,7 @@ var import_cookie_parser = __toESM(require_cookie_parser(), 1);
 var import_dotenv = __toESM(require_main(), 1);
 
 // server/routes/auth.ts
-var import_express = __toESM(require_express2(), 1);
+var import_express2 = __toESM(require_express2(), 1);
 
 // node_modules/bcryptjs/index.js
 import nodeCrypto from "crypto";
@@ -71372,6 +71372,21 @@ function toSqlDateTime(isoStr) {
     return null;
   }
 }
+function toSqlDate(dateStr) {
+  if (!dateStr) return (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+  const s2 = String(dateStr).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s2)) {
+    return s2.slice(0, 10);
+  }
+  try {
+    const d = new Date(s2);
+    if (!isNaN(d.getTime())) {
+      return d.toISOString().split("T")[0];
+    }
+  } catch {
+  }
+  return (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+}
 function toIsoDateTime(val) {
   if (!val) return null;
   const s2 = String(val).trim();
@@ -71620,10 +71635,10 @@ async function syncAllToTiDB(data) {
         u.manager_id || null,
         u.position || null,
         u.phone || null,
-        u.joining_date,
+        toSqlDate(u.joining_date),
         u.status
       ]),
-      "name=VALUES(name), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), status=VALUES(status)"
+      "name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status)"
     );
     await execBatch(
       "attendance",
@@ -71631,7 +71646,7 @@ async function syncAllToTiDB(data) {
       data.attendance.map((a) => [
         a.id,
         a.user_id,
-        a.work_date,
+        toSqlDate(a.work_date),
         toSqlDateTime(a.check_in),
         toSqlDateTime(a.check_out),
         a.total_minutes || 0,
@@ -71647,7 +71662,7 @@ async function syncAllToTiDB(data) {
       data.work_updates.map((w) => [
         w.id,
         w.user_id,
-        w.work_date,
+        toSqlDate(w.work_date),
         w.tasks_completed,
         w.project_details,
         w.accomplishments || null,
@@ -71669,8 +71684,8 @@ async function syncAllToTiDB(data) {
         l.id,
         l.user_id,
         l.leave_type,
-        l.start_date,
-        l.end_date,
+        toSqlDate(l.start_date),
+        toSqlDate(l.end_date),
         l.days_count,
         l.reason,
         l.status,
@@ -71687,7 +71702,7 @@ async function syncAllToTiDB(data) {
         c.id,
         c.user_id,
         c.attendance_id,
-        c.work_date || null,
+        toSqlDate(c.work_date),
         toSqlDateTime(c.requested_check_in),
         toSqlDateTime(c.requested_check_out),
         c.reason,
@@ -71740,7 +71755,7 @@ async function syncAllToTiDB(data) {
         `INSERT INTO holidays (id, name, date, description)
          VALUES (?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE name=VALUES(name), description=VALUES(description)`,
-        [h2.id, h2.name, h2.date, h2.description || null]
+        [h2.id, h2.name, toSqlDate(h2.date), h2.description || null]
       );
     }
     await conn.query("SET FOREIGN_KEY_CHECKS = 1");
@@ -71794,40 +71809,6 @@ async function getTiDBStatus() {
     tableCounts,
     error: error || null
   };
-}
-async function clearAllTiDBTables(targetPool) {
-  const p = targetPool || getPool();
-  const conn = await p.getConnection();
-  try {
-    const tables = [
-      "audit_logs",
-      "notifications",
-      "attendance_corrections",
-      "leave_requests",
-      "work_updates",
-      "attendance",
-      "users",
-      "departments",
-      "company_settings",
-      "holidays"
-    ];
-    await conn.query("SET FOREIGN_KEY_CHECKS = 0").catch(() => {
-    });
-    for (const t2 of tables) {
-      await conn.query(`DELETE FROM ${t2}`).catch(() => {
-      });
-    }
-    await conn.query("SET FOREIGN_KEY_CHECKS = 1").catch(() => {
-    });
-    console.log("[TiDB] \u{1F9F9} Cleared legacy tables in TiDB Cloud for fresh synchronization.");
-  } catch (err) {
-    console.warn("[TiDB] Notice while clearing tables:", err.message);
-  } finally {
-    try {
-      conn.release();
-    } catch {
-    }
-  }
 }
 async function initializeTiDB() {
   if (!isTiDBConfigured()) {
@@ -74904,6 +74885,36 @@ var buildrex_default = {
   ],
   audit_logs: [
     {
+      id: "audit-1793453690796-7t83z",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "CREATE_USER",
+      entity_type: "USER",
+      entity_id: "user-1793453683629-8zva",
+      details: {
+        email: "test.member.1793453683434@buildrex.com",
+        code: "BRX-INT-23",
+        role: "intern",
+        initial_password: "Verification@Brx26"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-31T13:34:50.796Z"
+    },
+    {
+      id: "audit-1793453683384-j23ci",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-31T13:34:43.384Z"
+    },
+    {
       id: "audit-1793375849684-uviab",
       actor_id: "user-admin-master",
       actor_name: "Buildrex Admin",
@@ -74915,7 +74926,23 @@ var buildrex_default = {
         role: "admin"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-10-30T15:57:29.684Z"
+      created_at: "2026-10-30 15:57:33"
+    },
+    {
+      id: "audit-1793375835019-4av61",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "CREATE_USER",
+      entity_type: "USER",
+      entity_id: "user-1793375835014-8qam",
+      details: {
+        code: "BRX-INT-23",
+        email: "rohan.sharma@buildrex.com",
+        initial_password: "Rohan@Brx26",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-30 15:57:20"
     },
     {
       id: "audit-1793375834777-g81zj",
@@ -74929,7 +74956,7 @@ var buildrex_default = {
         role: "admin"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-10-30T15:57:14.777Z"
+      created_at: "2026-10-30 15:57:20"
     },
     {
       id: "audit-1793374704030-dsu4i",
@@ -76045,9 +76072,7 @@ function getDb() {
     try {
       const content = fs.readFileSync(DB_FILE, "utf-8");
       const parsed = JSON.parse(content);
-      const adminCount = parsed.users.filter((u) => u.role === "admin").length;
-      const hasOnlyAdminBrx = adminCount === 1 && parsed.users.some((u) => u.email === "adminbrx@gmail.com" && u.role === "admin");
-      if (parsed && Array.isArray(parsed.users) && parsed.users.length >= 15 && parsed.users.some((u) => u.email === "ehsaanehsaan61@gmail.com") && hasOnlyAdminBrx) {
+      if (parsed && Array.isArray(parsed.users) && parsed.users.length > 0 && Array.isArray(parsed.departments)) {
         dbInstance = parsed;
         return dbInstance;
       }
@@ -76075,34 +76100,14 @@ function saveDbLocalOnly(data) {
     }
   }
 }
-var isSyncingToTiDB = false;
-var pendingSyncData = null;
-async function runSerializedTiDBSync(data) {
-  if (isSyncingToTiDB) {
-    pendingSyncData = data;
-    return;
-  }
-  isSyncingToTiDB = true;
-  try {
-    await syncAllToTiDB(data);
-  } catch (err) {
-    console.warn("[TiDB] Background sync warning:", err.message);
-  } finally {
-    isSyncingToTiDB = false;
-    if (pendingSyncData) {
-      const nextData = pendingSyncData;
-      pendingSyncData = null;
-      runSerializedTiDBSync(nextData).catch(() => {
-      });
-    }
-  }
-}
-function saveDb(data) {
+async function saveDb(data) {
   saveDbLocalOnly(data);
   if (isTiDBActive) {
-    runSerializedTiDBSync(data).catch((err) => {
-      console.warn("[TiDB] Background sync queue error:", err.message);
-    });
+    try {
+      await syncAllToTiDB(data);
+    } catch (err) {
+      console.warn("[TiDB] sync error in saveDb:", err.message);
+    }
   }
 }
 async function initDatabase() {
@@ -76118,21 +76123,18 @@ async function initDatabase() {
       isTiDBActive = true;
       const tidbData = await loadAllFromTiDB();
       const hasRealSheetUsers = tidbData && tidbData.users.some((u) => u.email === "ehsaanehsaan61@gmail.com");
-      const tidbAdminCount = tidbData ? tidbData.users.filter((u) => u.role === "admin").length : 0;
-      const hasOnlyAdminBrxInTiDB = tidbAdminCount === 1 && (tidbData ? tidbData.users.some((u) => u.email === "adminbrx@gmail.com" && u.role === "admin") : false);
-      if (tidbData && tidbData.users.length >= 15 && hasRealSheetUsers && hasOnlyAdminBrxInTiDB) {
+      if (tidbData && tidbData.users && tidbData.users.length > 0) {
         dbInstance = tidbData;
         saveDbLocalOnly(dbInstance);
         console.log(`[Database] \u2601\uFE0F Loaded ${dbInstance.users.length} users and ${dbInstance.attendance.length} attendance rows from TiDB Cloud.`);
         return { engine: "tidb", message: "Connected to TiDB Cloud and loaded active dataset." };
       } else {
-        console.log("[Database] \u2601\uFE0F Purging and synchronizing TiDB Cloud with 16 users (adminbrx@gmail.com exclusive admin)...");
-        await clearAllTiDBTables();
+        console.log("[Database] \u2601\uFE0F TiDB tables empty. Initializing initial seed dataset...");
         dbInstance = generateInitialSeed();
         saveDbLocalOnly(dbInstance);
         await syncAllToTiDB(dbInstance);
-        console.log("[Database] \u2705 TiDB Cloud synchronized with 16 users and 1 exclusive admin.");
-        return { engine: "tidb", message: "Connected to TiDB Cloud and seeded exclusive admin dataset." };
+        console.log("[Database] \u2705 TiDB Cloud seeded initial dataset.");
+        return { engine: "tidb", message: "Connected to TiDB Cloud and seeded initial dataset." };
       }
     } else {
       isTiDBActive = false;
@@ -76352,1016 +76354,9 @@ function requireRole(...allowedRoles) {
   };
 }
 
-// server/routes/auth.ts
-var router = (0, import_express.Router)();
-function sanitizeUser(user) {
-  const { password_hash, ...rest } = user;
-  return rest;
-}
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      res.status(400).json({ success: false, message: "Email and password are required." });
-      return;
-    }
-    const db = getDb();
-    const normalizedEmail = email.toLowerCase().trim();
-    let user = db.users.find(
-      (u) => u.email.toLowerCase().trim() === normalizedEmail
-    );
-    if (!user && normalizedEmail === "alex@buildrex.com") {
-      user = db.users.find((u) => u.role === "employee");
-    }
-    if (!user) {
-      res.status(401).json({ success: false, message: "Invalid email or password." });
-      return;
-    }
-    if (user.status !== "active") {
-      res.status(403).json({ success: false, message: "This account has been deactivated. Please contact your administrator." });
-      return;
-    }
-    let isMatch = await bcryptjs_default.compare(password, user.password_hash);
-    if (!isMatch && user.email.toLowerCase().trim() === "adminbrx@gmail.com" && (password === "buidrex@123" || password === "buildrex@123")) {
-      isMatch = true;
-    }
-    if (!isMatch) {
-      res.status(401).json({ success: false, message: "Invalid email or password." });
-      return;
-    }
-    const enriched = enrichUser(user);
-    const token = generateToken(enriched);
-    res.cookie("buildrex_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1e3
-      // 7 days
-    });
-    logAudit(
-      { id: user.id, name: user.name },
-      "USER_LOGIN",
-      "USER",
-      user.id,
-      { email: user.email, role: user.role },
-      req.ip || "127.0.0.1"
-    );
-    res.json({
-      success: true,
-      message: "Sign in successful.",
-      token,
-      user: sanitizeUser(enriched)
-    });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Internal server error during authentication." });
-  }
-});
-router.post("/logout", (req, res) => {
-  res.clearCookie("buildrex_token");
-  res.json({ success: true, message: "Logged out successfully." });
-});
-router.get("/me", authenticate, (req, res) => {
-  const db = getDb();
-  res.json({
-    success: true,
-    user: sanitizeUser(req.user),
-    company_settings: db.company_settings
-  });
-});
-router.post("/forgot-password", (req, res) => {
-  const { email } = req.body;
-  if (!email) {
-    res.status(400).json({ success: false, message: "Email address is required." });
-    return;
-  }
-  const db = getDb();
-  const user = db.users.find(
-    (u) => u.email.toLowerCase().trim() === email.toLowerCase().trim()
-  );
-  if (user) {
-    logAudit(
-      { id: user.id, name: user.name },
-      "FORGOT_PASSWORD_REQUESTED",
-      "USER",
-      user.id,
-      { email },
-      req.ip || "127.0.0.1"
-    );
-  }
-  res.json({
-    success: true,
-    message: "If an account with that email exists, password reset instructions and security token have been sent."
-  });
-});
-router.post("/reset-password", async (req, res) => {
-  const { email, new_password } = req.body;
-  if (!email || !new_password || new_password.length < 6) {
-    res.status(400).json({ success: false, message: "Email and new password (min 6 chars) are required." });
-    return;
-  }
-  const db = getDb();
-  const user = db.users.find(
-    (u) => u.email.toLowerCase().trim() === email.toLowerCase().trim()
-  );
-  if (!user) {
-    res.status(404).json({ success: false, message: "Account not found." });
-    return;
-  }
-  user.password_hash = await bcryptjs_default.hash(new_password, 10);
-  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  saveDb(db);
-  logAudit(
-    { id: user.id, name: user.name },
-    "PASSWORD_RESET_COMPLETED",
-    "USER",
-    user.id,
-    { email },
-    req.ip || "127.0.0.1"
-  );
-  res.json({
-    success: true,
-    message: "Password has been successfully updated. You may now sign in with your new password."
-  });
-});
-router.patch("/profile", authenticate, (req, res) => {
-  const { name, phone } = req.body;
-  const db = getDb();
-  const user = db.users.find((u) => u.id === req.user.id);
-  if (!user) {
-    res.status(404).json({ success: false, message: "User not found." });
-    return;
-  }
-  if (name && name.trim()) user.name = name.trim();
-  if (phone !== void 0) user.phone = phone.trim();
-  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  saveDb(db);
-  logAudit(
-    { id: user.id, name: user.name },
-    "UPDATE_PROFILE",
-    "USER",
-    user.id,
-    { name: user.name, phone: user.phone },
-    req.ip || "127.0.0.1"
-  );
-  res.json({
-    success: true,
-    message: "Profile updated successfully.",
-    user: sanitizeUser(enrichUser(user))
-  });
-});
-router.patch("/change-password", authenticate, async (req, res) => {
-  const { current_password, new_password } = req.body;
-  if (!current_password || !new_password || new_password.length < 6) {
-    res.status(400).json({ success: false, message: "Current password and new password (min 6 chars) are required." });
-    return;
-  }
-  const db = getDb();
-  const user = db.users.find((u) => u.id === req.user.id);
-  if (!user) {
-    res.status(404).json({ success: false, message: "User not found." });
-    return;
-  }
-  const isMatch = await bcryptjs_default.compare(current_password, user.password_hash);
-  if (!isMatch) {
-    res.status(400).json({ success: false, message: "Current password does not match." });
-    return;
-  }
-  user.password_hash = await bcryptjs_default.hash(new_password, 10);
-  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  saveDb(db);
-  res.json({ success: true, message: "Password changed successfully." });
-});
-var auth_default = router;
-
-// server/routes/attendance.ts
-var import_express2 = __toESM(require_express2(), 1);
-var router2 = (0, import_express2.Router)();
-router2.post("/check-in", authenticate, (req, res) => {
-  const db = getDb();
-  const userId = req.user.id;
-  const today = getTodayStr();
-  const existing = db.attendance.find(
-    (a) => a.user_id === userId && a.work_date === today
-  );
-  if (existing) {
-    if (existing.check_out) {
-      res.status(400).json({
-        success: false,
-        message: "You have already completed attendance checkout for today."
-      });
-      return;
-    }
-    res.status(400).json({
-      success: false,
-      message: "You are already checked in for today.",
-      attendance: enrichAttendance(existing)
-    });
-    return;
-  }
-  const now = /* @__PURE__ */ new Date();
-  const nowIso = now.toISOString();
-  const { status, isLate } = calculateAttendanceStatus(now, db.company_settings);
-  const newRecord = {
-    id: `att-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    user_id: userId,
-    work_date: today,
-    check_in: nowIso,
-    check_out: null,
-    total_minutes: 0,
-    status,
-    notes: isLate ? `Late arrival (checked in after grace window)` : void 0,
-    ip_address: req.ip || "127.0.0.1",
-    created_at: nowIso,
-    updated_at: nowIso
-  };
-  db.attendance.unshift(newRecord);
-  saveDb(db);
-  const recipients = db.users.filter(
-    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
-  );
-  recipients.forEach((recipient) => {
-    createNotification(
-      recipient.id,
-      "Attendance Clock-In",
-      `${req.user.name} checked in for ${today} (${status === "late" ? "Late Arrival" : "On Time"}).`,
-      status === "late" ? "warning" : "info",
-      "/admin/attendance"
-    );
-  });
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    "ATTENDANCE_CHECK_IN",
-    "ATTENDANCE",
-    newRecord.id,
-    { work_date: today, check_in: nowIso, status },
-    req.ip || "127.0.0.1"
-  );
-  res.status(201).json({
-    success: true,
-    message: isLate ? "Checked in successfully. Note: Marked as Late arrival based on company policy." : "Checked in successfully. Have a productive day at BUILDREX!",
-    attendance: enrichAttendance(newRecord)
-  });
-});
-router2.post("/check-out", authenticate, (req, res) => {
-  const db = getDb();
-  const userId = req.user.id;
-  const today = getTodayStr();
-  const record = db.attendance.find(
-    (a) => a.user_id === userId && a.work_date === today
-  );
-  if (!record) {
-    res.status(400).json({
-      success: false,
-      message: "No active check-in record found for today. Please check in first."
-    });
-    return;
-  }
-  if (record.check_out) {
-    res.status(400).json({
-      success: false,
-      message: "You have already checked out for today.",
-      attendance: enrichAttendance(record)
-    });
-    return;
-  }
-  const now = /* @__PURE__ */ new Date();
-  const nowIso = now.toISOString();
-  const checkInIso = record.check_in.includes("T") ? record.check_in : record.check_in.replace(" ", "T") + "Z";
-  const checkInTime = new Date(checkInIso);
-  const diffMs = Math.max(0, now.getTime() - checkInTime.getTime());
-  const totalMinutes = Math.max(1, Math.round(diffMs / (1e3 * 60)));
-  record.check_out = nowIso;
-  record.total_minutes = totalMinutes;
-  record.updated_at = nowIso;
-  const halfDayThreshold = db.company_settings.half_day_minutes || 240;
-  if (totalMinutes < halfDayThreshold && record.status === "present") {
-    record.status = "half_day";
-    record.notes = (record.notes ? record.notes + "; " : "") + "Shift under 4 hours (Half Day)";
-  }
-  saveDb(db);
-  const checkoutRecipients = db.users.filter(
-    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
-  );
-  checkoutRecipients.forEach((recipient) => {
-    createNotification(
-      recipient.id,
-      "Attendance Clock-Out",
-      `${req.user.name} checked out. Recorded duration: ${(totalMinutes / 60).toFixed(1)} hrs.`,
-      "info",
-      "/admin/attendance"
-    );
-  });
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    "ATTENDANCE_CHECK_OUT",
-    "ATTENDANCE",
-    record.id,
-    { work_date: today, check_out: nowIso, total_minutes: totalMinutes, status: record.status },
-    req.ip || "127.0.0.1"
-  );
-  res.json({
-    success: true,
-    message: "Checked out successfully. Today's working duration has been recorded.",
-    attendance: enrichAttendance(record)
-  });
-});
-router2.get("/today", authenticate, (req, res) => {
-  const db = getDb();
-  const userId = req.user.id;
-  const today = getTodayStr();
-  const record = db.attendance.find(
-    (a) => a.user_id === userId && a.work_date === today
-  );
-  let currentDurationMinutes = 0;
-  if (record) {
-    if (record.check_out) {
-      currentDurationMinutes = record.total_minutes;
-    } else {
-      const start = new Date(record.check_in).getTime();
-      const now = Date.now();
-      currentDurationMinutes = Math.max(0, Math.round((now - start) / (1e3 * 60)));
-    }
-  }
-  res.json({
-    success: true,
-    work_date: today,
-    record: record ? enrichAttendance(record) : null,
-    current_duration_minutes: currentDurationMinutes,
-    status_summary: !record ? "Not Started" : !record.check_out ? "Checked In" : "Checked Out"
-  });
-});
-router2.get("/history", authenticate, (req, res) => {
-  const db = getDb();
-  const userId = req.user.id;
-  const { start_date, end_date, status, limit, page } = req.query;
-  let records = db.attendance.filter((a) => a.user_id === userId);
-  if (start_date) {
-    records = records.filter((a) => a.work_date >= start_date);
-  }
-  if (end_date) {
-    records = records.filter((a) => a.work_date <= end_date);
-  }
-  if (status && status !== "all") {
-    records = records.filter((a) => a.status === status);
-  }
-  records.sort((a, b) => b.work_date.localeCompare(a.work_date));
-  const enriched = records.map(enrichAttendance);
-  const totalDays = enriched.length;
-  const totalMinutes = enriched.reduce((acc, cur) => acc + (cur.total_minutes || 0), 0);
-  const lateDays = enriched.filter((r2) => r2.status === "late").length;
-  const halfDays = enriched.filter((r2) => r2.status === "half_day").length;
-  const pageSize = Number(limit) || 20;
-  const currentPage = Number(page) || 1;
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginated = enriched.slice(startIndex, startIndex + pageSize);
-  res.json({
-    success: true,
-    total: enriched.length,
-    page: currentPage,
-    page_size: pageSize,
-    summary: {
-      total_days_logged: totalDays,
-      total_hours_worked: Number((totalMinutes / 60).toFixed(1)),
-      average_hours_per_day: totalDays > 0 ? Number((totalMinutes / 60 / totalDays).toFixed(1)) : 0,
-      late_arrivals_count: lateDays,
-      half_days_count: halfDays
-    },
-    records: paginated
-  });
-});
-router2.get(["/admin/attendance", "/admin", "/attendance"], authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const { date, start_date, end_date, department_id, role, status, user_id, search, page, limit } = req.query;
-  let records = [...db.attendance];
-  if (date && date !== "undefined" && date !== "null") {
-    records = records.filter((a) => a.work_date === date);
-  }
-  if (start_date && start_date !== "undefined" && start_date !== "null") {
-    records = records.filter((a) => a.work_date >= start_date);
-  }
-  if (end_date && end_date !== "undefined" && end_date !== "null") {
-    records = records.filter((a) => a.work_date <= end_date);
-  }
-  if (status && status !== "all" && status !== "undefined" && status !== "null") {
-    records = records.filter((a) => a.status === status);
-  }
-  if (user_id && user_id !== "undefined" && user_id !== "null") {
-    records = records.filter((a) => a.user_id === user_id);
-  }
-  let enriched = records.map(enrichAttendance);
-  if (department_id && department_id !== "all" && department_id !== "undefined" && department_id !== "null") {
-    enriched = enriched.filter((a) => {
-      const u = db.users.find((user) => user.id === a.user_id);
-      return u?.department_id === department_id;
-    });
-  }
-  if (role && role !== "all" && role !== "undefined" && role !== "null") {
-    enriched = enriched.filter((a) => a.role === role);
-  }
-  if (search && search !== "undefined" && search !== "null") {
-    const q = search.toLowerCase().trim();
-    if (q) {
-      enriched = enriched.filter(
-        (a) => a.user_name?.toLowerCase().includes(q) || a.employee_code?.toLowerCase().includes(q) || a.department_name?.toLowerCase().includes(q)
-      );
-    }
-  }
-  enriched.sort((a, b) => {
-    const dateComp = (b.work_date || "").localeCompare(a.work_date || "");
-    if (dateComp !== 0) return dateComp;
-    return (b.check_in || "").localeCompare(a.check_in || "");
-  });
-  const pageSize = Number(limit) || 20;
-  const currentPage = Number(page) || 1;
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginated = enriched.slice(startIndex, startIndex + pageSize);
-  res.json({
-    success: true,
-    total: enriched.length,
-    page: currentPage,
-    page_size: pageSize,
-    records: paginated
-  });
-});
-router2.get(["/admin/attendance/:id", "/attendance/:id"], authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const record = db.attendance.find((a) => a.id === req.params.id);
-  if (!record) {
-    res.status(404).json({ success: false, message: "Attendance record not found." });
-    return;
-  }
-  res.json({
-    success: true,
-    record: enrichAttendance(record)
-  });
-});
-router2.patch(["/admin/attendance/:id", "/attendance/:id"], authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const record = db.attendance.find((a) => a.id === req.params.id);
-  if (!record) {
-    res.status(404).json({ success: false, message: "Attendance record not found." });
-    return;
-  }
-  const { check_in, check_out, status, notes } = req.body;
-  if (check_in) record.check_in = check_in;
-  if (check_out !== void 0) record.check_out = check_out || null;
-  if (status) record.status = status;
-  if (notes !== void 0) record.notes = notes;
-  if (record.check_in && record.check_out) {
-    const inTime = new Date(record.check_in).getTime();
-    const outTime = new Date(record.check_out).getTime();
-    record.total_minutes = Math.max(0, Math.round((outTime - inTime) / (1e3 * 60)));
-  }
-  record.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  saveDb(db);
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    "ADMIN_MANUAL_ATTENDANCE_UPDATE",
-    "ATTENDANCE",
-    record.id,
-    { check_in: record.check_in, check_out: record.check_out, status: record.status },
-    req.ip || "127.0.0.1"
-  );
-  res.json({
-    success: true,
-    message: "Attendance record successfully adjusted by administrator.",
-    record: enrichAttendance(record)
-  });
-});
-var attendance_default = router2;
-
-// server/routes/workUpdates.ts
-var import_express3 = __toESM(require_express2(), 1);
-var router3 = (0, import_express3.Router)();
-router3.post("/", authenticate, (req, res) => {
-  const db = getDb();
-  const userId = req.user.id;
-  const {
-    work_date,
-    tasks_completed,
-    project_details,
-    accomplishments,
-    blockers,
-    next_day_plan,
-    hours_spent,
-    status = "submitted"
-    // 'draft' or 'submitted'
-  } = req.body;
-  const targetDate = work_date || getTodayStr();
-  if (status === "submitted") {
-    if (!tasks_completed || !project_details) {
-      res.status(400).json({
-        success: false,
-        message: "Tasks completed and project details are required for final submission."
-      });
-      return;
-    }
-  }
-  let update = db.work_updates.find(
-    (w) => w.user_id === userId && w.work_date === targetDate
-  );
-  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
-  if (update) {
-    if (update.status === "reviewed") {
-      res.status(400).json({
-        success: false,
-        message: "This report has already been reviewed by administration and cannot be re-submitted."
-      });
-      return;
-    }
-    const wasNeedsRevision = update.status === "needs_revision";
-    update.tasks_completed = tasks_completed || update.tasks_completed;
-    update.project_details = project_details || update.project_details;
-    update.accomplishments = accomplishments !== void 0 ? accomplishments : update.accomplishments;
-    update.blockers = blockers !== void 0 ? blockers : update.blockers;
-    update.next_day_plan = next_day_plan !== void 0 ? next_day_plan : update.next_day_plan;
-    update.hours_spent = hours_spent ? Number(hours_spent) : update.hours_spent;
-    update.status = status;
-    update.updated_at = nowIso;
-    if (status === "submitted") {
-      update.submitted_at = nowIso;
-      if (wasNeedsRevision) {
-        update.reviewed_by = null;
-        update.review_comment = null;
-        update.reviewed_at = null;
-      }
-    }
-  } else {
-    update = {
-      id: `wu-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-      user_id: userId,
-      work_date: targetDate,
-      tasks_completed: tasks_completed || "",
-      project_details: project_details || "",
-      accomplishments: accomplishments || "",
-      blockers: blockers || "",
-      next_day_plan: next_day_plan || "",
-      hours_spent: hours_spent ? Number(hours_spent) : 8,
-      status,
-      submitted_at: status === "submitted" ? nowIso : null,
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: nowIso,
-      updated_at: nowIso
-    };
-    db.work_updates.unshift(update);
-  }
-  saveDb(db);
-  if (status === "submitted") {
-    const recipients = db.users.filter(
-      (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
-    );
-    const notifTitle = update.review_comment ? "Work Update Re-submitted" : "Daily Work Update Submitted";
-    const notifMsg = `${req.user.name} ${update.review_comment ? "re-submitted revised" : "submitted"} daily work report for ${targetDate}.`;
-    recipients.forEach((recipient) => {
-      createNotification(
-        recipient.id,
-        notifTitle,
-        notifMsg,
-        "info",
-        "/admin/work-updates"
-      );
-    });
-  }
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    status === "draft" ? "WORK_UPDATE_SAVED_DRAFT" : "WORK_UPDATE_SUBMITTED",
-    "WORK_UPDATE",
-    update.id,
-    { work_date: targetDate, status },
-    req.ip || "127.0.0.1"
-  );
-  res.status(200).json({
-    success: true,
-    message: status === "draft" ? "Work update draft saved successfully." : "Daily work update submitted for admin review.",
-    work_update: enrichWorkUpdate(update)
-  });
-});
-router3.get("/my", authenticate, (req, res) => {
-  const db = getDb();
-  const userId = req.user.id;
-  const { status, limit, page } = req.query;
-  let updates = db.work_updates.filter((w) => w.user_id === userId);
-  if (status && status !== "all") {
-    updates = updates.filter((w) => w.status === status);
-  }
-  updates.sort((a, b) => b.work_date.localeCompare(a.work_date));
-  const pageSize = Number(limit) || 20;
-  const currentPage = Number(page) || 1;
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginated = updates.slice(startIndex, startIndex + pageSize);
-  res.json({
-    success: true,
-    total: updates.length,
-    page: currentPage,
-    records: paginated.map(enrichWorkUpdate)
-  });
-});
-router3.get("/today", authenticate, (req, res) => {
-  const db = getDb();
-  const userId = req.user.id;
-  const today = getTodayStr();
-  const update = db.work_updates.find(
-    (w) => w.user_id === userId && w.work_date === today
-  );
-  res.json({
-    success: true,
-    work_date: today,
-    record: update ? enrichWorkUpdate(update) : null,
-    is_submitted: update?.status === "submitted" || update?.status === "reviewed"
-  });
-});
-router3.get("/:id", authenticate, (req, res) => {
-  const db = getDb();
-  const update = db.work_updates.find((w) => w.id === req.params.id);
-  if (!update) {
-    res.status(404).json({ success: false, message: "Work update not found." });
-    return;
-  }
-  if (req.user.role !== "admin" && update.user_id !== req.user.id) {
-    res.status(403).json({ success: false, message: "Unauthorized to view this work update." });
-    return;
-  }
-  res.json({
-    success: true,
-    record: enrichWorkUpdate(update)
-  });
-});
-router3.get("/admin/list", authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const { date, status, role, department_id, search, limit, page } = req.query;
-  let list = db.work_updates.map(enrichWorkUpdate);
-  if (date && date !== "undefined" && date !== "null") {
-    list = list.filter((w) => w.work_date === date);
-  }
-  if (status && status !== "all" && status !== "undefined" && status !== "null") {
-    list = list.filter((w) => w.status === status);
-  }
-  if (role && role !== "all" && role !== "undefined" && role !== "null") {
-    list = list.filter((w) => w.role === role);
-  }
-  if (department_id && department_id !== "all" && department_id !== "undefined" && department_id !== "null") {
-    list = list.filter((w) => {
-      const u = db.users.find((user) => user.id === w.user_id);
-      return u?.department_id === department_id;
-    });
-  }
-  if (search && search !== "undefined" && search !== "null") {
-    const q = search.toLowerCase().trim();
-    if (q) {
-      list = list.filter(
-        (w) => w.user_name?.toLowerCase().includes(q) || w.employee_code?.toLowerCase().includes(q) || w.project_details.toLowerCase().includes(q) || w.tasks_completed.toLowerCase().includes(q)
-      );
-    }
-  }
-  list.sort((a, b) => {
-    const dateComp = (b.work_date || "").localeCompare(a.work_date || "");
-    if (dateComp !== 0) return dateComp;
-    const timeA = a.submitted_at || a.created_at || "";
-    const timeB = b.submitted_at || b.created_at || "";
-    return timeB.localeCompare(timeA);
-  });
-  const pageSize = Number(limit) || 20;
-  const currentPage = Number(page) || 1;
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginated = list.slice(startIndex, startIndex + pageSize);
-  res.json({
-    success: true,
-    total: list.length,
-    page: currentPage,
-    records: paginated
-  });
-});
-router3.patch("/admin/:id/review", authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const update = db.work_updates.find((w) => w.id === req.params.id);
-  if (!update) {
-    res.status(404).json({ success: false, message: "Work update not found." });
-    return;
-  }
-  const { status, review_comment } = req.body;
-  if (!status || !["reviewed", "needs_revision"].includes(status)) {
-    res.status(400).json({
-      success: false,
-      message: 'Status must be either "reviewed" or "needs_revision".'
-    });
-    return;
-  }
-  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
-  update.status = status;
-  update.reviewed_by = req.user.id;
-  update.review_comment = review_comment || null;
-  update.reviewed_at = nowIso;
-  update.updated_at = nowIso;
-  saveDb(db);
-  createNotification(
-    update.user_id,
-    status === "reviewed" ? "Work Update Reviewed" : "Work Update Needs Revision",
-    status === "reviewed" ? `Your work update for ${update.work_date} was approved and marked Reviewed.` : `Your reviewer requested revisions for ${update.work_date}: "${review_comment || "Please update tasks"}"`,
-    status === "reviewed" ? "success" : "warning",
-    "/work-updates"
-  );
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    "REVIEW_WORK_UPDATE",
-    "WORK_UPDATE",
-    update.id,
-    { status, review_comment, target_user: update.user_id },
-    req.ip || "127.0.0.1"
-  );
-  res.json({
-    success: true,
-    message: `Work update marked as ${status === "reviewed" ? "Reviewed" : "Needs Revision"}.`,
-    record: enrichWorkUpdate(update)
-  });
-});
-var workUpdates_default = router3;
-
-// server/routes/leaveAndCorrections.ts
-var import_express4 = __toESM(require_express2(), 1);
-var router4 = (0, import_express4.Router)();
-router4.get("/my", authenticate, (req, res) => {
-  const db = getDb();
-  const requests = db.leave_requests.filter((l) => l.user_id === req.user.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).map(enrichLeave);
-  res.json({ success: true, records: requests });
-});
-router4.post("/", authenticate, (req, res) => {
-  const { leave_type, start_date, end_date, reason } = req.body;
-  if (!leave_type || !start_date || !end_date || !reason) {
-    res.status(400).json({ success: false, message: "All leave fields are required." });
-    return;
-  }
-  if (start_date > end_date) {
-    res.status(400).json({ success: false, message: "Start date cannot be after end date." });
-    return;
-  }
-  const db = getDb();
-  const hasOverlap = db.leave_requests.some(
-    (l) => l.user_id === req.user.id && l.status !== "rejected" && (start_date >= l.start_date && start_date <= l.end_date || end_date >= l.start_date && end_date <= l.end_date)
-  );
-  if (hasOverlap) {
-    res.status(400).json({
-      success: false,
-      message: "You already have an existing pending or approved leave request covering these dates."
-    });
-    return;
-  }
-  const start = new Date(start_date);
-  const end = new Date(end_date);
-  const diffDays = Math.round((end.getTime() - start.getTime()) / (1e3 * 60 * 60 * 24)) + 1;
-  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
-  const newLeave = {
-    id: `leave-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    user_id: req.user.id,
-    leave_type,
-    start_date,
-    end_date,
-    days_count: Math.max(1, diffDays),
-    reason: reason.trim(),
-    status: "pending",
-    reviewed_by: null,
-    review_comment: null,
-    reviewed_at: null,
-    created_at: nowIso
-  };
-  db.leave_requests.unshift(newLeave);
-  saveDb(db);
-  const recipients = db.users.filter(
-    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
-  );
-  recipients.forEach((recipient) => {
-    createNotification(
-      recipient.id,
-      "New Leave Request",
-      `${req.user.name} requested ${newLeave.days_count} day(s) ${newLeave.leave_type} leave (${start_date} to ${end_date}).`,
-      "info",
-      "/admin/approvals"
-    );
-  });
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    "CREATE_LEAVE_REQUEST",
-    "LEAVE_REQUEST",
-    newLeave.id,
-    { start_date, end_date, days: newLeave.days_count, leave_type },
-    req.ip || "127.0.0.1"
-  );
-  res.status(201).json({
-    success: true,
-    message: "Leave request submitted successfully.",
-    record: enrichLeave(newLeave)
-  });
-});
-router4.get("/admin/list", authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const { status, limit, page } = req.query;
-  let list = db.leave_requests.map(enrichLeave);
-  if (status && status !== "all" && status !== "undefined" && status !== "null") {
-    list = list.filter((l) => l.status === status);
-  }
-  list.sort((a, b) => b.created_at.localeCompare(a.created_at));
-  const pageSize = Number(limit) || 20;
-  const currentPage = Number(page) || 1;
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginated = list.slice(startIndex, startIndex + pageSize);
-  res.json({
-    success: true,
-    total: list.length,
-    page: currentPage,
-    records: paginated
-  });
-});
-router4.patch("/admin/:id/review", authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const leave = db.leave_requests.find((l) => l.id === req.params.id);
-  if (!leave) {
-    res.status(404).json({ success: false, message: "Leave request not found." });
-    return;
-  }
-  const { status, review_comment } = req.body;
-  if (!status || !["approved", "rejected"].includes(status)) {
-    res.status(400).json({ success: false, message: "Status must be approved or rejected." });
-    return;
-  }
-  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
-  leave.status = status;
-  leave.reviewed_by = req.user.id;
-  leave.review_comment = review_comment || null;
-  leave.reviewed_at = nowIso;
-  saveDb(db);
-  createNotification(
-    leave.user_id,
-    `Leave Request ${status === "approved" ? "Approved" : "Rejected"}`,
-    `Your leave request for ${leave.start_date} to ${leave.end_date} has been ${status}. ${review_comment ? `Note: ${review_comment}` : ""}`,
-    status === "approved" ? "success" : "alert",
-    "/leave-requests"
-  );
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    status === "approved" ? "APPROVE_LEAVE_REQUEST" : "REJECT_LEAVE_REQUEST",
-    "LEAVE_REQUEST",
-    leave.id,
-    { status, review_comment, target_user: leave.user_id },
-    req.ip || "127.0.0.1"
-  );
-  res.json({
-    success: true,
-    message: `Leave request ${status} successfully.`,
-    record: enrichLeave(leave)
-  });
-});
-router4.get(["/corrections/my", "/attendance/correction-requests/my"], authenticate, (req, res) => {
-  const db = getDb();
-  const corrections = db.attendance_corrections.filter((c) => c.user_id === req.user.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).map(enrichCorrection);
-  res.json({ success: true, records: corrections });
-});
-router4.post(["/corrections", "/attendance/correction-requests"], authenticate, (req, res) => {
-  const { attendance_id, work_date, requested_check_in, requested_check_out, reason } = req.body;
-  if (!work_date || !requested_check_in || !requested_check_out || !reason) {
-    res.status(400).json({ success: false, message: "All correction fields are required." });
-    return;
-  }
-  const db = getDb();
-  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
-  const newCorrection = {
-    id: `corr-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    user_id: req.user.id,
-    attendance_id: attendance_id || "manual-entry",
-    work_date,
-    requested_check_in,
-    requested_check_out,
-    reason: reason.trim(),
-    status: "pending",
-    reviewed_by: null,
-    review_comment: null,
-    reviewed_at: null,
-    created_at: nowIso
-  };
-  db.attendance_corrections.unshift(newCorrection);
-  saveDb(db);
-  const corrRecipients = db.users.filter(
-    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
-  );
-  corrRecipients.forEach((recipient) => {
-    createNotification(
-      recipient.id,
-      "Attendance Correction Submitted",
-      `${req.user.name} submitted a correction for ${work_date}.`,
-      "warning",
-      "/admin/approvals"
-    );
-  });
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    "CREATE_CORRECTION_REQUEST",
-    "ATTENDANCE_CORRECTION",
-    newCorrection.id,
-    { work_date, requested_check_in, requested_check_out },
-    req.ip || "127.0.0.1"
-  );
-  res.status(201).json({
-    success: true,
-    message: "Attendance correction request submitted for admin review.",
-    record: enrichCorrection(newCorrection)
-  });
-});
-router4.get(["/admin/corrections", "/admin/attendance-corrections"], authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const { status, limit, page } = req.query;
-  let list = db.attendance_corrections.map(enrichCorrection);
-  if (status && status !== "all" && status !== "undefined" && status !== "null") {
-    list = list.filter((c) => c.status === status);
-  }
-  list.sort((a, b) => b.created_at.localeCompare(a.created_at));
-  const pageSize = Number(limit) || 20;
-  const currentPage = Number(page) || 1;
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginated = list.slice(startIndex, startIndex + pageSize);
-  res.json({
-    success: true,
-    total: list.length,
-    page: currentPage,
-    records: paginated
-  });
-});
-router4.patch(["/admin/corrections/:id/review", "/admin/attendance-corrections/:id/review"], authenticate, requireRole("admin"), (req, res) => {
-  const db = getDb();
-  const corr = db.attendance_corrections.find((c) => c.id === req.params.id);
-  if (!corr) {
-    res.status(404).json({ success: false, message: "Attendance correction request not found." });
-    return;
-  }
-  const { status, review_comment } = req.body;
-  if (!status || !["approved", "rejected"].includes(status)) {
-    res.status(400).json({ success: false, message: "Status must be approved or rejected." });
-    return;
-  }
-  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
-  corr.status = status;
-  corr.reviewed_by = req.user.id;
-  corr.review_comment = review_comment || null;
-  corr.reviewed_at = nowIso;
-  if (status === "approved") {
-    let att = db.attendance.find(
-      (a) => a.id === corr.attendance_id || a.user_id === corr.user_id && a.work_date === corr.work_date
-    );
-    const inTime = new Date(corr.requested_check_in).getTime();
-    const outTime = new Date(corr.requested_check_out).getTime();
-    const totalMinutes = Math.max(0, Math.round((outTime - inTime) / (1e3 * 60)));
-    if (att) {
-      att.check_in = corr.requested_check_in;
-      att.check_out = corr.requested_check_out;
-      att.total_minutes = totalMinutes;
-      att.status = totalMinutes >= 240 ? "present" : "half_day";
-      att.notes = "Updated via approved attendance correction request";
-      att.updated_at = nowIso;
-    } else {
-      att = {
-        id: `att-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        user_id: corr.user_id,
-        work_date: corr.work_date,
-        check_in: corr.requested_check_in,
-        check_out: corr.requested_check_out,
-        total_minutes: totalMinutes,
-        status: totalMinutes >= 240 ? "present" : "half_day",
-        notes: "Created via approved attendance correction request",
-        created_at: nowIso,
-        updated_at: nowIso
-      };
-      db.attendance.unshift(att);
-    }
-  }
-  saveDb(db);
-  createNotification(
-    corr.user_id,
-    `Attendance Correction ${status === "approved" ? "Approved" : "Rejected"}`,
-    `Your correction request for ${corr.work_date} was ${status}. ${review_comment ? `(${review_comment})` : ""}`,
-    status === "approved" ? "success" : "alert",
-    "/my-attendance"
-  );
-  logAudit(
-    { id: req.user.id, name: req.user.name },
-    status === "approved" ? "APPROVE_CORRECTION_REQUEST" : "REJECT_CORRECTION_REQUEST",
-    "ATTENDANCE_CORRECTION",
-    corr.id,
-    { status, review_comment, target_user: corr.user_id },
-    req.ip || "127.0.0.1"
-  );
-  res.json({
-    success: true,
-    message: `Correction request ${status} successfully.`,
-    record: enrichCorrection(corr)
-  });
-});
-var leaveAndCorrections_default = router4;
-
-// server/routes/admin.ts
-var import_express6 = __toESM(require_express2(), 1);
-
 // server/routes/googleSheetSync.ts
-var import_express5 = __toESM(require_express2(), 1);
-var router5 = (0, import_express5.Router)();
+var import_express = __toESM(require_express2(), 1);
+var router = (0, import_express.Router)();
 var GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1aBE1-g5k-uYmBzTynBFsS5VxxwYDyGXnUV0lW6bqMZ0/gviz/tq?tqx=out:csv&gid=35659883";
 var lastSyncTime = null;
 var lastSyncResult = null;
@@ -77568,7 +76563,7 @@ async function performGoogleSheetSync() {
         });
       }
     }
-    saveDb(db);
+    await saveDb(db);
     lastSyncTime = (/* @__PURE__ */ new Date()).toISOString();
     lastSyncResult = {
       success: true,
@@ -77604,7 +76599,7 @@ async function performGoogleSheetSync() {
     };
   }
 }
-router5.get("/google-sheet-status", (req, res) => {
+router.get("/google-sheet-status", (req, res) => {
   const db = getDb();
   res.json({
     success: true,
@@ -77620,7 +76615,7 @@ router5.get("/google-sheet-status", (req, res) => {
     } : null
   });
 });
-router5.post("/google-sheet", authenticate, async (req, res) => {
+router.post("/google-sheet", authenticate, async (req, res) => {
   const result = await performGoogleSheetSync();
   if (result.success) {
     res.json({
@@ -77636,7 +76631,7 @@ router5.post("/google-sheet", authenticate, async (req, res) => {
     });
   }
 });
-router5.get("/team-credentials", (req, res) => {
+router.get("/team-credentials", (req, res) => {
   const db = getDb();
   const credentials = db.users.map((u) => {
     const plainPassword = getMemberPassword(u.email, u.name);
@@ -77662,9 +76657,1020 @@ router5.get("/team-credentials", (req, res) => {
     credentials
   });
 });
-var googleSheetSync_default = router5;
+var googleSheetSync_default = router;
+
+// server/routes/auth.ts
+var router2 = (0, import_express2.Router)();
+function sanitizeUser(user) {
+  const { password_hash, ...rest } = user;
+  return rest;
+}
+router2.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      res.status(400).json({ success: false, message: "Email and password are required." });
+      return;
+    }
+    const db = getDb();
+    const normalizedEmail = email.toLowerCase().trim();
+    let user = db.users.find(
+      (u) => u.email.toLowerCase().trim() === normalizedEmail
+    );
+    if (!user && normalizedEmail === "alex@buildrex.com") {
+      user = db.users.find((u) => u.role === "employee");
+    }
+    if (!user) {
+      res.status(401).json({ success: false, message: "Invalid email or password." });
+      return;
+    }
+    if (user.status !== "active") {
+      res.status(403).json({ success: false, message: "This account has been deactivated. Please contact your administrator." });
+      return;
+    }
+    let isMatch = await bcryptjs_default.compare(password, user.password_hash);
+    if (!isMatch && user.email.toLowerCase().trim() === "adminbrx@gmail.com" && (password === "buidrex@123" || password === "buildrex@123")) {
+      isMatch = true;
+    }
+    if (!isMatch && password === getMemberPassword(user.email, user.name)) {
+      isMatch = true;
+      user.password_hash = await bcryptjs_default.hash(password, 10);
+      user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+      await saveDb(db);
+    }
+    if (!isMatch) {
+      res.status(401).json({ success: false, message: "Invalid email or password." });
+      return;
+    }
+    const enriched = enrichUser(user);
+    const token = generateToken(enriched);
+    res.cookie("buildrex_token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1e3
+      // 7 days
+    });
+    logAudit(
+      { id: user.id, name: user.name },
+      "USER_LOGIN",
+      "USER",
+      user.id,
+      { email: user.email, role: user.role },
+      req.ip || "127.0.0.1"
+    );
+    res.json({
+      success: true,
+      message: "Sign in successful.",
+      token,
+      user: sanitizeUser(enriched)
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Internal server error during authentication." });
+  }
+});
+router2.post("/logout", (req, res) => {
+  res.clearCookie("buildrex_token");
+  res.json({ success: true, message: "Logged out successfully." });
+});
+router2.get("/me", authenticate, (req, res) => {
+  const db = getDb();
+  res.json({
+    success: true,
+    user: sanitizeUser(req.user),
+    company_settings: db.company_settings
+  });
+});
+router2.post("/forgot-password", (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({ success: false, message: "Email address is required." });
+    return;
+  }
+  const db = getDb();
+  const user = db.users.find(
+    (u) => u.email.toLowerCase().trim() === email.toLowerCase().trim()
+  );
+  if (user) {
+    logAudit(
+      { id: user.id, name: user.name },
+      "FORGOT_PASSWORD_REQUESTED",
+      "USER",
+      user.id,
+      { email },
+      req.ip || "127.0.0.1"
+    );
+  }
+  res.json({
+    success: true,
+    message: "If an account with that email exists, password reset instructions and security token have been sent."
+  });
+});
+router2.post("/reset-password", async (req, res) => {
+  const { email, new_password } = req.body;
+  if (!email || !new_password || new_password.length < 6) {
+    res.status(400).json({ success: false, message: "Email and new password (min 6 chars) are required." });
+    return;
+  }
+  const db = getDb();
+  const user = db.users.find(
+    (u) => u.email.toLowerCase().trim() === email.toLowerCase().trim()
+  );
+  if (!user) {
+    res.status(404).json({ success: false, message: "Account not found." });
+    return;
+  }
+  user.password_hash = await bcryptjs_default.hash(new_password, 10);
+  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+  await saveDb(db);
+  logAudit(
+    { id: user.id, name: user.name },
+    "PASSWORD_RESET_COMPLETED",
+    "USER",
+    user.id,
+    { email },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: "Password has been successfully updated. You may now sign in with your new password."
+  });
+});
+router2.patch("/profile", authenticate, async (req, res) => {
+  const { name, phone } = req.body;
+  const db = getDb();
+  const user = db.users.find((u) => u.id === req.user.id);
+  if (!user) {
+    res.status(404).json({ success: false, message: "User not found." });
+    return;
+  }
+  if (name && name.trim()) user.name = name.trim();
+  if (phone !== void 0) user.phone = phone.trim();
+  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+  await saveDb(db);
+  logAudit(
+    { id: user.id, name: user.name },
+    "UPDATE_PROFILE",
+    "USER",
+    user.id,
+    { name: user.name, phone: user.phone },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: "Profile updated successfully.",
+    user: sanitizeUser(enrichUser(user))
+  });
+});
+router2.patch("/change-password", authenticate, async (req, res) => {
+  const { current_password, new_password } = req.body;
+  if (!current_password || !new_password || new_password.length < 6) {
+    res.status(400).json({ success: false, message: "Current password and new password (min 6 chars) are required." });
+    return;
+  }
+  const db = getDb();
+  const user = db.users.find((u) => u.id === req.user.id);
+  if (!user) {
+    res.status(404).json({ success: false, message: "User not found." });
+    return;
+  }
+  const isMatch = await bcryptjs_default.compare(current_password, user.password_hash);
+  if (!isMatch) {
+    res.status(400).json({ success: false, message: "Current password does not match." });
+    return;
+  }
+  user.password_hash = await bcryptjs_default.hash(new_password, 10);
+  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+  await saveDb(db);
+  res.json({ success: true, message: "Password changed successfully." });
+});
+var auth_default = router2;
+
+// server/routes/attendance.ts
+var import_express3 = __toESM(require_express2(), 1);
+var router3 = (0, import_express3.Router)();
+router3.post("/check-in", authenticate, async (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const today = getTodayStr();
+  const existing = db.attendance.find(
+    (a) => a.user_id === userId && a.work_date === today
+  );
+  if (existing) {
+    if (existing.check_out) {
+      res.status(400).json({
+        success: false,
+        message: "You have already completed attendance checkout for today."
+      });
+      return;
+    }
+    res.status(400).json({
+      success: false,
+      message: "You are already checked in for today.",
+      attendance: enrichAttendance(existing)
+    });
+    return;
+  }
+  const now = /* @__PURE__ */ new Date();
+  const nowIso = now.toISOString();
+  const { status, isLate } = calculateAttendanceStatus(now, db.company_settings);
+  const newRecord = {
+    id: `att-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    user_id: userId,
+    work_date: today,
+    check_in: nowIso,
+    check_out: null,
+    total_minutes: 0,
+    status,
+    notes: isLate ? `Late arrival (checked in after grace window)` : void 0,
+    ip_address: req.ip || "127.0.0.1",
+    created_at: nowIso,
+    updated_at: nowIso
+  };
+  db.attendance.unshift(newRecord);
+  await saveDb(db);
+  const recipients = db.users.filter(
+    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
+  );
+  recipients.forEach((recipient) => {
+    createNotification(
+      recipient.id,
+      "Attendance Clock-In",
+      `${req.user.name} checked in for ${today} (${status === "late" ? "Late Arrival" : "On Time"}).`,
+      status === "late" ? "warning" : "info",
+      "/admin/attendance"
+    );
+  });
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    "ATTENDANCE_CHECK_IN",
+    "ATTENDANCE",
+    newRecord.id,
+    { work_date: today, check_in: nowIso, status },
+    req.ip || "127.0.0.1"
+  );
+  res.status(201).json({
+    success: true,
+    message: isLate ? "Checked in successfully. Note: Marked as Late arrival based on company policy." : "Checked in successfully. Have a productive day at BUILDREX!",
+    attendance: enrichAttendance(newRecord)
+  });
+});
+router3.post("/check-out", authenticate, async (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const today = getTodayStr();
+  const record = db.attendance.find(
+    (a) => a.user_id === userId && a.work_date === today
+  );
+  if (!record) {
+    res.status(400).json({
+      success: false,
+      message: "No active check-in record found for today. Please check in first."
+    });
+    return;
+  }
+  if (record.check_out) {
+    res.status(400).json({
+      success: false,
+      message: "You have already checked out for today.",
+      attendance: enrichAttendance(record)
+    });
+    return;
+  }
+  const now = /* @__PURE__ */ new Date();
+  const nowIso = now.toISOString();
+  const checkInIso = record.check_in.includes("T") ? record.check_in : record.check_in.replace(" ", "T") + "Z";
+  const checkInTime = new Date(checkInIso);
+  const diffMs = Math.max(0, now.getTime() - checkInTime.getTime());
+  const totalMinutes = Math.max(1, Math.round(diffMs / (1e3 * 60)));
+  record.check_out = nowIso;
+  record.total_minutes = totalMinutes;
+  record.updated_at = nowIso;
+  const halfDayThreshold = db.company_settings.half_day_minutes || 240;
+  if (totalMinutes < halfDayThreshold && record.status === "present") {
+    record.status = "half_day";
+    record.notes = (record.notes ? record.notes + "; " : "") + "Shift under 4 hours (Half Day)";
+  }
+  await saveDb(db);
+  const checkoutRecipients = db.users.filter(
+    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
+  );
+  checkoutRecipients.forEach((recipient) => {
+    createNotification(
+      recipient.id,
+      "Attendance Clock-Out",
+      `${req.user.name} checked out. Recorded duration: ${(totalMinutes / 60).toFixed(1)} hrs.`,
+      "info",
+      "/admin/attendance"
+    );
+  });
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    "ATTENDANCE_CHECK_OUT",
+    "ATTENDANCE",
+    record.id,
+    { work_date: today, check_out: nowIso, total_minutes: totalMinutes, status: record.status },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: "Checked out successfully. Today's working duration has been recorded.",
+    attendance: enrichAttendance(record)
+  });
+});
+router3.get("/today", authenticate, (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const today = getTodayStr();
+  const record = db.attendance.find(
+    (a) => a.user_id === userId && a.work_date === today
+  );
+  let currentDurationMinutes = 0;
+  if (record) {
+    if (record.check_out) {
+      currentDurationMinutes = record.total_minutes;
+    } else {
+      const start = new Date(record.check_in).getTime();
+      const now = Date.now();
+      currentDurationMinutes = Math.max(0, Math.round((now - start) / (1e3 * 60)));
+    }
+  }
+  res.json({
+    success: true,
+    work_date: today,
+    record: record ? enrichAttendance(record) : null,
+    current_duration_minutes: currentDurationMinutes,
+    status_summary: !record ? "Not Started" : !record.check_out ? "Checked In" : "Checked Out"
+  });
+});
+router3.get("/history", authenticate, (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const { start_date, end_date, status, limit, page } = req.query;
+  let records = db.attendance.filter((a) => a.user_id === userId);
+  if (start_date) {
+    records = records.filter((a) => a.work_date >= start_date);
+  }
+  if (end_date) {
+    records = records.filter((a) => a.work_date <= end_date);
+  }
+  if (status && status !== "all") {
+    records = records.filter((a) => a.status === status);
+  }
+  records.sort((a, b) => b.work_date.localeCompare(a.work_date));
+  const enriched = records.map(enrichAttendance);
+  const totalDays = enriched.length;
+  const totalMinutes = enriched.reduce((acc, cur) => acc + (cur.total_minutes || 0), 0);
+  const lateDays = enriched.filter((r2) => r2.status === "late").length;
+  const halfDays = enriched.filter((r2) => r2.status === "half_day").length;
+  const pageSize = Number(limit) || 20;
+  const currentPage = Number(page) || 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginated = enriched.slice(startIndex, startIndex + pageSize);
+  res.json({
+    success: true,
+    total: enriched.length,
+    page: currentPage,
+    page_size: pageSize,
+    summary: {
+      total_days_logged: totalDays,
+      total_hours_worked: Number((totalMinutes / 60).toFixed(1)),
+      average_hours_per_day: totalDays > 0 ? Number((totalMinutes / 60 / totalDays).toFixed(1)) : 0,
+      late_arrivals_count: lateDays,
+      half_days_count: halfDays
+    },
+    records: paginated
+  });
+});
+router3.get(["/admin/attendance", "/admin", "/attendance"], authenticate, requireRole("admin"), (req, res) => {
+  const db = getDb();
+  const { date, start_date, end_date, department_id, role, status, user_id, search, page, limit } = req.query;
+  let records = [...db.attendance];
+  if (date && date !== "undefined" && date !== "null") {
+    records = records.filter((a) => a.work_date === date);
+  }
+  if (start_date && start_date !== "undefined" && start_date !== "null") {
+    records = records.filter((a) => a.work_date >= start_date);
+  }
+  if (end_date && end_date !== "undefined" && end_date !== "null") {
+    records = records.filter((a) => a.work_date <= end_date);
+  }
+  if (status && status !== "all" && status !== "undefined" && status !== "null") {
+    records = records.filter((a) => a.status === status);
+  }
+  if (user_id && user_id !== "undefined" && user_id !== "null") {
+    records = records.filter((a) => a.user_id === user_id);
+  }
+  let enriched = records.map(enrichAttendance);
+  if (department_id && department_id !== "all" && department_id !== "undefined" && department_id !== "null") {
+    enriched = enriched.filter((a) => {
+      const u = db.users.find((user) => user.id === a.user_id);
+      return u?.department_id === department_id;
+    });
+  }
+  if (role && role !== "all" && role !== "undefined" && role !== "null") {
+    enriched = enriched.filter((a) => a.role === role);
+  }
+  if (search && search !== "undefined" && search !== "null") {
+    const q = search.toLowerCase().trim();
+    if (q) {
+      enriched = enriched.filter(
+        (a) => a.user_name?.toLowerCase().includes(q) || a.employee_code?.toLowerCase().includes(q) || a.department_name?.toLowerCase().includes(q)
+      );
+    }
+  }
+  enriched.sort((a, b) => {
+    const dateComp = (b.work_date || "").localeCompare(a.work_date || "");
+    if (dateComp !== 0) return dateComp;
+    return (b.check_in || "").localeCompare(a.check_in || "");
+  });
+  const pageSize = Number(limit) || 20;
+  const currentPage = Number(page) || 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginated = enriched.slice(startIndex, startIndex + pageSize);
+  res.json({
+    success: true,
+    total: enriched.length,
+    page: currentPage,
+    page_size: pageSize,
+    records: paginated
+  });
+});
+router3.get(["/admin/attendance/:id", "/attendance/:id"], authenticate, requireRole("admin"), (req, res) => {
+  const db = getDb();
+  const record = db.attendance.find((a) => a.id === req.params.id);
+  if (!record) {
+    res.status(404).json({ success: false, message: "Attendance record not found." });
+    return;
+  }
+  res.json({
+    success: true,
+    record: enrichAttendance(record)
+  });
+});
+router3.patch(["/admin/attendance/:id", "/attendance/:id"], authenticate, requireRole("admin"), async (req, res) => {
+  const db = getDb();
+  const record = db.attendance.find((a) => a.id === req.params.id);
+  if (!record) {
+    res.status(404).json({ success: false, message: "Attendance record not found." });
+    return;
+  }
+  const { check_in, check_out, status, notes } = req.body;
+  if (check_in) record.check_in = check_in;
+  if (check_out !== void 0) record.check_out = check_out || null;
+  if (status) record.status = status;
+  if (notes !== void 0) record.notes = notes;
+  if (record.check_in && record.check_out) {
+    const inTime = new Date(record.check_in).getTime();
+    const outTime = new Date(record.check_out).getTime();
+    record.total_minutes = Math.max(0, Math.round((outTime - inTime) / (1e3 * 60)));
+  }
+  record.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+  await saveDb(db);
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+    "ATTENDANCE",
+    record.id,
+    { check_in: record.check_in, check_out: record.check_out, status: record.status },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: "Attendance record successfully adjusted by administrator.",
+    record: enrichAttendance(record)
+  });
+});
+var attendance_default = router3;
+
+// server/routes/workUpdates.ts
+var import_express4 = __toESM(require_express2(), 1);
+var router4 = (0, import_express4.Router)();
+router4.post("/", authenticate, async (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const {
+    work_date,
+    tasks_completed,
+    project_details,
+    accomplishments,
+    blockers,
+    next_day_plan,
+    hours_spent,
+    status = "submitted"
+    // 'draft' or 'submitted'
+  } = req.body;
+  const targetDate = work_date || getTodayStr();
+  if (status === "submitted") {
+    if (!tasks_completed || !project_details) {
+      res.status(400).json({
+        success: false,
+        message: "Tasks completed and project details are required for final submission."
+      });
+      return;
+    }
+  }
+  let update = db.work_updates.find(
+    (w) => w.user_id === userId && w.work_date === targetDate
+  );
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  if (update) {
+    if (update.status === "reviewed") {
+      res.status(400).json({
+        success: false,
+        message: "This report has already been reviewed by administration and cannot be re-submitted."
+      });
+      return;
+    }
+    const wasNeedsRevision = update.status === "needs_revision";
+    update.tasks_completed = tasks_completed || update.tasks_completed;
+    update.project_details = project_details || update.project_details;
+    update.accomplishments = accomplishments !== void 0 ? accomplishments : update.accomplishments;
+    update.blockers = blockers !== void 0 ? blockers : update.blockers;
+    update.next_day_plan = next_day_plan !== void 0 ? next_day_plan : update.next_day_plan;
+    update.hours_spent = hours_spent ? Number(hours_spent) : update.hours_spent;
+    update.status = status;
+    update.updated_at = nowIso;
+    if (status === "submitted") {
+      update.submitted_at = nowIso;
+      if (wasNeedsRevision) {
+        update.reviewed_by = null;
+        update.review_comment = null;
+        update.reviewed_at = null;
+      }
+    }
+  } else {
+    update = {
+      id: `wu-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      user_id: userId,
+      work_date: targetDate,
+      tasks_completed: tasks_completed || "",
+      project_details: project_details || "",
+      accomplishments: accomplishments || "",
+      blockers: blockers || "",
+      next_day_plan: next_day_plan || "",
+      hours_spent: hours_spent ? Number(hours_spent) : 8,
+      status,
+      submitted_at: status === "submitted" ? nowIso : null,
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: nowIso,
+      updated_at: nowIso
+    };
+    db.work_updates.unshift(update);
+  }
+  await saveDb(db);
+  if (status === "submitted") {
+    const recipients = db.users.filter(
+      (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
+    );
+    const notifTitle = update.review_comment ? "Work Update Re-submitted" : "Daily Work Update Submitted";
+    const notifMsg = `${req.user.name} ${update.review_comment ? "re-submitted revised" : "submitted"} daily work report for ${targetDate}.`;
+    recipients.forEach((recipient) => {
+      createNotification(
+        recipient.id,
+        notifTitle,
+        notifMsg,
+        "info",
+        "/admin/work-updates"
+      );
+    });
+  }
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    status === "draft" ? "WORK_UPDATE_SAVED_DRAFT" : "WORK_UPDATE_SUBMITTED",
+    "WORK_UPDATE",
+    update.id,
+    { work_date: targetDate, status },
+    req.ip || "127.0.0.1"
+  );
+  res.status(200).json({
+    success: true,
+    message: status === "draft" ? "Work update draft saved successfully." : "Daily work update submitted for admin review.",
+    work_update: enrichWorkUpdate(update)
+  });
+});
+router4.get("/my", authenticate, (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const { status, limit, page } = req.query;
+  let updates = db.work_updates.filter((w) => w.user_id === userId);
+  if (status && status !== "all") {
+    updates = updates.filter((w) => w.status === status);
+  }
+  updates.sort((a, b) => b.work_date.localeCompare(a.work_date));
+  const pageSize = Number(limit) || 20;
+  const currentPage = Number(page) || 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginated = updates.slice(startIndex, startIndex + pageSize);
+  res.json({
+    success: true,
+    total: updates.length,
+    page: currentPage,
+    records: paginated.map(enrichWorkUpdate)
+  });
+});
+router4.get("/today", authenticate, (req, res) => {
+  const db = getDb();
+  const userId = req.user.id;
+  const today = getTodayStr();
+  const update = db.work_updates.find(
+    (w) => w.user_id === userId && w.work_date === today
+  );
+  res.json({
+    success: true,
+    work_date: today,
+    record: update ? enrichWorkUpdate(update) : null,
+    is_submitted: update?.status === "submitted" || update?.status === "reviewed"
+  });
+});
+router4.get("/:id", authenticate, (req, res) => {
+  const db = getDb();
+  const update = db.work_updates.find((w) => w.id === req.params.id);
+  if (!update) {
+    res.status(404).json({ success: false, message: "Work update not found." });
+    return;
+  }
+  if (req.user.role !== "admin" && update.user_id !== req.user.id) {
+    res.status(403).json({ success: false, message: "Unauthorized to view this work update." });
+    return;
+  }
+  res.json({
+    success: true,
+    record: enrichWorkUpdate(update)
+  });
+});
+router4.get("/admin/list", authenticate, requireRole("admin"), (req, res) => {
+  const db = getDb();
+  const { date, status, role, department_id, search, limit, page } = req.query;
+  let list = db.work_updates.map(enrichWorkUpdate);
+  if (date && date !== "undefined" && date !== "null") {
+    list = list.filter((w) => w.work_date === date);
+  }
+  if (status && status !== "all" && status !== "undefined" && status !== "null") {
+    list = list.filter((w) => w.status === status);
+  }
+  if (role && role !== "all" && role !== "undefined" && role !== "null") {
+    list = list.filter((w) => w.role === role);
+  }
+  if (department_id && department_id !== "all" && department_id !== "undefined" && department_id !== "null") {
+    list = list.filter((w) => {
+      const u = db.users.find((user) => user.id === w.user_id);
+      return u?.department_id === department_id;
+    });
+  }
+  if (search && search !== "undefined" && search !== "null") {
+    const q = search.toLowerCase().trim();
+    if (q) {
+      list = list.filter(
+        (w) => w.user_name?.toLowerCase().includes(q) || w.employee_code?.toLowerCase().includes(q) || w.project_details.toLowerCase().includes(q) || w.tasks_completed.toLowerCase().includes(q)
+      );
+    }
+  }
+  list.sort((a, b) => {
+    const dateComp = (b.work_date || "").localeCompare(a.work_date || "");
+    if (dateComp !== 0) return dateComp;
+    const timeA = a.submitted_at || a.created_at || "";
+    const timeB = b.submitted_at || b.created_at || "";
+    return timeB.localeCompare(timeA);
+  });
+  const pageSize = Number(limit) || 20;
+  const currentPage = Number(page) || 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginated = list.slice(startIndex, startIndex + pageSize);
+  res.json({
+    success: true,
+    total: list.length,
+    page: currentPage,
+    records: paginated
+  });
+});
+router4.patch("/admin/:id/review", authenticate, requireRole("admin"), async (req, res) => {
+  const db = getDb();
+  const update = db.work_updates.find((w) => w.id === req.params.id);
+  if (!update) {
+    res.status(404).json({ success: false, message: "Work update not found." });
+    return;
+  }
+  const { status, review_comment } = req.body;
+  if (!status || !["reviewed", "needs_revision"].includes(status)) {
+    res.status(400).json({
+      success: false,
+      message: 'Status must be either "reviewed" or "needs_revision".'
+    });
+    return;
+  }
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  update.status = status;
+  update.reviewed_by = req.user.id;
+  update.review_comment = review_comment || null;
+  update.reviewed_at = nowIso;
+  update.updated_at = nowIso;
+  await saveDb(db);
+  createNotification(
+    update.user_id,
+    status === "reviewed" ? "Work Update Reviewed" : "Work Update Needs Revision",
+    status === "reviewed" ? `Your work update for ${update.work_date} was approved and marked Reviewed.` : `Your reviewer requested revisions for ${update.work_date}: "${review_comment || "Please update tasks"}"`,
+    status === "reviewed" ? "success" : "warning",
+    "/work-updates"
+  );
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    "REVIEW_WORK_UPDATE",
+    "WORK_UPDATE",
+    update.id,
+    { status, review_comment, target_user: update.user_id },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: `Work update marked as ${status === "reviewed" ? "Reviewed" : "Needs Revision"}.`,
+    record: enrichWorkUpdate(update)
+  });
+});
+var workUpdates_default = router4;
+
+// server/routes/leaveAndCorrections.ts
+var import_express5 = __toESM(require_express2(), 1);
+var router5 = (0, import_express5.Router)();
+router5.get("/my", authenticate, (req, res) => {
+  const db = getDb();
+  const requests = db.leave_requests.filter((l) => l.user_id === req.user.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).map(enrichLeave);
+  res.json({ success: true, records: requests });
+});
+router5.post("/", authenticate, async (req, res) => {
+  const { leave_type, start_date, end_date, reason } = req.body;
+  if (!leave_type || !start_date || !end_date || !reason) {
+    res.status(400).json({ success: false, message: "All leave fields are required." });
+    return;
+  }
+  if (start_date > end_date) {
+    res.status(400).json({ success: false, message: "Start date cannot be after end date." });
+    return;
+  }
+  const db = getDb();
+  const hasOverlap = db.leave_requests.some(
+    (l) => l.user_id === req.user.id && l.status !== "rejected" && (start_date >= l.start_date && start_date <= l.end_date || end_date >= l.start_date && end_date <= l.end_date)
+  );
+  if (hasOverlap) {
+    res.status(400).json({
+      success: false,
+      message: "You already have an existing pending or approved leave request covering these dates."
+    });
+    return;
+  }
+  const start = new Date(start_date);
+  const end = new Date(end_date);
+  const diffDays = Math.round((end.getTime() - start.getTime()) / (1e3 * 60 * 60 * 24)) + 1;
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  const newLeave = {
+    id: `leave-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    user_id: req.user.id,
+    leave_type,
+    start_date,
+    end_date,
+    days_count: Math.max(1, diffDays),
+    reason: reason.trim(),
+    status: "pending",
+    reviewed_by: null,
+    review_comment: null,
+    reviewed_at: null,
+    created_at: nowIso
+  };
+  db.leave_requests.unshift(newLeave);
+  await saveDb(db);
+  const recipients = db.users.filter(
+    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
+  );
+  recipients.forEach((recipient) => {
+    createNotification(
+      recipient.id,
+      "New Leave Request",
+      `${req.user.name} requested ${newLeave.days_count} day(s) ${newLeave.leave_type} leave (${start_date} to ${end_date}).`,
+      "info",
+      "/admin/approvals"
+    );
+  });
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    "CREATE_LEAVE_REQUEST",
+    "LEAVE_REQUEST",
+    newLeave.id,
+    { start_date, end_date, days: newLeave.days_count, leave_type },
+    req.ip || "127.0.0.1"
+  );
+  res.status(201).json({
+    success: true,
+    message: "Leave request submitted successfully.",
+    record: enrichLeave(newLeave)
+  });
+});
+router5.get("/admin/list", authenticate, requireRole("admin"), (req, res) => {
+  const db = getDb();
+  const { status, limit, page } = req.query;
+  let list = db.leave_requests.map(enrichLeave);
+  if (status && status !== "all" && status !== "undefined" && status !== "null") {
+    list = list.filter((l) => l.status === status);
+  }
+  list.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const pageSize = Number(limit) || 20;
+  const currentPage = Number(page) || 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginated = list.slice(startIndex, startIndex + pageSize);
+  res.json({
+    success: true,
+    total: list.length,
+    page: currentPage,
+    records: paginated
+  });
+});
+router5.patch("/admin/:id/review", authenticate, requireRole("admin"), async (req, res) => {
+  const db = getDb();
+  const leave = db.leave_requests.find((l) => l.id === req.params.id);
+  if (!leave) {
+    res.status(404).json({ success: false, message: "Leave request not found." });
+    return;
+  }
+  const { status, review_comment } = req.body;
+  if (!status || !["approved", "rejected"].includes(status)) {
+    res.status(400).json({ success: false, message: "Status must be approved or rejected." });
+    return;
+  }
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  leave.status = status;
+  leave.reviewed_by = req.user.id;
+  leave.review_comment = review_comment || null;
+  leave.reviewed_at = nowIso;
+  await saveDb(db);
+  createNotification(
+    leave.user_id,
+    `Leave Request ${status === "approved" ? "Approved" : "Rejected"}`,
+    `Your leave request for ${leave.start_date} to ${leave.end_date} has been ${status}. ${review_comment ? `Note: ${review_comment}` : ""}`,
+    status === "approved" ? "success" : "alert",
+    "/leave-requests"
+  );
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    status === "approved" ? "APPROVE_LEAVE_REQUEST" : "REJECT_LEAVE_REQUEST",
+    "LEAVE_REQUEST",
+    leave.id,
+    { status, review_comment, target_user: leave.user_id },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: `Leave request ${status} successfully.`,
+    record: enrichLeave(leave)
+  });
+});
+router5.get(["/corrections/my", "/attendance/correction-requests/my"], authenticate, (req, res) => {
+  const db = getDb();
+  const corrections = db.attendance_corrections.filter((c) => c.user_id === req.user.id).sort((a, b) => b.created_at.localeCompare(a.created_at)).map(enrichCorrection);
+  res.json({ success: true, records: corrections });
+});
+router5.post(["/corrections", "/attendance/correction-requests"], authenticate, async (req, res) => {
+  const { attendance_id, work_date, requested_check_in, requested_check_out, reason } = req.body;
+  if (!work_date || !requested_check_in || !requested_check_out || !reason) {
+    res.status(400).json({ success: false, message: "All correction fields are required." });
+    return;
+  }
+  const db = getDb();
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  const newCorrection = {
+    id: `corr-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    user_id: req.user.id,
+    attendance_id: attendance_id || "manual-entry",
+    work_date,
+    requested_check_in,
+    requested_check_out,
+    reason: reason.trim(),
+    status: "pending",
+    reviewed_by: null,
+    review_comment: null,
+    reviewed_at: null,
+    created_at: nowIso
+  };
+  db.attendance_corrections.unshift(newCorrection);
+  await saveDb(db);
+  const corrRecipients = db.users.filter(
+    (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
+  );
+  corrRecipients.forEach((recipient) => {
+    createNotification(
+      recipient.id,
+      "Attendance Correction Submitted",
+      `${req.user.name} submitted a correction for ${work_date}.`,
+      "warning",
+      "/admin/approvals"
+    );
+  });
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    "CREATE_CORRECTION_REQUEST",
+    "ATTENDANCE_CORRECTION",
+    newCorrection.id,
+    { work_date, requested_check_in, requested_check_out },
+    req.ip || "127.0.0.1"
+  );
+  res.status(201).json({
+    success: true,
+    message: "Attendance correction request submitted for admin review.",
+    record: enrichCorrection(newCorrection)
+  });
+});
+router5.get(["/admin/corrections", "/admin/attendance-corrections"], authenticate, requireRole("admin"), (req, res) => {
+  const db = getDb();
+  const { status, limit, page } = req.query;
+  let list = db.attendance_corrections.map(enrichCorrection);
+  if (status && status !== "all" && status !== "undefined" && status !== "null") {
+    list = list.filter((c) => c.status === status);
+  }
+  list.sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const pageSize = Number(limit) || 20;
+  const currentPage = Number(page) || 1;
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginated = list.slice(startIndex, startIndex + pageSize);
+  res.json({
+    success: true,
+    total: list.length,
+    page: currentPage,
+    records: paginated
+  });
+});
+router5.patch(["/admin/corrections/:id/review", "/admin/attendance-corrections/:id/review"], authenticate, requireRole("admin"), async (req, res) => {
+  const db = getDb();
+  const corr = db.attendance_corrections.find((c) => c.id === req.params.id);
+  if (!corr) {
+    res.status(404).json({ success: false, message: "Attendance correction request not found." });
+    return;
+  }
+  const { status, review_comment } = req.body;
+  if (!status || !["approved", "rejected"].includes(status)) {
+    res.status(400).json({ success: false, message: "Status must be approved or rejected." });
+    return;
+  }
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  corr.status = status;
+  corr.reviewed_by = req.user.id;
+  corr.review_comment = review_comment || null;
+  corr.reviewed_at = nowIso;
+  if (status === "approved") {
+    let att = db.attendance.find(
+      (a) => a.id === corr.attendance_id || a.user_id === corr.user_id && a.work_date === corr.work_date
+    );
+    const inTime = new Date(corr.requested_check_in).getTime();
+    const outTime = new Date(corr.requested_check_out).getTime();
+    const totalMinutes = Math.max(0, Math.round((outTime - inTime) / (1e3 * 60)));
+    if (att) {
+      att.check_in = corr.requested_check_in;
+      att.check_out = corr.requested_check_out;
+      att.total_minutes = totalMinutes;
+      att.status = totalMinutes >= 240 ? "present" : "half_day";
+      att.notes = "Updated via approved attendance correction request";
+      att.updated_at = nowIso;
+    } else {
+      att = {
+        id: `att-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        user_id: corr.user_id,
+        work_date: corr.work_date,
+        check_in: corr.requested_check_in,
+        check_out: corr.requested_check_out,
+        total_minutes: totalMinutes,
+        status: totalMinutes >= 240 ? "present" : "half_day",
+        notes: "Created via approved attendance correction request",
+        created_at: nowIso,
+        updated_at: nowIso
+      };
+      db.attendance.unshift(att);
+    }
+  }
+  await saveDb(db);
+  createNotification(
+    corr.user_id,
+    `Attendance Correction ${status === "approved" ? "Approved" : "Rejected"}`,
+    `Your correction request for ${corr.work_date} was ${status}. ${review_comment ? `(${review_comment})` : ""}`,
+    status === "approved" ? "success" : "alert",
+    "/my-attendance"
+  );
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    status === "approved" ? "APPROVE_CORRECTION_REQUEST" : "REJECT_CORRECTION_REQUEST",
+    "ATTENDANCE_CORRECTION",
+    corr.id,
+    { status, review_comment, target_user: corr.user_id },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: `Correction request ${status} successfully.`,
+    record: enrichCorrection(corr)
+  });
+});
+var leaveAndCorrections_default = router5;
 
 // server/routes/admin.ts
+var import_express6 = __toESM(require_express2(), 1);
 var router6 = (0, import_express6.Router)();
 function sanitizeUser2(u) {
   const { password_hash, ...rest } = u;
@@ -77880,7 +77886,7 @@ router6.post("/users", authenticate, requireRole("admin"), async (req, res) => {
     updated_at: nowIso
   };
   db.users.push(newUser);
-  saveDb(db);
+  await saveDb(db);
   logAudit(
     { id: req.user.id, name: req.user.name },
     "CREATE_USER",
@@ -77895,7 +77901,7 @@ router6.post("/users", authenticate, requireRole("admin"), async (req, res) => {
     user: sanitizeUser2(enrichUser(newUser))
   });
 });
-router6.patch("/users/:id", authenticate, requireRole("admin"), (req, res) => {
+router6.patch("/users/:id", authenticate, requireRole("admin"), async (req, res) => {
   const db = getDb();
   const user = db.users.find((u) => u.id === req.params.id);
   if (!user) {
@@ -77912,7 +77918,7 @@ router6.patch("/users/:id", authenticate, requireRole("admin"), (req, res) => {
   if (status) user.status = status;
   if (joining_date) user.joining_date = joining_date;
   user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  saveDb(db);
+  await saveDb(db);
   logAudit(
     { id: req.user.id, name: req.user.name },
     "UPDATE_USER",
@@ -77938,7 +77944,7 @@ router6.post("/users/:id/reset-password", authenticate, requireRole("admin"), as
   const pass = new_password && new_password.length >= 6 ? new_password : "Buildrex@2026";
   user.password_hash = await bcryptjs_default.hash(pass, 10);
   user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  saveDb(db);
+  await saveDb(db);
   logAudit(
     { id: req.user.id, name: req.user.name },
     "ADMIN_RESET_USER_PASSWORD",
@@ -78034,7 +78040,7 @@ router6.get("/departments", authenticate, (req, res) => {
   });
   res.json({ success: true, departments: depts });
 });
-router6.post("/departments", authenticate, requireRole("admin"), (req, res) => {
+router6.post("/departments", authenticate, requireRole("admin"), async (req, res) => {
   const { name, code, description, manager_id } = req.body;
   if (!name || !code) {
     res.status(400).json({ success: false, message: "Department name and code are required." });
@@ -78050,10 +78056,10 @@ router6.post("/departments", authenticate, requireRole("admin"), (req, res) => {
     created_at: (/* @__PURE__ */ new Date()).toISOString()
   };
   db.departments.push(newDept);
-  saveDb(db);
+  await saveDb(db);
   res.status(201).json({ success: true, department: newDept });
 });
-router6.patch("/settings", authenticate, requireRole("admin"), (req, res) => {
+router6.patch("/settings", authenticate, requireRole("admin"), async (req, res) => {
   const db = getDb();
   const {
     company_name,
@@ -78074,7 +78080,7 @@ router6.patch("/settings", authenticate, requireRole("admin"), (req, res) => {
   if (timezone) db.company_settings.timezone = timezone;
   if (allow_breaks !== void 0) db.company_settings.allow_breaks = Boolean(allow_breaks);
   db.company_settings.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-  saveDb(db);
+  await saveDb(db);
   logAudit(
     { id: req.user.id, name: req.user.name },
     "UPDATE_COMPANY_SETTINGS",
@@ -78108,16 +78114,16 @@ router6.get("/notifications", authenticate, (req, res) => {
   const userNotifs = db.notifications.filter((n) => n.user_id === req.user.id).sort((a, b) => b.created_at.localeCompare(a.created_at));
   res.json({ success: true, notifications: userNotifs });
 });
-router6.patch("/notifications/:id/read", authenticate, (req, res) => {
+router6.patch("/notifications/:id/read", authenticate, async (req, res) => {
   const db = getDb();
   const notif = db.notifications.find((n) => n.id === req.params.id && n.user_id === req.user.id);
   if (notif) {
     notif.read_at = (/* @__PURE__ */ new Date()).toISOString();
-    saveDb(db);
+    await saveDb(db);
   }
   res.json({ success: true });
 });
-router6.post("/notifications/read-all", authenticate, (req, res) => {
+router6.post("/notifications/read-all", authenticate, async (req, res) => {
   const db = getDb();
   const nowIso = (/* @__PURE__ */ new Date()).toISOString();
   db.notifications.forEach((n) => {
@@ -78125,7 +78131,7 @@ router6.post("/notifications/read-all", authenticate, (req, res) => {
       n.read_at = nowIso;
     }
   });
-  saveDb(db);
+  await saveDb(db);
   res.json({ success: true });
 });
 router6.get("/database/status", authenticate, requireRole("admin"), async (req, res) => {
@@ -102063,21 +102069,27 @@ app.use((req, res, next) => {
   });
   next();
 });
-var dbInitStarted = false;
+var dbInitPromise = null;
 function ensureDbInitialized() {
   getDb();
-  if (!dbInitStarted) {
-    dbInitStarted = true;
-    return initDatabase().catch((err) => {
+  if (!dbInitPromise) {
+    dbInitPromise = initDatabase().catch((err) => {
       console.warn("[Database] Background init notice:", err?.message);
+      dbInitPromise = null;
       return { engine: "json", message: err?.message };
     });
   }
-  return Promise.resolve();
+  return dbInitPromise;
 }
-app.use((req, res, next) => {
-  ensureDbInitialized().catch(() => {
-  });
+app.use(async (req, res, next) => {
+  const isApi = (req.originalUrl || req.url || "").startsWith("/api");
+  if (isApi) {
+    try {
+      await ensureDbInitialized();
+    } catch (err) {
+      console.warn("[Database] API init wait notice:", err?.message);
+    }
+  }
   next();
 });
 app.get(["/api/health", "/health"], (req, res) => {
@@ -102121,7 +102133,12 @@ app.use((err, req, res, next) => {
 var app_default = app;
 
 // server/serverless.ts
-function handler(req, res) {
+async function handler(req, res) {
+  try {
+    await ensureDbInitialized();
+  } catch (err) {
+    console.warn("[Serverless] Database initialization notice:", err?.message);
+  }
   return new Promise((resolve, reject) => {
     res.on("finish", () => resolve());
     res.on("close", () => resolve());

@@ -50,15 +50,25 @@ export const AdminUsersView: React.FC = () => {
   const [resetFeedback, setResetFeedback] = useState<{ success?: boolean; message?: string }>({});
   const [isResetting, setIsResetting] = useState(false);
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (overrides?: {
+    search?: string;
+    role?: string;
+    department_id?: string;
+    status?: string;
+  }) => {
     setIsLoading(true);
     try {
+      const activeSearch = overrides && overrides.search !== undefined ? overrides.search : search;
+      const activeRole = overrides && overrides.role !== undefined ? overrides.role : roleFilter;
+      const activeDept = overrides && overrides.department_id !== undefined ? overrides.department_id : deptFilter;
+      const activeStatus = overrides && overrides.status !== undefined ? overrides.status : statusFilter;
+
       const [usersRes, deptsRes] = await Promise.all([
         api.getAdminUsers({
-          search: search || undefined,
-          role: roleFilter !== 'all' ? roleFilter : undefined,
-          department_id: deptFilter !== 'all' ? deptFilter : undefined,
-          status: statusFilter !== 'all' ? statusFilter : undefined,
+          search: activeSearch || undefined,
+          role: activeRole !== 'all' ? activeRole : undefined,
+          department_id: activeDept !== 'all' ? activeDept : undefined,
+          status: activeStatus !== 'all' ? activeStatus : undefined,
         }),
         api.getDepartments(),
       ]);
@@ -149,6 +159,7 @@ export const AdminUsersView: React.FC = () => {
         });
         setFormFeedback({ success: true, message: res.message });
         showToast(res.message, 'success');
+        await fetchUsers();
       } else {
         const res = await api.createUser({
           name: formName.trim(),
@@ -163,12 +174,18 @@ export const AdminUsersView: React.FC = () => {
         });
         setFormFeedback({ success: true, message: res.message });
         showToast(res.message, 'success');
+
+        // Reset filter states so the new member is immediately visible in the directory table
+        setSearch('');
+        setRoleFilter('all');
+        setDeptFilter('all');
+        setStatusFilter('all');
+        await fetchUsers({ search: '', role: 'all', department_id: 'all', status: 'all' });
       }
 
-      await fetchUsers();
       setTimeout(() => {
         setIsModalOpen(false);
-      }, 1200);
+      }, 1000);
     } catch (err: any) {
       setFormFeedback({ success: false, message: err.message || 'Operation failed.' });
       showToast(err.message || 'Operation failed', 'error');

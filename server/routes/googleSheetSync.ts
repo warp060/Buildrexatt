@@ -275,7 +275,7 @@ export async function performGoogleSheetSync(): Promise<{
     }
 
     // Save changes locally and sync to TiDB Cloud
-    saveDb(db);
+    await saveDb(db);
 
     lastSyncTime = new Date().toISOString();
     lastSyncResult = {

@@ -3050,6 +3050,36 @@
   ],
   "audit_logs": [
     {
+      "id": "audit-1793453690796-7t83z",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "CREATE_USER",
+      "entity_type": "USER",
+      "entity_id": "user-1793453683629-8zva",
+      "details": {
+        "email": "test.member.1793453683434@buildrex.com",
+        "code": "BRX-INT-23",
+        "role": "intern",
+        "initial_password": "Verification@Brx26"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-31T13:34:50.796Z"
+    },
+    {
+      "id": "audit-1793453683384-j23ci",
+      "actor_id": "user-admin-master",
+      "actor_name": "Buildrex Admin",
+      "action": "USER_LOGIN",
+      "entity_type": "USER",
+      "entity_id": "user-admin-master",
+      "details": {
+        "email": "adminbrx@gmail.com",
+        "role": "admin"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-31T13:34:43.384Z"
+    },
+    {
       "id": "audit-1793375849684-uviab",
       "actor_id": "user-admin-master",
       "actor_name": "Buildrex Admin",

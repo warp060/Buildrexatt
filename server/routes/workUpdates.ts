@@ -13,7 +13,7 @@ import { WorkUpdate } from '../types';
 const router = Router();
 
 // POST /api/work-updates (Draft or Submit)
-router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.post('/', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const userId = req.user!.id;
   const {
@@ -97,7 +97,7 @@ router.post('/', authenticate, (req: AuthenticatedRequest, res: Response): void 
     db.work_updates.unshift(update);
   }
 
-  saveDb(db);
+  await saveDb(db);
 
   // Notify admins and manager when report is submitted
   if (status === 'submitted') {
@@ -259,7 +259,7 @@ router.get('/admin/list', authenticate, requireRole('admin'), (req: Authenticate
 });
 
 // PATCH /api/admin/work-updates/:id/review
-router.patch('/admin/:id/review', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const update = db.work_updates.find((w) => w.id === req.params.id);
 
@@ -285,7 +285,7 @@ router.patch('/admin/:id/review', authenticate, requireRole('admin'), (req: Auth
   update.reviewed_at = nowIso;
   update.updated_at = nowIso;
 
-  saveDb(db);
+  await saveDb(db);
 
   // Notify the employee / intern
   createNotification(
