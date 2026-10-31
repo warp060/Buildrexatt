@@ -18,6 +18,7 @@ import {
   initializeTiDB,
   loadAllFromTiDB,
   syncAllToTiDB,
+  deleteUserFromTiDB,
   clearAllTiDBTables,
   getTiDBStatus,
   runMigrations,
@@ -201,7 +202,44 @@ export async function initDatabase(): Promise<{ engine: 'tidb' | 'json'; message
   }
 }
 
-export { getTiDBStatus, syncAllToTiDB, runMigrations, ensureDatabaseExists };
+export { getTiDBStatus, syncAllToTiDB, deleteUserFromTiDB, runMigrations, ensureDatabaseExists };
+
+/**
+ * Permanently delete a user from local memory, disk JSON, and TiDB Cloud.
+ */
+export async function deleteUserAndPersist(userId: string): Promise<{ success: boolean; message: string }> {
+  const db = getDb();
+  const idx = db.users.findIndex((u) => u.id === userId);
+  if (idx === -1) {
+    return { success: false, message: 'User not found.' };
+  }
+  const user = db.users[idx];
+  if (user.email.toLowerCase().trim() === 'adminbrx@gmail.com') {
+    return { success: false, message: 'Cannot delete the system primary administrator account.' };
+  }
+
+  // Remove from in-memory arrays
+  db.users.splice(idx, 1);
+  db.attendance = db.attendance.filter((a) => a.user_id !== userId);
+  db.work_updates = db.work_updates.filter((w) => w.user_id !== userId);
+  db.leave_requests = db.leave_requests.filter((l) => l.user_id !== userId);
+  db.attendance_corrections = db.attendance_corrections.filter((c) => c.user_id !== userId);
+  db.notifications = db.notifications.filter((n) => n.user_id !== userId);
+
+  // Save to local JSON and /tmp/buildrex.json
+  saveDbLocalOnly(db);
+
+  // Delete from TiDB Cloud
+  if (isTiDBActive) {
+    try {
+      await deleteUserFromTiDB(userId);
+    } catch (err: any) {
+      console.warn('[TiDB] Error deleting user from TiDB:', err.message);
+    }
+  }
+
+  return { success: true, message: `Member ${user.name} (${user.employee_code}) was removed successfully.` };
+}
 
 
 // ----------------- Data Access Helpers -----------------

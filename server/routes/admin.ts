@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import {
   getDb,
   saveDb,
+  deleteUserAndPersist,
   getTodayStr,
   enrichUser,
   enrichAttendance,
@@ -353,6 +354,49 @@ router.patch('/users/:id', authenticate, requireRole('admin'), async (req: Authe
     success: true,
     message: `User ${user.name} updated successfully.`,
     user: sanitizeUser(enrichUser(user)),
+  });
+});
+
+// DELETE /api/admin/users/:id (Remove member)
+router.delete('/users/:id', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const userId = req.params.id;
+  const db = getDb();
+  const user = db.users.find((u) => u.id === userId);
+
+  if (!user) {
+    res.status(404).json({ success: false, message: 'User not found.' });
+    return;
+  }
+
+  if (user.id === req.user!.id) {
+    res.status(400).json({ success: false, message: 'You cannot remove your own administrator account.' });
+    return;
+  }
+
+  if (user.email.toLowerCase().trim() === 'adminbrx@gmail.com') {
+    res.status(400).json({ success: false, message: 'Cannot delete the system primary administrator account.' });
+    return;
+  }
+
+  const result = await deleteUserAndPersist(userId);
+  if (!result.success) {
+    res.status(400).json({ success: false, message: result.message });
+    return;
+  }
+
+  logAudit(
+    { id: req.user!.id, name: req.user!.name },
+    'DELETE_USER',
+    'USER',
+    userId,
+    { email: user.email, code: user.employee_code, name: user.name, role: user.role },
+    req.ip || '127.0.0.1'
+  );
+
+  res.json({
+    success: true,
+    message: result.message,
+    deleted_user_id: userId,
   });
 });
 

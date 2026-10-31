@@ -265,6 +265,7 @@ export async function performGoogleSheetSync(): Promise<{
           email: newUser.email,
           role: newUser.role,
           position: newUser.position,
+          
           department_id: newUser.department_id,
           phone: newUser.phone,
           plainPassword,

@@ -291,6 +291,11 @@ export const api = {
       body: JSON.stringify(data),
     }),
 
+  deleteUser: (id: string) =>
+    request<{ success: boolean; message: string; deleted_user_id: string }>(`/api/admin/users/${id}`, {
+      method: 'DELETE',
+    }),
+
   adminResetUserPassword: (id: string, new_password?: string) =>
     request<{ success: boolean; message: string }>(`/api/admin/users/${id}/reset-password`, {
       method: 'POST',

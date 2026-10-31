@@ -864,6 +864,30 @@ export async function syncAllToTiDB(data: {
 }
 
 /**
+ * Permanently delete a user and cascaded child records from TiDB Cloud.
+ */
+export async function deleteUserFromTiDB(userId: string): Promise<void> {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return;
+  }
+  const p = getPool();
+  const conn = await p.getConnection();
+  try {
+    await conn.query('DELETE FROM notifications WHERE user_id = ?', [userId]);
+    await conn.query('DELETE FROM attendance_corrections WHERE user_id = ?', [userId]);
+    await conn.query('DELETE FROM leave_requests WHERE user_id = ?', [userId]);
+    await conn.query('DELETE FROM work_updates WHERE user_id = ?', [userId]);
+    await conn.query('DELETE FROM attendance WHERE user_id = ?', [userId]);
+    await conn.query('DELETE FROM users WHERE id = ?', [userId]);
+    console.log(`[TiDB] ✅ Successfully deleted user ${userId} and cascaded dependent rows.`);
+  } catch (err: any) {
+    console.error(`[TiDB] ❌ Failed to delete user ${userId}:`, err.message);
+  } finally {
+    try { conn.release(); } catch {}
+  }
+}
+
+/**
  * Get comprehensive diagnostic status of the TiDB database connection.
  */
 export async function getTiDBStatus(): Promise<TiDBStatus> {

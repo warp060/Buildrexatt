@@ -71774,6 +71774,29 @@ async function syncAllToTiDB(data) {
     }
   }
 }
+async function deleteUserFromTiDB(userId) {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return;
+  }
+  const p = getPool();
+  const conn = await p.getConnection();
+  try {
+    await conn.query("DELETE FROM notifications WHERE user_id = ?", [userId]);
+    await conn.query("DELETE FROM attendance_corrections WHERE user_id = ?", [userId]);
+    await conn.query("DELETE FROM leave_requests WHERE user_id = ?", [userId]);
+    await conn.query("DELETE FROM work_updates WHERE user_id = ?", [userId]);
+    await conn.query("DELETE FROM attendance WHERE user_id = ?", [userId]);
+    await conn.query("DELETE FROM users WHERE id = ?", [userId]);
+    console.log(`[TiDB] \u2705 Successfully deleted user ${userId} and cascaded dependent rows.`);
+  } catch (err) {
+    console.error(`[TiDB] \u274C Failed to delete user ${userId}:`, err.message);
+  } finally {
+    try {
+      conn.release();
+    } catch {
+    }
+  }
+}
 async function getTiDBStatus() {
   const config = getConfig();
   const configured = isTiDBConfigured();
@@ -71894,17 +71917,17 @@ var buildrex_default = {
   ],
   users: [
     {
-      id: "user-ehsaan",
-      employee_code: "BRX-COO-02",
-      name: "G Mohamed Ehsaan",
-      email: "ehsaanehsaan61@gmail.com",
-      password_hash: "$2b$10$uKqlKYrbUaQ20RmcQG6akuSHQZOviGemEJNCA6DVvGpZLlL.EXSte",
-      role: "employee",
-      department_id: "dept-ops",
-      manager_id: null,
-      position: "Chief Operating Officer",
-      phone: "9894484534",
-      joining_date: "2026-07-23",
+      id: "user-azeez",
+      employee_code: "BRX-INT-21",
+      name: "Mohammad Azeez.N",
+      email: "azeezmohammed560@gmail.com",
+      password_hash: "$2b$10$NkIr3XXHsEojl2XqJt/EcuzxdLaRvlMEbf1zq379.ACTpzQmlZnV2",
+      role: "intern",
+      department_id: "dept-media",
+      manager_id: "user-ehsaan",
+      position: "Graphic Designer",
+      phone: "9171313874",
+      joining_date: "2026-09-18",
       status: "active",
       created_at: "2026-10-23 14:54:38",
       updated_at: "2026-10-23 14:54:38"
@@ -71921,6 +71944,22 @@ var buildrex_default = {
       position: "CTO",
       phone: "6380559119",
       joining_date: "2026-09-23",
+      status: "active",
+      created_at: "2026-10-23 14:54:38",
+      updated_at: "2026-10-23 14:54:38"
+    },
+    {
+      id: "user-abbas",
+      employee_code: "BRX-INT-18",
+      name: "Mohammed Abbas R Y",
+      email: "abbas6618532@gmail.com",
+      password_hash: "$2b$10$s9jZB.U4QNHz7EhyhyzeiOy5o3uc0afpQh72kve0Zpi9ZMgd30.2G",
+      role: "intern",
+      department_id: "dept-tech",
+      manager_id: "user-emad",
+      position: "Full Stack Intern",
+      phone: "6369906810",
+      joining_date: "2026-09-06",
       status: "active",
       created_at: "2026-10-23 14:54:38",
       updated_at: "2026-10-23 14:54:38"
@@ -72006,33 +72045,49 @@ var buildrex_default = {
       updated_at: "2026-10-23 14:54:38"
     },
     {
-      id: "user-azeez",
-      employee_code: "BRX-INT-21",
-      name: "Mohammad Azeez.N",
-      email: "azeezmohammed560@gmail.com",
-      password_hash: "$2b$10$NkIr3XXHsEojl2XqJt/EcuzxdLaRvlMEbf1zq379.ACTpzQmlZnV2",
-      role: "intern",
-      department_id: "dept-media",
+      id: "user-zafeera",
+      employee_code: "BRX-EMP-05",
+      name: "Zafeera",
+      email: "faisalzafeera@gmail.com",
+      password_hash: "$2b$10$3NTaVYBFFYvHGB16szUQJ.zjN6ANUF0xtotB76fm8zqaILXhhgUau",
+      role: "employee",
+      department_id: "dept-ops",
       manager_id: "user-ehsaan",
-      position: "Graphic Designer",
-      phone: "9171313874",
-      joining_date: "2026-09-18",
+      position: "Operations Manager",
+      phone: "8300879846",
+      joining_date: "2026-07-08",
       status: "active",
       created_at: "2026-10-23 14:54:38",
       updated_at: "2026-10-23 14:54:38"
     },
     {
-      id: "user-abbas",
-      employee_code: "BRX-INT-18",
-      name: "Mohammed Abbas R Y",
-      email: "abbas6618532@gmail.com",
-      password_hash: "$2b$10$s9jZB.U4QNHz7EhyhyzeiOy5o3uc0afpQh72kve0Zpi9ZMgd30.2G",
+      id: "user-sumaiya",
+      employee_code: "BRX-INT-20",
+      name: "Sumaiya J",
+      email: "sumaiyajameelahamed@gmail.com",
+      password_hash: "$2b$10$cGObKq9GF89QV.dWvdVzT.LR/7I2HjOUr6eds9ZnE/XZ0d8H5BfqO",
       role: "intern",
-      department_id: "dept-tech",
-      manager_id: "user-emad",
-      position: "Full Stack Intern",
-      phone: "6369906810",
-      joining_date: "2026-09-06",
+      department_id: "dept-hr",
+      manager_id: "user-ehsaan",
+      position: "HR Intern",
+      phone: "9025920732",
+      joining_date: "2026-09-22",
+      status: "active",
+      created_at: "2026-10-23 14:54:38",
+      updated_at: "2026-10-23 14:54:38"
+    },
+    {
+      id: "user-ehsaan",
+      employee_code: "BRX-COO-02",
+      name: "G Mohamed Ehsaan",
+      email: "ehsaanehsaan61@gmail.com",
+      password_hash: "$2b$10$uKqlKYrbUaQ20RmcQG6akuSHQZOviGemEJNCA6DVvGpZLlL.EXSte",
+      role: "employee",
+      department_id: "dept-ops",
+      manager_id: null,
+      position: "Chief Operating Officer",
+      phone: "9894484534",
+      joining_date: "2026-07-23",
       status: "active",
       created_at: "2026-10-23 14:54:38",
       updated_at: "2026-10-23 14:54:38"
@@ -72049,22 +72104,6 @@ var buildrex_default = {
       position: "Team Leader",
       phone: "8778477488",
       joining_date: "2026-07-31",
-      status: "active",
-      created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
-    },
-    {
-      id: "user-zafeera",
-      employee_code: "BRX-EMP-05",
-      name: "Zafeera",
-      email: "faisalzafeera@gmail.com",
-      password_hash: "$2b$10$3NTaVYBFFYvHGB16szUQJ.zjN6ANUF0xtotB76fm8zqaILXhhgUau",
-      role: "employee",
-      department_id: "dept-ops",
-      manager_id: "user-ehsaan",
-      position: "Operations Manager",
-      phone: "8300879846",
-      joining_date: "2026-07-08",
       status: "active",
       created_at: "2026-10-23 14:54:38",
       updated_at: "2026-10-23 14:54:38"
@@ -72134,22 +72173,6 @@ var buildrex_default = {
       updated_at: "2026-10-23 14:54:38"
     },
     {
-      id: "user-sumaiya",
-      employee_code: "BRX-INT-20",
-      name: "Sumaiya J",
-      email: "sumaiyajameelahamed@gmail.com",
-      password_hash: "$2b$10$cGObKq9GF89QV.dWvdVzT.LR/7I2HjOUr6eds9ZnE/XZ0d8H5BfqO",
-      role: "intern",
-      department_id: "dept-hr",
-      manager_id: "user-ehsaan",
-      position: "HR Intern",
-      phone: "9025920732",
-      joining_date: "2026-09-22",
-      status: "active",
-      created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
-    },
-    {
       id: "user-1793287370582-karo",
       employee_code: "BRX-INT-017",
       name: "SAFFIYA HARMEEN",
@@ -72164,6 +72187,22 @@ var buildrex_default = {
       status: "active",
       created_at: "2026-10-29 15:22:51",
       updated_at: "2026-10-30 13:17:37"
+    },
+    {
+      id: "user-1793454603321-5yvc",
+      employee_code: "BRX-INT-23",
+      name: "Asmath Sakeena",
+      email: "asmazehra2046@gmail.com",
+      password_hash: "$2b$10$VGlV8Hece.ClOuH6uMKGwOlRNlKCvSgJ1VeixnfJ5OuTAmuMUbtCC",
+      role: "intern",
+      department_id: "dept-hr",
+      manager_id: null,
+      position: "HR intern",
+      phone: "7598840020",
+      joining_date: "2026-10-28",
+      status: "active",
+      created_at: "2026-10-31 13:50:05",
+      updated_at: "2026-10-31 13:50:05"
     }
   ],
   attendance: [
@@ -74885,6 +74924,68 @@ var buildrex_default = {
   ],
   audit_logs: [
     {
+      id: "audit-1793456487016-k77vw",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "DELETE_USER",
+      entity_type: "USER",
+      entity_id: "user-1793456468233-tdj5",
+      details: {
+        email: "test.del.1793456468031@buildrex.com",
+        code: "BRX-INT-24",
+        name: "Member To Delete",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-31T14:21:27.016Z"
+    },
+    {
+      id: "audit-1793456474881-t0ppp",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "CREATE_USER",
+      entity_type: "USER",
+      entity_id: "user-1793456468233-tdj5",
+      details: {
+        email: "test.del.1793456468031@buildrex.com",
+        code: "BRX-INT-24",
+        role: "intern",
+        initial_password: "Member@Brx26"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-31T14:21:14.881Z"
+    },
+    {
+      id: "audit-1793456467971-0t98g",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-31T14:21:07.971Z"
+    },
+    {
+      id: "audit-1793454607811-9nuyl",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "CREATE_USER",
+      entity_type: "USER",
+      entity_id: "user-1793454603321-5yvc",
+      details: {
+        code: "BRX-INT-23",
+        email: "asmazehra2046@gmail.com",
+        initial_password: "Asmath@Brx26",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-31 13:51:05"
+    },
+    {
       id: "audit-1793453690796-7t83z",
       actor_id: "user-admin-master",
       actor_name: "Buildrex Admin",
@@ -74892,13 +74993,13 @@ var buildrex_default = {
       entity_type: "USER",
       entity_id: "user-1793453683629-8zva",
       details: {
-        email: "test.member.1793453683434@buildrex.com",
         code: "BRX-INT-23",
-        role: "intern",
-        initial_password: "Verification@Brx26"
+        email: "test.member.1793453683434@buildrex.com",
+        initial_password: "Verification@Brx26",
+        role: "intern"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-10-31T13:34:50.796Z"
+      created_at: "2026-10-31 13:35:03"
     },
     {
       id: "audit-1793453683384-j23ci",
@@ -74912,7 +75013,7 @@ var buildrex_default = {
         role: "admin"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-10-31T13:34:43.384Z"
+      created_at: "2026-10-31 13:34:46"
     },
     {
       id: "audit-1793375849684-uviab",
@@ -76145,6 +76246,32 @@ async function initDatabase() {
     isTiDBActive = false;
     return { engine: "json", message: `TiDB error: ${err.message}. Operating in JSON fallback mode.` };
   }
+}
+async function deleteUserAndPersist(userId) {
+  const db = getDb();
+  const idx = db.users.findIndex((u) => u.id === userId);
+  if (idx === -1) {
+    return { success: false, message: "User not found." };
+  }
+  const user = db.users[idx];
+  if (user.email.toLowerCase().trim() === "adminbrx@gmail.com") {
+    return { success: false, message: "Cannot delete the system primary administrator account." };
+  }
+  db.users.splice(idx, 1);
+  db.attendance = db.attendance.filter((a) => a.user_id !== userId);
+  db.work_updates = db.work_updates.filter((w) => w.user_id !== userId);
+  db.leave_requests = db.leave_requests.filter((l) => l.user_id !== userId);
+  db.attendance_corrections = db.attendance_corrections.filter((c) => c.user_id !== userId);
+  db.notifications = db.notifications.filter((n) => n.user_id !== userId);
+  saveDbLocalOnly(db);
+  if (isTiDBActive) {
+    try {
+      await deleteUserFromTiDB(userId);
+    } catch (err) {
+      console.warn("[TiDB] Error deleting user from TiDB:", err.message);
+    }
+  }
+  return { success: true, message: `Member ${user.name} (${user.employee_code}) was removed successfully.` };
 }
 function logAudit(actor, action, entityType, entityId, details, ip = "127.0.0.1") {
   const db = getDb();
@@ -77931,6 +78058,41 @@ router6.patch("/users/:id", authenticate, requireRole("admin"), async (req, res)
     success: true,
     message: `User ${user.name} updated successfully.`,
     user: sanitizeUser2(enrichUser(user))
+  });
+});
+router6.delete("/users/:id", authenticate, requireRole("admin"), async (req, res) => {
+  const userId = req.params.id;
+  const db = getDb();
+  const user = db.users.find((u) => u.id === userId);
+  if (!user) {
+    res.status(404).json({ success: false, message: "User not found." });
+    return;
+  }
+  if (user.id === req.user.id) {
+    res.status(400).json({ success: false, message: "You cannot remove your own administrator account." });
+    return;
+  }
+  if (user.email.toLowerCase().trim() === "adminbrx@gmail.com") {
+    res.status(400).json({ success: false, message: "Cannot delete the system primary administrator account." });
+    return;
+  }
+  const result = await deleteUserAndPersist(userId);
+  if (!result.success) {
+    res.status(400).json({ success: false, message: result.message });
+    return;
+  }
+  logAudit(
+    { id: req.user.id, name: req.user.name },
+    "DELETE_USER",
+    "USER",
+    userId,
+    { email: user.email, code: user.employee_code, name: user.name, role: user.role },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: result.message,
+    deleted_user_id: userId
   });
 });
 router6.post("/users/:id/reset-password", authenticate, requireRole("admin"), async (req, res) => {

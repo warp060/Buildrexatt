@@ -4,15 +4,22 @@ import { User, Department, UserRole, UserStatus } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { TeamCredentialsModal } from '../components/TeamCredentialsModal';
-import { Search, UserPlus, Edit2, Key, CheckCircle2, AlertCircle, Shield, GraduationCap, Briefcase, RefreshCw, Copy, Check, ExternalLink, KeyRound, CloudLightning, Users } from 'lucide-react';
+import { Search, UserPlus, Edit2, Key, CheckCircle2, AlertCircle, Shield, GraduationCap, Briefcase, RefreshCw, Copy, Check, ExternalLink, KeyRound, CloudLightning, Users, Trash2 } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 
 export const AdminUsersView: React.FC = () => {
+  const { user: currentUser } = useAuth();
   const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Delete User Confirmation Modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Google Sheet Sync & Credentials state
   const [isSyncingSheet, setIsSyncingSheet] = useState(false);
@@ -124,6 +131,30 @@ export const AdminUsersView: React.FC = () => {
     setTempPassword('Buildrex@2026');
     setResetFeedback({});
     setIsResetModalOpen(true);
+  };
+
+  const handleOpenDelete = (u: User) => {
+    setUserToDelete(u);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+    setIsDeleting(true);
+    try {
+      const res = await api.deleteUser(userToDelete.id);
+      showToast(res.message || `Member ${userToDelete.name} was removed successfully.`, 'success');
+      setDeleteModalOpen(false);
+      if (isModalOpen && selectedUserId === userToDelete.id) {
+        setIsModalOpen(false);
+      }
+      setUserToDelete(null);
+      await fetchUsers();
+    } catch (err: any) {
+      showToast(err.message || 'Failed to remove member.', 'error');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleSubmitUser = async (e: React.FormEvent) => {
@@ -427,20 +458,29 @@ export const AdminUsersView: React.FC = () => {
                       <StatusBadge status={u.status} type="user" />
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleOpenResetPass(u)}
                           title="Reset Password"
-                          className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                         >
                           <Key className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleOpenEdit(u)}
-                          className="px-2.5 py-1 text-[11px] font-semibold text-[#0B1F3A] hover:bg-slate-100 rounded-md transition-colors"
+                          className="px-2.5 py-1 text-[11px] font-semibold text-[#0B1F3A] hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                         >
                           Edit
                         </button>
+                        {u.email !== 'adminbrx@gmail.com' && u.id !== currentUser?.id && (
+                          <button
+                            onClick={() => handleOpenDelete(u)}
+                            title={`Remove ${u.name}`}
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -628,21 +668,38 @@ export const AdminUsersView: React.FC = () => {
             </p>
           )}
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#142C4E] rounded-lg transition-colors disabled:opacity-50"
-            >
-              {isSubmitting ? 'Saving...' : isEditMode ? 'Save Changes' : 'Create Member'}
-            </button>
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <div>
+              {isEditMode && selectedUserId && formEmail !== 'adminbrx@gmail.com' && selectedUserId !== currentUser?.id && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = users.find((u) => u.id === selectedUserId);
+                    if (target) handleOpenDelete(target);
+                  }}
+                  className="px-3 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Remove Member</span>
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#142C4E] rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                {isSubmitting ? 'Saving...' : isEditMode ? 'Save Changes' : 'Create Member'}
+              </button>
+            </div>
           </div>
         </form>
       </Modal>
@@ -706,6 +763,83 @@ export const AdminUsersView: React.FC = () => {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => !isDeleting && setDeleteModalOpen(false)}
+        title="Remove Team Member"
+        subtitle="Permanently remove account and data from system"
+        maxWidth="max-w-md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-3.5 bg-rose-50/80 border border-rose-200 rounded-xl text-rose-900">
+            <div className="p-2 bg-rose-100 rounded-lg text-rose-600 shrink-0 mt-0.5">
+              <Trash2 className="w-5 h-5" />
+            </div>
+            <div className="text-xs space-y-1">
+              <p className="font-bold text-rose-950 text-sm">
+                Confirm Member Removal
+              </p>
+              <p className="text-rose-800/90 leading-relaxed">
+                Are you sure you want to remove{' '}
+                <strong className="text-rose-950 font-bold">
+                  {userToDelete?.name} ({userToDelete?.employee_code})
+                </strong>?
+              </p>
+              <p className="text-[11px] text-rose-700/80">
+                This will delete their account and associated records across localhost and the cloud database.
+              </p>
+            </div>
+          </div>
+
+          {userToDelete && (
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs space-y-1.5">
+              <div className="flex justify-between text-slate-600">
+                <span>Email:</span>
+                <span className="font-semibold text-slate-800">{userToDelete.email}</span>
+              </div>
+              <div className="flex justify-between text-slate-600">
+                <span>Role:</span>
+                <span className="font-semibold text-slate-800 capitalize">{userToDelete.role}</span>
+              </div>
+              <div className="flex justify-between text-slate-600">
+                <span>Department:</span>
+                <span className="font-semibold text-slate-800">{userToDelete.department_name || 'Engineering'}</span>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <button
+              type="button"
+              onClick={() => setDeleteModalOpen(false)}
+              disabled={isDeleting}
+              className="px-3.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="px-4 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-[0.98] rounded-lg transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer shadow-xs"
+            >
+              {isDeleting ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Removing...</span>
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Yes, Remove Member</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       </Modal>
 
       {/* TEAM CREDENTIALS DIRECTORY MODAL */}
