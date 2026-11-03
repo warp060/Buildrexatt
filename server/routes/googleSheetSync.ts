@@ -371,6 +371,7 @@ router.get('/team-credentials', (req: Request, res: Response): void => {
       phone: u.phone,
       joining_date: u.joining_date,
       status: u.status,
+      avatar_url: u.avatar_url || null,
       password: plainPassword,
     };
   });

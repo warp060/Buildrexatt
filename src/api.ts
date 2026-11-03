@@ -93,7 +93,7 @@ export const api = {
       body: JSON.stringify({ email, new_password }),
     }),
 
-  updateProfile: (data: { name?: string; phone?: string }) =>
+  updateProfile: (data: { name?: string; phone?: string; avatar_url?: string | null }) =>
     request<{ success: boolean; user: User; message: string }>('/api/auth/profile', {
       method: 'PATCH',
       body: JSON.stringify(data),

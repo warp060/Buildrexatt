@@ -179,6 +179,7 @@ router.post('/users', authenticate, requireRole('admin'), async (req: Authentica
     position,
     phone,
     joining_date,
+    avatar_url,
   } = req.body;
 
   if (!name || !name.trim() || !email || !email.trim() || !role) {
@@ -294,6 +295,7 @@ router.post('/users', authenticate, requireRole('admin'), async (req: Authentica
     phone: phone ? phone.trim() : '',
     joining_date: (joining_date && joining_date.trim()) ? joining_date.trim() : getTodayStr(),
     status: 'active',
+    avatar_url: avatar_url ? String(avatar_url).trim() : null,
     created_at: nowIso,
     updated_at: nowIso,
   };
@@ -327,7 +329,7 @@ router.patch('/users/:id', authenticate, requireRole('admin'), async (req: Authe
     return;
   }
 
-  const { name, role, department_id, manager_id, position, phone, status, joining_date } = req.body;
+  const { name, role, department_id, manager_id, position, phone, status, joining_date, avatar_url } = req.body;
 
   if (name) user.name = name.trim();
   if (role) user.role = role;
@@ -337,6 +339,9 @@ router.patch('/users/:id', authenticate, requireRole('admin'), async (req: Authe
   if (phone !== undefined) user.phone = phone.trim();
   if (status) user.status = status;
   if (joining_date) user.joining_date = joining_date;
+  if (avatar_url !== undefined) {
+    user.avatar_url = avatar_url && String(avatar_url).trim() ? String(avatar_url).trim() : null;
+  }
   user.updated_at = new Date().toISOString();
 
   await saveDb(db);

@@ -1,17 +1,93 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
-import { User, Lock, Phone, Mail, Building, Calendar, Shield, CheckCircle2, AlertCircle } from 'lucide-react';
+import { User, Lock, Phone, Mail, Building, Calendar, Shield, CheckCircle2, AlertCircle, Camera, Upload, Trash2, Loader2 } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
 
 export const ProfileView: React.FC = () => {
   const { user, refreshUser } = useAuth();
   const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [profileMsg, setProfileMsg] = useState<{ success?: boolean; message?: string }>({});
+
+  const compressAndCropImage = (file: File, maxDim = 320): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!file.type.startsWith('image/')) {
+        return reject(new Error('Selected file must be an image (PNG, JPG, WEBP).'));
+      }
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Invalid image file'));
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const size = Math.min(img.width, img.height);
+          const offsetX = (img.width - size) / 2;
+          const offsetY = (img.height - size) / 2;
+          const targetDim = Math.min(size, maxDim);
+
+          canvas.width = targetDim;
+          canvas.height = targetDim;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            return reject(new Error('Canvas rendering context not available'));
+          }
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, targetDim, targetDim);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          resolve(dataUrl);
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 12 * 1024 * 1024) {
+      showToast('Image file too large. Please select an image under 12MB.', 'warning');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const dataUrl = await compressAndCropImage(file, 320);
+      const res = await api.updateProfile({ avatar_url: dataUrl });
+      await refreshUser();
+      showToast(res.message || 'Profile picture updated successfully!', 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Failed to process and update profile picture.', 'error');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    if (!user?.avatar_url) return;
+    setIsUploadingAvatar(true);
+    try {
+      const res = await api.updateProfile({ avatar_url: null });
+      await refreshUser();
+      showToast('Profile picture removed successfully.', 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Failed to remove profile picture.', 'error');
+    } finally {
+      setIsUploadingAvatar(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   // Password Change
   const [currentPassword, setCurrentPassword] = useState('');
@@ -90,19 +166,91 @@ export const ProfileView: React.FC = () => {
 
       {/* Profile Overview Card */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-6 border-b border-slate-100">
-          <div className="w-14 h-14 rounded-2xl bg-[#0B1F3A] text-white flex items-center justify-center font-bold text-lg shadow-sm">
-            {user?.name?.slice(0, 2).toUpperCase() || 'BX'}
-          </div>
-          <div>
-            <h2 className="text-base font-bold text-slate-900">{user?.name}</h2>
-            <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-              <span className="font-mono text-slate-700 font-semibold">{user?.employee_code}</span>
-              <span>·</span>
-              <span className="capitalize">{user?.role}</span>
-              <span>·</span>
-              <span>{user?.position}</span>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div className="flex items-center gap-4">
+            <div className="relative group shrink-0">
+              <div className="w-16 h-16 rounded-2xl bg-[#0B1F3A] text-white flex items-center justify-center font-bold text-xl shadow-sm overflow-hidden ring-2 ring-slate-100">
+                {user?.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span>{user?.name?.slice(0, 2).toUpperCase() || 'BX'}</span>
+                )}
+              </div>
+
+              {/* Hover camera action button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingAvatar}
+                className="absolute inset-0 rounded-2xl bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] font-semibold cursor-pointer backdrop-blur-[2px] disabled:opacity-50"
+                title="Click to change profile picture"
+              >
+                {isUploadingAvatar ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Camera className="w-5 h-5 mb-0.5" />
+                    <span>Change</span>
+                  </>
+                )}
+              </button>
             </div>
+
+            <div>
+              <h2 className="text-base font-bold text-slate-900">{user?.name}</h2>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-0.5">
+                <span className="font-mono text-slate-700 font-semibold">{user?.employee_code}</span>
+                <span>·</span>
+                <span className="capitalize">{user?.role}</span>
+                <span>·</span>
+                <span>{user?.position}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action buttons to upload / change / remove own image */}
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+              onChange={handleImageSelect}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploadingAvatar}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200/80 rounded-lg transition-all cursor-pointer shadow-2xs active:scale-[0.98] disabled:opacity-50"
+            >
+              {isUploadingAvatar ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-500" />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-3.5 h-3.5 text-slate-500" />
+                  <span>{user?.avatar_url ? 'Change Photo' : 'Upload Photo'}</span>
+                </>
+              )}
+            </button>
+            {user?.avatar_url && (
+              <button
+                type="button"
+                onClick={handleRemoveAvatar}
+                disabled={isUploadingAvatar}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-rose-600 hover:bg-rose-50 border border-rose-200/60 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                title="Remove profile picture"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Remove</span>
+              </button>
+            )}
           </div>
         </div>
 

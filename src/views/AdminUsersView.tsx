@@ -438,8 +438,21 @@ export const AdminUsersView: React.FC = () => {
                 users.map((u) => (
                   <tr key={u.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="py-3 px-4 font-semibold text-slate-900 whitespace-nowrap">
-                      {u.name}
-                      <span className="block text-[11px] text-slate-400 font-normal">{u.email}</span>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-2xs ring-1 ring-slate-200">
+                          {u.avatar_url ? (
+                            <img src={u.avatar_url} alt={u.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs">
+                              {u.name.slice(0, 2).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div>{u.name}</div>
+                          <span className="block text-[11px] text-slate-400 font-normal">{u.email}</span>
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3 px-4 font-mono font-semibold text-slate-700 whitespace-nowrap">
                       {u.employee_code}

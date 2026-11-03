@@ -180,7 +180,7 @@ router.post('/reset-password', async (req, res): Promise<void> => {
 
 // PATCH /api/auth/profile
 router.patch('/profile', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-  const { name, phone } = req.body;
+  const { name, phone, avatar_url } = req.body;
   const db = getDb();
   const user = db.users.find((u) => u.id === req.user!.id);
 
@@ -191,6 +191,9 @@ router.patch('/profile', authenticate, async (req: AuthenticatedRequest, res: Re
 
   if (name && name.trim()) user.name = name.trim();
   if (phone !== undefined) user.phone = phone.trim();
+  if (avatar_url !== undefined) {
+    user.avatar_url = avatar_url && String(avatar_url).trim() ? String(avatar_url).trim() : null;
+  }
   user.updated_at = new Date().toISOString();
 
   await saveDb(db);
@@ -200,7 +203,7 @@ router.patch('/profile', authenticate, async (req: AuthenticatedRequest, res: Re
     'UPDATE_PROFILE',
     'USER',
     user.id,
-    { name: user.name, phone: user.phone },
+    { name: user.name, phone: user.phone, has_avatar: !!user.avatar_url },
     req.ip || '127.0.0.1'
   );
 

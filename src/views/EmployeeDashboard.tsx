@@ -118,8 +118,14 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
         <div className="absolute top-0 right-0 w-80 h-80 bg-brand-glow-subtle rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
 
         <div className="relative z-10 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0 ring-1 ring-emerald-900/20">
-            {user?.name?.slice(0, 2).toUpperCase()}
+          <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 shadow-sm ring-1 ring-slate-200/80">
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white flex items-center justify-center font-black text-lg ring-1 ring-emerald-900/20">
+                {user?.name?.slice(0, 2).toUpperCase()}
+              </div>
+            )}
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 font-medium">

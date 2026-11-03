@@ -259,8 +259,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
               }}
               className="flex items-center gap-2 p-1 sm:p-1.5 hover:bg-slate-100 rounded-lg transition-all text-left cursor-pointer border border-slate-200/60 bg-white/70 shadow-2xs"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white flex items-center justify-center font-bold text-xs shadow-xs ring-1 ring-emerald-900/20">
-                {user?.name?.slice(0, 2).toUpperCase() || 'BX'}
+              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-xs ring-1 ring-slate-200/80">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white flex items-center justify-center font-bold text-xs ring-1 ring-emerald-900/20">
+                    {user?.name?.slice(0, 2).toUpperCase() || 'BX'}
+                  </div>
+                )}
               </div>
               <div className="hidden sm:block">
                 <p className="text-xs font-bold text-slate-900 leading-none truncate max-w-[110px]">
@@ -272,12 +278,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleMobileSidebar, currentSe
 
             {showProfileMenu && (
               <div className="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-xl shadow-xl border border-slate-200/90 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                <div className="pb-3 border-b border-slate-100">
-                  <p className="text-xs font-bold text-slate-900">{user?.name}</p>
-                  <p className="text-xs text-slate-500 truncate">{user?.email}</p>
-                  <div className="mt-2 flex items-center justify-between">
-                    {getRoleBadge(user?.role)}
-                    <span className="text-[10px] text-slate-400 font-mono">{user?.employee_code}</span>
+                <div className="pb-3 border-b border-slate-100 flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 shadow-xs ring-1 ring-slate-200/80">
+                    {user?.avatar_url ? (
+                      <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white flex items-center justify-center font-bold text-xs">
+                        {user?.name?.slice(0, 2).toUpperCase() || 'BX'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{user?.email}</p>
+                    <div className="mt-1 flex items-center justify-between">
+                      {getRoleBadge(user?.role)}
+                      <span className="text-[10px] text-slate-400 font-mono">{user?.employee_code}</span>
+                    </div>
                   </div>
                 </div>
 

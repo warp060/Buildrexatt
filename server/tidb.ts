@@ -220,6 +220,7 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
         phone VARCHAR(30),
         joining_date DATE NOT NULL,
         status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+        avatar_url LONGTEXT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY uq_employee_code (employee_code),
@@ -366,6 +367,7 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
     // Ensure check_in column is nullable for absent records
     await conn.query('ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL').catch(() => {});
     await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {});
+    await conn.query('ALTER TABLE users ADD COLUMN avatar_url LONGTEXT NULL').catch(() => {});
 
     console.log('[TiDB] ✅ All 10 tables verified and ready in TiDB Cloud.');
   } finally {
@@ -539,6 +541,7 @@ export async function loadAllFromTiDB(): Promise<{
         phone: r.phone || '',
         joining_date: r.joining_date,
         status: r.status,
+        avatar_url: r.avatar_url || undefined,
         created_at: r.created_at,
         updated_at: r.updated_at || r.created_at,
       })),
@@ -698,7 +701,7 @@ export async function syncAllToTiDB(data: {
     // 2. Users
     await execBatch(
       'users',
-      ['id', 'employee_code', 'name', 'email', 'password_hash', 'role', 'department_id', 'manager_id', 'position', 'phone', 'joining_date', 'status'],
+      ['id', 'employee_code', 'name', 'email', 'password_hash', 'role', 'department_id', 'manager_id', 'position', 'phone', 'joining_date', 'status', 'avatar_url'],
       data.users.map((u) => [
         u.id,
         u.employee_code,
@@ -712,8 +715,9 @@ export async function syncAllToTiDB(data: {
         u.phone || null,
         toSqlDate(u.joining_date),
         u.status,
+        u.avatar_url || null,
       ]),
-      'name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status)'
+      'name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status), avatar_url=VALUES(avatar_url)'
     );
 
     // 3. Attendance

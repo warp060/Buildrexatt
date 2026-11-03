@@ -183,7 +183,7 @@ export const TeamCredentialsModal: React.FC<TeamCredentialsModalProps> = ({
               >
                 <div className="flex items-start gap-3 min-w-0">
                   <div
-                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 font-bold text-xs text-white shadow-2xs ${
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 font-bold text-xs text-white shadow-2xs overflow-hidden ${
                       c.role === 'admin'
                         ? 'bg-purple-600'
                         : c.role === 'intern'
@@ -191,12 +191,16 @@ export const TeamCredentialsModal: React.FC<TeamCredentialsModalProps> = ({
                         : 'bg-emerald-700'
                     }`}
                   >
-                    {c.name
-                      .split(' ')
-                      .map((n: string) => n[0])
-                      .slice(0, 2)
-                      .join('')
-                      .toUpperCase()}
+                    {c.avatar_url ? (
+                      <img src={c.avatar_url} alt={c.name} className="w-full h-full object-cover" />
+                    ) : (
+                      c.name
+                        .split(' ')
+                        .map((n: string) => n[0])
+                        .slice(0, 2)
+                        .join('')
+                        .toUpperCase()
+                    )}
                   </div>
 
                   <div className="min-w-0">

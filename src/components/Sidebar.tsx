@@ -159,8 +159,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Bottom User Card in Sidebar */}
       <div className="p-3 border-t border-slate-100 bg-slate-50/70">
         <div className="flex items-center gap-2.5 p-2 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white text-xs font-bold flex items-center justify-center shrink-0 shadow-xs ring-1 ring-emerald-900/20">
-            {user?.name?.slice(0, 1).toUpperCase()}
+          <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-xs ring-1 ring-slate-200/80">
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#0F5132] to-[#0A3822] text-white text-xs font-bold flex items-center justify-center ring-1 ring-emerald-900/20">
+                {user?.name?.slice(0, 1).toUpperCase()}
+              </div>
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-slate-900 truncate leading-tight">{user?.name}</p>
