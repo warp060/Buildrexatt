@@ -6,14 +6,19 @@
   "scripts": {
     "dev": "node ./node_modules/tsx/dist/cli.mjs server.ts",
     "build": "node ./node_modules/vite/bin/vite.js build && node scripts/build-api.js",
+    "build:render": "node ./node_modules/vite/bin/vite.js build",
     "preview": "node ./node_modules/vite/bin/vite.js preview",
     "start": "node ./node_modules/tsx/dist/cli.mjs server.ts",
+    "start:render": "NODE_ENV=production node ./node_modules/tsx/dist/cli.mjs server.ts",
     "clean": "rm -rf dist server.js",
     "lint": "node ./node_modules/typescript/bin/tsc --noEmit",
     "db:test": "node ./node_modules/tsx/dist/cli.mjs scripts/test-tidb.ts",
     "db:migrate": "node ./node_modules/tsx/dist/cli.mjs scripts/migrate-tidb.ts",
     "db:sync": "node ./node_modules/tsx/dist/cli.mjs scripts/sync-tidb.ts",
     "db:setup": "node ./node_modules/tsx/dist/cli.mjs scripts/migrate-tidb.ts && node ./node_modules/tsx/dist/cli.mjs scripts/sync-tidb.ts"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
