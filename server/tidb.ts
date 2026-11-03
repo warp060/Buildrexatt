@@ -399,21 +399,62 @@ function toSqlDateTime(isoStr: string | null | undefined): string | null {
 }
 
 /**
- * Helper to format/sanitize DATE values as YYYY-MM-DD for MySQL DATE columns.
+ * Helper to format/sanitize DATE values as YYYY-MM-DD for MySQL DATE columns in Asia/Kolkata timezone.
  */
-function toSqlDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return new Date().toISOString().split('T')[0];
+function toSqlDate(dateStr: string | null | undefined | Date): string {
+  if (!dateStr) {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date());
+  }
+  if (dateStr instanceof Date) {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(dateStr);
+  }
   const s = String(dateStr).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    return s;
+  }
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    if (s.includes('T') || s.includes(' ')) {
+      try {
+        const d = new Date(s);
+        if (!isNaN(d.getTime())) {
+          return new Intl.DateTimeFormat('en-CA', {
+            timeZone: 'Asia/Kolkata',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }).format(d);
+        }
+      } catch {}
+    }
     return s.slice(0, 10);
   }
   try {
     const d = new Date(s);
     if (!isNaN(d.getTime())) {
-      return d.toISOString().split('T')[0];
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(d);
     }
   } catch {}
-  return new Date().toISOString().split('T')[0];
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
 }
 
 /**
@@ -542,7 +583,7 @@ export async function loadAllFromTiDB(): Promise<{
         manager_id: r.manager_id || null,
         position: r.position || '',
         phone: r.phone || '',
-        joining_date: r.joining_date,
+        joining_date: toSqlDate(r.joining_date),
         status: r.status,
         plain_password: r.plain_password || undefined,
         password_updated_at: toIsoDateTime(r.password_updated_at) || undefined,
@@ -553,7 +594,7 @@ export async function loadAllFromTiDB(): Promise<{
       attendance: attendanceRows.map((r: any) => ({
         id: r.id,
         user_id: r.user_id,
-        work_date: r.work_date,
+        work_date: toSqlDate(r.work_date),
         check_in: toIsoDateTime(r.check_in) || r.check_in,
         check_out: toIsoDateTime(r.check_out),
         total_minutes: r.total_minutes || 0,
@@ -566,7 +607,7 @@ export async function loadAllFromTiDB(): Promise<{
       work_updates: workUpdatesRows.map((r: any) => ({
         id: r.id,
         user_id: r.user_id,
-        work_date: r.work_date,
+        work_date: toSqlDate(r.work_date),
         tasks_completed: r.tasks_completed,
         project_details: r.project_details,
         accomplishments: r.accomplishments || '',
@@ -585,8 +626,8 @@ export async function loadAllFromTiDB(): Promise<{
         id: r.id,
         user_id: r.user_id,
         leave_type: r.leave_type,
-        start_date: r.start_date,
-        end_date: r.end_date,
+        start_date: toSqlDate(r.start_date),
+        end_date: toSqlDate(r.end_date),
         days_count: r.days_count,
         reason: r.reason,
         status: r.status,
@@ -599,7 +640,7 @@ export async function loadAllFromTiDB(): Promise<{
         id: r.id,
         user_id: r.user_id,
         attendance_id: r.attendance_id,
-        work_date: r.work_date || null,
+        work_date: toSqlDate(r.work_date),
         requested_check_in: toIsoDateTime(r.requested_check_in) || r.requested_check_in,
         requested_check_out: toIsoDateTime(r.requested_check_out) || r.requested_check_out,
         reason: r.reason,
@@ -922,6 +963,46 @@ export async function updateUserPasswordInTiDB(userId: string, newPasswordHash: 
     return true;
   } catch (err: any) {
     console.error(`[TiDB] ❌ Failed to update password for user ${userId}:`, err.message);
+    return false;
+  }
+}
+
+/**
+ * Directly and immediately upsert an attendance record in TiDB Cloud (50ms).
+ */
+export async function upsertAttendanceInTiDB(a: AttendanceRecord): Promise<boolean> {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return false;
+  }
+  const p = getPool();
+  try {
+    await p.query(
+      `INSERT INTO attendance (id, user_id, work_date, check_in, check_out, total_minutes, status, ip_address, notes, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+       ON DUPLICATE KEY UPDATE
+         check_in = VALUES(check_in),
+         check_out = VALUES(check_out),
+         total_minutes = VALUES(total_minutes),
+         status = VALUES(status),
+         ip_address = VALUES(ip_address),
+         notes = VALUES(notes),
+         updated_at = NOW()`,
+      [
+        a.id,
+        a.user_id,
+        toSqlDate(a.work_date),
+        toSqlDateTime(a.check_in),
+        toSqlDateTime(a.check_out),
+        a.total_minutes || 0,
+        a.status,
+        a.ip_address || null,
+        a.notes || null,
+      ]
+    );
+    console.log(`[TiDB] ✅ Fast direct attendance sync for ${a.user_id} (${toSqlDate(a.work_date)}) complete.`);
+    return true;
+  } catch (err: any) {
+    console.warn(`[TiDB] Direct attendance sync notice:`, err.message);
     return false;
   }
 }

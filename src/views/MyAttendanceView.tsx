@@ -148,6 +148,13 @@ export const MyAttendanceView: React.FC = () => {
     setActionFeedback(null);
     try {
       const res = await api.checkIn();
+      if (res.success && res.attendance) {
+        setTodayAttendance({
+          record: res.attendance,
+          status_summary: 'Checked In',
+        });
+        setElapsedSeconds(0);
+      }
       setActionFeedback({ type: 'success', message: res.message });
       showToast(res.message, 'success');
       await Promise.all([loadTodayAttendance(), fetchAttendance()]);
@@ -165,6 +172,13 @@ export const MyAttendanceView: React.FC = () => {
     setActionFeedback(null);
     try {
       const res = await api.checkOut();
+      if (res.success && res.attendance) {
+        setTodayAttendance({
+          record: res.attendance,
+          status_summary: 'Checked Out',
+        });
+        setElapsedSeconds((res.attendance.total_minutes || 0) * 60);
+      }
       setActionFeedback({ type: 'success', message: res.message });
       showToast(res.message, 'success');
       await Promise.all([loadTodayAttendance(), fetchAttendance()]);

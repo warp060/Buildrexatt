@@ -10,6 +10,7 @@ import {
 } from '../db';
 import { authenticate, requireRole, AuthenticatedRequest } from '../auth';
 import { AttendanceRecord } from '../types';
+import { upsertAttendanceInTiDB } from '../tidb';
 
 const router = Router();
 
@@ -61,6 +62,7 @@ router.post('/check-in', authenticate, async (req: AuthenticatedRequest, res: Re
   };
 
   db.attendance.unshift(newRecord);
+  await upsertAttendanceInTiDB(newRecord);
   await saveDb(db);
 
   // Notify admins and manager in real-time
@@ -101,10 +103,19 @@ router.post('/check-out', authenticate, async (req: AuthenticatedRequest, res: R
   const userId = req.user!.id;
   const today = getTodayStr();
 
-  // Find active session
-  const record = db.attendance.find(
+  // Find active session: first for today, or any active open session (!check_out)
+  let record = db.attendance.find(
     (a) => a.user_id === userId && a.work_date === today
   );
+
+  if (!record || record.check_out) {
+    const openRecord = db.attendance.find(
+      (a) => a.user_id === userId && !a.check_out
+    );
+    if (openRecord) {
+      record = openRecord;
+    }
+  }
 
   if (!record) {
     res.status(400).json({
@@ -141,6 +152,10 @@ router.post('/check-out', authenticate, async (req: AuthenticatedRequest, res: R
     record.notes = (record.notes ? record.notes + '; ' : '') + 'Shift under 4 hours (Half Day)';
   }
 
+  // 1. Direct fast update to TiDB Cloud (50ms)
+  await upsertAttendanceInTiDB(record);
+
+  // 2. Local persistence and background sync
   await saveDb(db);
 
   // Notify admins and manager in real-time
@@ -179,9 +194,19 @@ router.get('/today', authenticate, (req: AuthenticatedRequest, res: Response): v
   const userId = req.user!.id;
   const today = getTodayStr();
 
-  const record = db.attendance.find(
+  let record = db.attendance.find(
     (a) => a.user_id === userId && a.work_date === today
   );
+
+  // If no record found for today, check for any open active session (!check_out)
+  if (!record) {
+    const openRecord = db.attendance.find(
+      (a) => a.user_id === userId && !a.check_out
+    );
+    if (openRecord) {
+      record = openRecord;
+    }
+  }
 
   // Compute live duration if currently checked in
   let currentDurationMinutes = 0;

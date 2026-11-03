@@ -71383,19 +71383,61 @@ function toSqlDateTime(isoStr) {
   }
 }
 function toSqlDate(dateStr) {
-  if (!dateStr) return (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+  if (!dateStr) {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(/* @__PURE__ */ new Date());
+  }
+  if (dateStr instanceof Date) {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(dateStr);
+  }
   const s2 = String(dateStr).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s2)) {
+    return s2;
+  }
   if (/^\d{4}-\d{2}-\d{2}/.test(s2)) {
+    if (s2.includes("T") || s2.includes(" ")) {
+      try {
+        const d = new Date(s2);
+        if (!isNaN(d.getTime())) {
+          return new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Kolkata",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+          }).format(d);
+        }
+      } catch {
+      }
+    }
     return s2.slice(0, 10);
   }
   try {
     const d = new Date(s2);
     if (!isNaN(d.getTime())) {
-      return d.toISOString().split("T")[0];
+      return new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(d);
     }
   } catch {
   }
-  return (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(/* @__PURE__ */ new Date());
 }
 function toIsoDateTime(val) {
   if (!val) return null;
@@ -71494,7 +71536,7 @@ async function loadAllFromTiDB() {
         manager_id: r2.manager_id || null,
         position: r2.position || "",
         phone: r2.phone || "",
-        joining_date: r2.joining_date,
+        joining_date: toSqlDate(r2.joining_date),
         status: r2.status,
         plain_password: r2.plain_password || void 0,
         password_updated_at: toIsoDateTime(r2.password_updated_at) || void 0,
@@ -71505,7 +71547,7 @@ async function loadAllFromTiDB() {
       attendance: attendanceRows.map((r2) => ({
         id: r2.id,
         user_id: r2.user_id,
-        work_date: r2.work_date,
+        work_date: toSqlDate(r2.work_date),
         check_in: toIsoDateTime(r2.check_in) || r2.check_in,
         check_out: toIsoDateTime(r2.check_out),
         total_minutes: r2.total_minutes || 0,
@@ -71518,7 +71560,7 @@ async function loadAllFromTiDB() {
       work_updates: workUpdatesRows.map((r2) => ({
         id: r2.id,
         user_id: r2.user_id,
-        work_date: r2.work_date,
+        work_date: toSqlDate(r2.work_date),
         tasks_completed: r2.tasks_completed,
         project_details: r2.project_details,
         accomplishments: r2.accomplishments || "",
@@ -71537,8 +71579,8 @@ async function loadAllFromTiDB() {
         id: r2.id,
         user_id: r2.user_id,
         leave_type: r2.leave_type,
-        start_date: r2.start_date,
-        end_date: r2.end_date,
+        start_date: toSqlDate(r2.start_date),
+        end_date: toSqlDate(r2.end_date),
         days_count: r2.days_count,
         reason: r2.reason,
         status: r2.status,
@@ -71551,7 +71593,7 @@ async function loadAllFromTiDB() {
         id: r2.id,
         user_id: r2.user_id,
         attendance_id: r2.attendance_id,
-        work_date: r2.work_date || null,
+        work_date: toSqlDate(r2.work_date),
         requested_check_in: toIsoDateTime(r2.requested_check_in) || r2.requested_check_in,
         requested_check_out: toIsoDateTime(r2.requested_check_out) || r2.requested_check_out,
         reason: r2.reason,
@@ -71834,6 +71876,42 @@ async function updateUserPasswordInTiDB(userId, newPasswordHash, plainPassword) 
     return true;
   } catch (err) {
     console.error(`[TiDB] \u274C Failed to update password for user ${userId}:`, err.message);
+    return false;
+  }
+}
+async function upsertAttendanceInTiDB(a) {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return false;
+  }
+  const p = getPool();
+  try {
+    await p.query(
+      `INSERT INTO attendance (id, user_id, work_date, check_in, check_out, total_minutes, status, ip_address, notes, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+       ON DUPLICATE KEY UPDATE
+         check_in = VALUES(check_in),
+         check_out = VALUES(check_out),
+         total_minutes = VALUES(total_minutes),
+         status = VALUES(status),
+         ip_address = VALUES(ip_address),
+         notes = VALUES(notes),
+         updated_at = NOW()`,
+      [
+        a.id,
+        a.user_id,
+        toSqlDate(a.work_date),
+        toSqlDateTime(a.check_in),
+        toSqlDateTime(a.check_out),
+        a.total_minutes || 0,
+        a.status,
+        a.ip_address || null,
+        a.notes || null
+      ]
+    );
+    console.log(`[TiDB] \u2705 Fast direct attendance sync for ${a.user_id} (${toSqlDate(a.work_date)}) complete.`);
+    return true;
+  } catch (err) {
+    console.warn(`[TiDB] Direct attendance sync notice:`, err.message);
     return false;
   }
 }
@@ -72333,12 +72411,12 @@ var buildrex_default = {
       user_id: "user-abbas",
       work_date: "2026-11-03",
       check_in: "2026-11-03T06:20:20.000Z",
-      check_out: null,
-      total_minutes: 0,
+      check_out: "2026-11-03T16:05:12.191Z",
+      total_minutes: 585,
       status: "present",
       ip_address: "127.0.0.1",
       created_at: "2026-11-03T06:20:22.000Z",
-      updated_at: "2026-11-03T06:20:22.000Z"
+      updated_at: "2026-11-03T16:05:12.191Z"
     },
     {
       id: "att-1793678451233-ib1x2",
@@ -74678,6 +74756,26 @@ var buildrex_default = {
   ],
   notifications: [
     {
+      id: "notif-1793721912204-x9j8",
+      user_id: "user-emad",
+      title: "Attendance Clock-Out",
+      message: "Mohammed Abbas R Y checked out. Recorded duration: 9.8 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03T16:05:12.204Z"
+    },
+    {
+      id: "notif-1793721912196-c82w",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Mohammed Abbas R Y checked out. Recorded duration: 9.8 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03T16:05:12.197Z"
+    },
+    {
       id: "notif-1793717547135-y6j4",
       user_id: "user-admin-master",
       title: "Attendance Clock-In",
@@ -75319,6 +75417,50 @@ var buildrex_default = {
     }
   ],
   audit_logs: [
+    {
+      id: "audit-1793721912210-tbl0u",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793686820664-5byzo",
+      details: {
+        work_date: "2026-11-03",
+        check_out: "2026-11-03T16:05:12.191Z",
+        total_minutes: 585,
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T16:05:12.210Z"
+    },
+    {
+      id: "audit-1793721912158-p5u94",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        email: "abbas6618532@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T16:05:12.158Z"
+    },
+    {
+      id: "audit-1793721843161-njor1",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        email: "abbas6618532@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T16:04:03.161Z"
+    },
     {
       id: "audit-1793717547142-d2uon",
       actor_id: "user-mushrath",
@@ -77418,11 +77560,20 @@ try {
 }
 var dbInstance = null;
 function getTodayDateString() {
-  const now = /* @__PURE__ */ new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Kolkata",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(/* @__PURE__ */ new Date());
+  } catch {
+    const now = /* @__PURE__ */ new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 }
 function generateInitialSeed() {
   return generateSeedDatabase();
@@ -78330,6 +78481,7 @@ router3.post("/check-in", authenticate, async (req, res) => {
     updated_at: nowIso
   };
   db.attendance.unshift(newRecord);
+  await upsertAttendanceInTiDB(newRecord);
   await saveDb(db);
   const recipients = db.users.filter(
     (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
@@ -78361,9 +78513,17 @@ router3.post("/check-out", authenticate, async (req, res) => {
   const db = getDb();
   const userId = req.user.id;
   const today = getTodayStr();
-  const record = db.attendance.find(
+  let record = db.attendance.find(
     (a) => a.user_id === userId && a.work_date === today
   );
+  if (!record || record.check_out) {
+    const openRecord = db.attendance.find(
+      (a) => a.user_id === userId && !a.check_out
+    );
+    if (openRecord) {
+      record = openRecord;
+    }
+  }
   if (!record) {
     res.status(400).json({
       success: false,
@@ -78393,6 +78553,7 @@ router3.post("/check-out", authenticate, async (req, res) => {
     record.status = "half_day";
     record.notes = (record.notes ? record.notes + "; " : "") + "Shift under 4 hours (Half Day)";
   }
+  await upsertAttendanceInTiDB(record);
   await saveDb(db);
   const checkoutRecipients = db.users.filter(
     (u) => u.role === "admin" || req.user.manager_id && u.id === req.user.manager_id
@@ -78424,9 +78585,17 @@ router3.get("/today", authenticate, (req, res) => {
   const db = getDb();
   const userId = req.user.id;
   const today = getTodayStr();
-  const record = db.attendance.find(
+  let record = db.attendance.find(
     (a) => a.user_id === userId && a.work_date === today
   );
+  if (!record) {
+    const openRecord = db.attendance.find(
+      (a) => a.user_id === userId && !a.check_out
+    );
+    if (openRecord) {
+      record = openRecord;
+    }
+  }
   let currentDurationMinutes = 0;
   if (record) {
     if (record.check_out) {
