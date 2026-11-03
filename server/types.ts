@@ -21,6 +21,7 @@ export interface User {
   joining_date: string;
   status: UserStatus;
   avatar_url?: string | null;
+  password_updated_at?: string | null;
   created_at: string;
   updated_at: string;
 }

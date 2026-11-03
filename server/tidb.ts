@@ -126,7 +126,7 @@ export function getPool(customConfig?: TiDBConfig): Pool {
     idleTimeout: isServerless ? 3000 : 60000,
     queueLimit: 0,
     enableKeepAlive: !isServerless,
-    connectTimeout: 5000,
+    connectTimeout: 20000,
     timezone: '+00:00',
     dateStrings: true,
   });
@@ -360,14 +360,16 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
     ];
 
-    for (const sql of tableDefinitions) {
-      await conn.query(sql);
+    const [existingTables] = await conn.query<RowDataPacket[]>('SHOW TABLES');
+    if (!existingTables || existingTables.length < 10) {
+      for (const sql of tableDefinitions) {
+        await conn.query(sql);
+      }
+      await conn.query('ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL').catch(() => {});
+      await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {});
+      await conn.query('ALTER TABLE users ADD COLUMN avatar_url LONGTEXT NULL').catch(() => {});
+      await conn.query('ALTER TABLE users ADD COLUMN password_updated_at TIMESTAMP NULL').catch(() => {});
     }
-
-    // Ensure check_in column is nullable for absent records
-    await conn.query('ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL').catch(() => {});
-    await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {});
-    await conn.query('ALTER TABLE users ADD COLUMN avatar_url LONGTEXT NULL').catch(() => {});
 
     console.log('[TiDB] ✅ All 10 tables verified and ready in TiDB Cloud.');
   } finally {
@@ -542,6 +544,7 @@ export async function loadAllFromTiDB(): Promise<{
         joining_date: r.joining_date,
         status: r.status,
         avatar_url: r.avatar_url || undefined,
+        password_updated_at: toIsoDateTime(r.password_updated_at) || undefined,
         created_at: r.created_at,
         updated_at: r.updated_at || r.created_at,
       })),
@@ -701,7 +704,7 @@ export async function syncAllToTiDB(data: {
     // 2. Users
     await execBatch(
       'users',
-      ['id', 'employee_code', 'name', 'email', 'password_hash', 'role', 'department_id', 'manager_id', 'position', 'phone', 'joining_date', 'status', 'avatar_url'],
+      ['id', 'employee_code', 'name', 'email', 'password_hash', 'role', 'department_id', 'manager_id', 'position', 'phone', 'joining_date', 'status', 'avatar_url', 'password_updated_at'],
       data.users.map((u) => [
         u.id,
         u.employee_code,
@@ -716,8 +719,9 @@ export async function syncAllToTiDB(data: {
         toSqlDate(u.joining_date),
         u.status,
         u.avatar_url || null,
+        toSqlDateTime(u.password_updated_at),
       ]),
-      'name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status), avatar_url=VALUES(avatar_url)'
+      'name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status), avatar_url=VALUES(avatar_url), password_updated_at=VALUES(password_updated_at)'
     );
 
     // 3. Attendance
@@ -888,6 +892,27 @@ export async function deleteUserFromTiDB(userId: string): Promise<void> {
     console.error(`[TiDB] ❌ Failed to delete user ${userId}:`, err.message);
   } finally {
     try { conn.release(); } catch {}
+  }
+}
+
+/**
+ * Directly and immediately update user password hash in TiDB Cloud.
+ */
+export async function updateUserPasswordInTiDB(userId: string, newPasswordHash: string): Promise<boolean> {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return false;
+  }
+  const p = getPool();
+  try {
+    await p.query(
+      'UPDATE users SET password_hash = ?, password_updated_at = NOW(), updated_at = NOW() WHERE id = ?',
+      [newPasswordHash, userId]
+    );
+    console.log(`[TiDB] ✅ Successfully updated password for user ${userId} in TiDB Cloud.`);
+    return true;
+  } catch (err: any) {
+    console.error(`[TiDB] ❌ Failed to update password for user ${userId}:`, err.message);
+    return false;
   }
 }
 

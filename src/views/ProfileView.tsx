@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
-import { User, Lock, Phone, Mail, Building, Calendar, Shield, CheckCircle2, AlertCircle, Camera, Upload, Trash2, Loader2 } from 'lucide-react';
+import { User, Lock, Phone, Mail, Building, Calendar, Shield, CheckCircle2, AlertCircle, Camera, Upload, Trash2, Loader2, Eye, EyeOff, KeyRound } from 'lucide-react';
 
 import { useToast } from '../context/ToastContext';
 
@@ -93,6 +93,9 @@ export const ProfileView: React.FC = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPass, setShowCurrentPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [isChangingPass, setIsChangingPass] = useState(false);
   const [passMsg, setPassMsg] = useState<{ success?: boolean; message?: string }>({});
 
@@ -146,6 +149,10 @@ export const ProfileView: React.FC = () => {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+      if ((res as any).token) {
+        localStorage.setItem('buildrex_jwt', (res as any).token);
+      }
+      await refreshUser();
     } catch (err: any) {
       setPassMsg({ success: false, message: err.message || 'Failed to change password.' });
       showToast(err.message || 'Password update failed', 'error');
@@ -341,12 +348,22 @@ export const ProfileView: React.FC = () => {
 
       {/* Security & Password Change */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs p-6">
-        <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1">
-          Security Credentials
-        </h3>
-        <p className="text-xs text-slate-500 mb-4">
-          Update your corporate account password to maintain system access integrity
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+              Security Credentials
+            </h3>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Update your corporate account password to maintain system access integrity
+            </p>
+          </div>
+          {user?.password_updated_at && (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-800">
+              <KeyRound className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Custom Password Active</span>
+            </div>
+          )}
+        </div>
 
         {passMsg.message && (
           <div
@@ -368,37 +385,79 @@ export const ProfileView: React.FC = () => {
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Current Password</label>
-            <input
-              type="password"
-              required
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full sm:w-80 px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
-            />
+            <div className="relative w-full sm:w-80">
+              <input
+                type={showCurrentPass ? 'text' : 'password'}
+                required
+                autoComplete="current-password"
+                placeholder="Enter current password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                onInput={(e: any) => setCurrentPassword(e.target.value)}
+                className="w-full pr-10 pl-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
+              />
+              <button
+                type="button"
+                onClick={() => setShowCurrentPass(!showCurrentPass)}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                tabIndex={-1}
+                title={showCurrentPass ? 'Hide password' : 'Show password'}
+              >
+                {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">New Password</label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
-              />
+              <div className="relative">
+                <input
+                  type={showNewPass ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  placeholder="Minimum 6 characters"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  onInput={(e: any) => setNewPassword(e.target.value)}
+                  className="w-full pr-10 pl-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPass(!showNewPass)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                  tabIndex={-1}
+                  title={showNewPass ? 'Hide password' : 'Show password'}
+                >
+                  {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Confirm New Password</label>
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPass ? 'text' : 'password'}
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                  placeholder="Re-enter new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onInput={(e: any) => setConfirmPassword(e.target.value)}
+                  className="w-full pr-10 pl-3 py-2 text-xs border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B1F3A]/20 focus:border-[#0B1F3A]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPass(!showConfirmPass)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                  tabIndex={-1}
+                  title={showConfirmPass ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -406,7 +465,7 @@ export const ProfileView: React.FC = () => {
             <button
               type="submit"
               disabled={isChangingPass}
-              className="px-4 py-2 text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#142C4E] rounded-lg transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-xs font-semibold text-white bg-[#0B1F3A] hover:bg-[#142C4E] rounded-lg transition-colors disabled:opacity-50 cursor-pointer shadow-2xs"
             >
               {isChangingPass ? 'Updating...' : 'Update Password'}
             </button>

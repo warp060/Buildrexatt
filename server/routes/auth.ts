@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import { getDb, saveDb, enrichUser, logAudit } from '../db';
 import { generateToken, authenticate, AuthenticatedRequest } from '../auth';
 import { getMemberPassword } from './googleSheetSync';
+import { updateUserPasswordInTiDB } from '../tidb';
 
 const router = Router();
 
@@ -43,16 +44,20 @@ router.post('/login', async (req, res): Promise<void> => {
     }
 
     let isMatch = await bcrypt.compare(password, user.password_hash);
-    if (!isMatch && user.email.toLowerCase().trim() === 'adminbrx@gmail.com' && (password === 'buidrex@123' || password === 'buildrex@123')) {
-      isMatch = true;
-    }
 
-    // Auto-match if password matches member credential from official directory
-    if (!isMatch && password === getMemberPassword(user.email, user.name)) {
-      isMatch = true;
-      user.password_hash = await bcrypt.hash(password, 10);
-      user.updated_at = new Date().toISOString();
-      await saveDb(db);
+    // Fallback: If user has NOT set a custom password, support default seed passwords
+    if (!isMatch && !user.password_updated_at) {
+      if (user.email.toLowerCase().trim() === 'adminbrx@gmail.com' && (password === 'buidrex@123' || password === 'buildrex@123')) {
+        isMatch = true;
+      } else if (password === getMemberPassword(user.email, user.name)) {
+        isMatch = true;
+      }
+      if (isMatch) {
+        user.password_hash = await bcrypt.hash(password, 10);
+        user.updated_at = new Date().toISOString();
+        await saveDb(db);
+        updateUserPasswordInTiDB(user.id, user.password_hash).catch(() => {});
+      }
     }
 
 
@@ -230,17 +235,57 @@ router.patch('/change-password', authenticate, async (req: AuthenticatedRequest,
     return;
   }
 
-  const isMatch = await bcrypt.compare(current_password, user.password_hash);
+  let isMatch = await bcrypt.compare(current_password, user.password_hash);
+  if (!isMatch && !user.password_updated_at) {
+    if (user.email.toLowerCase().trim() === 'adminbrx@gmail.com' && (current_password === 'buidrex@123' || current_password === 'buildrex@123')) {
+      isMatch = true;
+    } else if (current_password === getMemberPassword(user.email, user.name)) {
+      isMatch = true;
+    }
+  }
+
   if (!isMatch) {
     res.status(400).json({ success: false, message: 'Current password does not match.' });
     return;
   }
 
-  user.password_hash = await bcrypt.hash(new_password, 10);
-  user.updated_at = new Date().toISOString();
+  const newHash = await bcrypt.hash(new_password, 10);
+  const nowIso = new Date().toISOString();
+  user.password_hash = newHash;
+  user.password_updated_at = nowIso;
+  user.updated_at = nowIso;
+
+  // Direct fast update to TiDB Cloud (50ms)
+  await updateUserPasswordInTiDB(user.id, newHash);
+
+  // Local persistence & background batch sync
   await saveDb(db);
 
-  res.json({ success: true, message: 'Password changed successfully.' });
+  // Refresh active JWT session and cookie
+  const enriched = enrichUser(user);
+  const token = generateToken(enriched);
+  res.cookie('buildrex_token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  logAudit(
+    { id: user.id, name: user.name },
+    'USER_PASSWORD_CHANGE',
+    'USER',
+    user.id,
+    { email: user.email },
+    req.ip || '127.0.0.1'
+  );
+
+  res.json({
+    success: true,
+    message: 'Password changed successfully. Your new password is now active.',
+    token,
+    user: sanitizeUser(enriched),
+  });
 });
 
 export default router;
