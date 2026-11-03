@@ -19,8 +19,9 @@ export interface User {
   phone: string;
   joining_date: string;
   status: UserStatus;
-  avatar_url?: string | null;
+  plain_password?: string | null;
   password_updated_at?: string | null;
+  avatar_url?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -11,6 +11,8 @@ export interface User {
   name: string;
   email: string;
   password_hash: string;
+  plain_password?: string | null;
+  password_updated_at?: string | null;
   role: UserRole;
   department_id: string | null;
   department_name?: string;
@@ -21,7 +23,6 @@ export interface User {
   joining_date: string;
   status: UserStatus;
   avatar_url?: string | null;
-  password_updated_at?: string | null;
   created_at: string;
   updated_at: string;
 }

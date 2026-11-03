@@ -8,7 +8,7 @@ import { updateUserPasswordInTiDB } from '../tidb';
 const router = Router();
 
 function sanitizeUser(user: any) {
-  const { password_hash, ...rest } = user;
+  const { password_hash, plain_password, ...rest } = user;
   return rest;
 }
 
@@ -44,6 +44,9 @@ router.post('/login', async (req, res): Promise<void> => {
     }
 
     let isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch && user.plain_password && password === user.plain_password) {
+      isMatch = true;
+    }
 
     // Fallback: If user has NOT set a custom password, support default seed passwords
     if (!isMatch && !user.password_updated_at) {
@@ -54,9 +57,10 @@ router.post('/login', async (req, res): Promise<void> => {
       }
       if (isMatch) {
         user.password_hash = await bcrypt.hash(password, 10);
+        user.plain_password = password;
         user.updated_at = new Date().toISOString();
         await saveDb(db);
-        updateUserPasswordInTiDB(user.id, user.password_hash).catch(() => {});
+        updateUserPasswordInTiDB(user.id, user.password_hash, password).catch(() => {});
       }
     }
 
@@ -236,11 +240,15 @@ router.patch('/change-password', authenticate, async (req: AuthenticatedRequest,
   }
 
   let isMatch = await bcrypt.compare(current_password, user.password_hash);
-  if (!isMatch && !user.password_updated_at) {
-    if (user.email.toLowerCase().trim() === 'adminbrx@gmail.com' && (current_password === 'buidrex@123' || current_password === 'buildrex@123')) {
+  if (!isMatch) {
+    if (user.plain_password && current_password === user.plain_password) {
       isMatch = true;
-    } else if (current_password === getMemberPassword(user.email, user.name)) {
-      isMatch = true;
+    } else if (!user.password_updated_at) {
+      if (user.email.toLowerCase().trim() === 'adminbrx@gmail.com' && (current_password === 'buidrex@123' || current_password === 'buildrex@123')) {
+        isMatch = true;
+      } else if (current_password === getMemberPassword(user.email, user.name)) {
+        isMatch = true;
+      }
     }
   }
 
@@ -252,16 +260,17 @@ router.patch('/change-password', authenticate, async (req: AuthenticatedRequest,
   const newHash = await bcrypt.hash(new_password, 10);
   const nowIso = new Date().toISOString();
   user.password_hash = newHash;
+  user.plain_password = new_password;
   user.password_updated_at = nowIso;
   user.updated_at = nowIso;
 
-  // Direct fast update to TiDB Cloud (50ms)
-  await updateUserPasswordInTiDB(user.id, newHash);
+  // 1. Direct fast update to TiDB Cloud (50ms)
+  await updateUserPasswordInTiDB(user.id, newHash, new_password);
 
-  // Local persistence & background batch sync
+  // 2. Local persistence & background batch sync
   await saveDb(db);
 
-  // Refresh active JWT session and cookie
+  // 3. Refresh active JWT session and cookie
   const enriched = enrichUser(user);
   const token = generateToken(enriched);
   res.cookie('buildrex_token', token, {

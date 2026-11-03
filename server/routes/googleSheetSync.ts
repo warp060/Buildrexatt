@@ -219,6 +219,7 @@ export async function performGoogleSheetSync(): Promise<{
         existingUser.updated_at = nowIso;
         updatedCount++;
 
+        const activePassword = existingUser.plain_password || plainPassword;
         syncedMemberList.push({
           id: existingUser.id,
           employee_code: existingUser.employee_code,
@@ -228,7 +229,7 @@ export async function performGoogleSheetSync(): Promise<{
           position: existingUser.position,
           department_id: existingUser.department_id,
           phone: existingUser.phone,
-          plainPassword,
+          plainPassword: activePassword,
           status: existingUser.status,
           isNew: false,
         });
@@ -244,6 +245,8 @@ export async function performGoogleSheetSync(): Promise<{
           name: rawName,
           email,
           password_hash: bcrypt.hashSync(plainPassword, 10),
+          plain_password: plainPassword,
+          password_updated_at: nowIso,
           role,
           department_id: deptId,
           manager_id: 'user-emad',
@@ -358,7 +361,7 @@ router.post('/google-sheet', authenticate, async (req: AuthenticatedRequest, res
 router.get('/team-credentials', (req: Request, res: Response): void => {
   const db = getDb();
   const credentials = db.users.map((u) => {
-    const plainPassword = getMemberPassword(u.email, u.name);
+    const plainPassword = u.plain_password || getMemberPassword(u.email, u.name);
     const dept = db.departments.find((d) => d.id === u.department_id);
     return {
       id: u.id,

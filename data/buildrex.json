@@ -95,7 +95,7 @@
       "employee_code": "BRX-INT-18",
       "name": "Mohammed Abbas R Y",
       "email": "abbas6618532@gmail.com",
-      "password_hash": "$2b$10$zONIVTbsIh0SWd3dtaZN0e5xrbBjuGIoT2imlYvqDRma9KRPjrtCi",
+      "password_hash": "$2b$10$JWRQM5pB41o8BJb6HDOhc..RevwiOA1DRucjEw.48/24.or3O6.zu",
       "role": "intern",
       "department_id": "dept-tech",
       "manager_id": "user-emad",
@@ -104,7 +104,9 @@
       "joining_date": "2026-09-06",
       "status": "active",
       "created_at": "2026-10-23 14:54:38",
-      "updated_at": "2026-11-03 07:02:55"
+      "updated_at": "2026-11-03 07:02:55",
+      "plain_password": "Abbas11",
+      "password_updated_at": "2026-11-03T14:06:38.905Z"
     },
     {
       "id": "user-admin-master",

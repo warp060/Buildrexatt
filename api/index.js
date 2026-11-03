@@ -71139,7 +71139,7 @@ function getPool(customConfig) {
     idleTimeout: isServerless ? 3e3 : 6e4,
     queueLimit: 0,
     enableKeepAlive: !isServerless,
-    connectTimeout: 5e3,
+    connectTimeout: 2e4,
     timezone: "+00:00",
     dateStrings: true
   });
@@ -71215,6 +71215,7 @@ async function runMigrations(targetPool) {
         phone VARCHAR(30),
         joining_date DATE NOT NULL,
         status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
+        avatar_url LONGTEXT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY uq_employee_code (employee_code),
@@ -71345,13 +71346,22 @@ async function runMigrations(targetPool) {
         UNIQUE KEY uq_holiday_date (date)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`
     ];
-    for (const sql of tableDefinitions) {
-      await conn.query(sql);
+    const [existingTables] = await conn.query("SHOW TABLES");
+    if (!existingTables || existingTables.length < 10) {
+      for (const sql of tableDefinitions) {
+        await conn.query(sql);
+      }
+      await conn.query("ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL").catch(() => {
+      });
+      await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {
+      });
+      await conn.query("ALTER TABLE users ADD COLUMN avatar_url LONGTEXT NULL").catch(() => {
+      });
+      await conn.query("ALTER TABLE users ADD COLUMN password_updated_at TIMESTAMP NULL").catch(() => {
+      });
+      await conn.query("ALTER TABLE users ADD COLUMN plain_password VARCHAR(255) NULL").catch(() => {
+      });
     }
-    await conn.query("ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL").catch(() => {
-    });
-    await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {
-    });
     console.log("[TiDB] \u2705 All 10 tables verified and ready in TiDB Cloud.");
   } finally {
     conn.release();
@@ -71486,6 +71496,9 @@ async function loadAllFromTiDB() {
         phone: r2.phone || "",
         joining_date: r2.joining_date,
         status: r2.status,
+        plain_password: r2.plain_password || void 0,
+        password_updated_at: toIsoDateTime(r2.password_updated_at) || void 0,
+        avatar_url: r2.avatar_url || void 0,
         created_at: r2.created_at,
         updated_at: r2.updated_at || r2.created_at
       })),
@@ -71623,22 +71636,25 @@ async function syncAllToTiDB(data) {
     );
     await execBatch(
       "users",
-      ["id", "employee_code", "name", "email", "password_hash", "role", "department_id", "manager_id", "position", "phone", "joining_date", "status"],
+      ["id", "employee_code", "name", "email", "password_hash", "plain_password", "role", "department_id", "manager_id", "position", "phone", "joining_date", "status", "avatar_url", "password_updated_at"],
       data.users.map((u) => [
         u.id,
         u.employee_code,
         u.name,
         u.email,
         u.password_hash,
+        u.plain_password || null,
         u.role,
         u.department_id || null,
         u.manager_id || null,
         u.position || null,
         u.phone || null,
         toSqlDate(u.joining_date),
-        u.status
+        u.status,
+        u.avatar_url || null,
+        toSqlDateTime(u.password_updated_at)
       ]),
-      "name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status)"
+      "name=VALUES(name), email=VALUES(email), employee_code=VALUES(employee_code), password_hash=VALUES(password_hash), plain_password=VALUES(plain_password), role=VALUES(role), department_id=VALUES(department_id), manager_id=VALUES(manager_id), position=VALUES(position), phone=VALUES(phone), joining_date=VALUES(joining_date), status=VALUES(status), avatar_url=VALUES(avatar_url), password_updated_at=VALUES(password_updated_at)"
     );
     await execBatch(
       "attendance",
@@ -71797,6 +71813,30 @@ async function deleteUserFromTiDB(userId) {
     }
   }
 }
+async function updateUserPasswordInTiDB(userId, newPasswordHash, plainPassword) {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return false;
+  }
+  const p = getPool();
+  try {
+    if (plainPassword !== void 0) {
+      await p.query(
+        "UPDATE users SET password_hash = ?, plain_password = ?, password_updated_at = NOW(), updated_at = NOW() WHERE id = ?",
+        [newPasswordHash, plainPassword, userId]
+      );
+    } else {
+      await p.query(
+        "UPDATE users SET password_hash = ?, password_updated_at = NOW(), updated_at = NOW() WHERE id = ?",
+        [newPasswordHash, userId]
+      );
+    }
+    console.log(`[TiDB] \u2705 Successfully updated password for user ${userId} in TiDB Cloud.`);
+    return true;
+  } catch (err) {
+    console.error(`[TiDB] \u274C Failed to update password for user ${userId}:`, err.message);
+    return false;
+  }
+}
 async function getTiDBStatus() {
   const config = getConfig();
   const configured = isTiDBConfigured();
@@ -71917,22 +71957,6 @@ var buildrex_default = {
   ],
   users: [
     {
-      id: "user-azeez",
-      employee_code: "BRX-INT-21",
-      name: "Mohammad Azeez.N",
-      email: "azeezmohammed560@gmail.com",
-      password_hash: "$2b$10$NkIr3XXHsEojl2XqJt/EcuzxdLaRvlMEbf1zq379.ACTpzQmlZnV2",
-      role: "intern",
-      department_id: "dept-media",
-      manager_id: "user-ehsaan",
-      position: "Graphic Designer",
-      phone: "9171313874",
-      joining_date: "2026-09-18",
-      status: "active",
-      created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
-    },
-    {
       id: "user-emad",
       employee_code: "BRX-CTO-04",
       name: "Mohamed Emad Ur Rahman",
@@ -71949,11 +71973,27 @@ var buildrex_default = {
       updated_at: "2026-10-23 14:54:38"
     },
     {
+      id: "user-fareed",
+      employee_code: "BRX-EMP-07",
+      name: "N Fareeduddeen",
+      email: "Hafizfareedvlr@gmail.com",
+      password_hash: "$2b$10$E8oDsszbIuOGKYbI/H3MOe9K6LrC5tIc7sQOnTM3Zm6baj4Ly1yNa",
+      role: "employee",
+      department_id: "dept-tech",
+      manager_id: "user-emad",
+      position: "Team Leader",
+      phone: "8778477488",
+      joining_date: "2026-07-31",
+      status: "active",
+      created_at: "2026-10-23 14:54:38",
+      updated_at: "2026-10-23 14:54:38"
+    },
+    {
       id: "user-abbas",
       employee_code: "BRX-INT-18",
       name: "Mohammed Abbas R Y",
       email: "abbas6618532@gmail.com",
-      password_hash: "$2b$10$s9jZB.U4QNHz7EhyhyzeiOy5o3uc0afpQh72kve0Zpi9ZMgd30.2G",
+      password_hash: "$2b$10$JWRQM5pB41o8BJb6HDOhc..RevwiOA1DRucjEw.48/24.or3O6.zu",
       role: "intern",
       department_id: "dept-tech",
       manager_id: "user-emad",
@@ -71962,14 +72002,16 @@ var buildrex_default = {
       joining_date: "2026-09-06",
       status: "active",
       created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
+      updated_at: "2026-11-03 07:02:55",
+      plain_password: "Abbas11",
+      password_updated_at: "2026-11-03T14:06:38.905Z"
     },
     {
       id: "user-admin-master",
       employee_code: "BRX-ADM-00",
       name: "Buildrex Admin",
       email: "adminbrx@gmail.com",
-      password_hash: "$2b$10$UTF4KvIYMAy6/gLx1oC8lOW5Q8.eop6zL4.gRaCygPxTaQ8UG6qEK",
+      password_hash: "$2b$10$MxIPZv.YIKMCEyjjN1dNf.Q10yLoKrzHBNWqSlI7WlLO1P2.7qU6K",
       role: "admin",
       department_id: "dept-ops",
       manager_id: null,
@@ -71978,39 +72020,8 @@ var buildrex_default = {
       joining_date: "2026-05-01",
       status: "active",
       created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
-    },
-    {
-      id: "user-afra",
-      employee_code: "BRX-INT-22",
-      name: "A Afra Fameena",
-      email: "afrafameena1208@gmail.com",
-      password_hash: "$2b$10$.x.HMrzA2t0Rwxkd3wVrAeq9QoYKwY49PWazOqSXO8TlzfZYclOCm",
-      role: "intern",
-      department_id: "dept-fin",
-      manager_id: "user-ehsaan",
-      position: "Finance Intern",
-      phone: "9361224059",
-      joining_date: "2026-09-28",
-      status: "active",
-      created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
-    },
-    {
-      id: "user-ameen",
-      employee_code: "BRX-INT-14",
-      name: "Muhammad Ameen J",
-      email: "jmuhammadameen19@gmail.com",
-      password_hash: "$2b$10$lQpigthwApFegNyaYgqNd.PpJ04EU2ADGczsFz1xNO.2Thwbjtt/e",
-      role: "intern",
-      department_id: "dept-media",
-      manager_id: "user-ehsaan",
-      position: "Assistant Department Head (Media)",
-      phone: "9600801085",
-      joining_date: "2026-07-31",
-      status: "active",
-      created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
+      updated_at: "2026-11-03T13:47:12.690Z",
+      password_updated_at: "2026-11-03T13:47:12.690Z"
     },
     {
       id: "user-ashfaq",
@@ -72035,14 +72046,14 @@ var buildrex_default = {
       email: "ayshaanam.k3706@gmail.com",
       password_hash: "$2b$10$XYoOmpU3NaNxr.6LqMe7O.Nou5SXnpgN02C.06if88BpT24HCLB3W",
       role: "intern",
-      department_id: "dept-hack",
+      department_id: "dept-tech",
       manager_id: "user-sahil",
-      position: "Video Editor",
+      position: "UI UX DESIGNER",
       phone: "7339072724",
       joining_date: "2026-06-14",
       status: "active",
       created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
+      updated_at: "2026-11-02 04:10:29"
     },
     {
       id: "user-zafeera",
@@ -72056,6 +72067,22 @@ var buildrex_default = {
       position: "Operations Manager",
       phone: "8300879846",
       joining_date: "2026-07-08",
+      status: "active",
+      created_at: "2026-10-23 14:54:38",
+      updated_at: "2026-10-23 14:54:38"
+    },
+    {
+      id: "user-azeez",
+      employee_code: "BRX-INT-21",
+      name: "Mohammad Azeez.N",
+      email: "azeezmohammed560@gmail.com",
+      password_hash: "$2b$10$NkIr3XXHsEojl2XqJt/EcuzxdLaRvlMEbf1zq379.ACTpzQmlZnV2",
+      role: "intern",
+      department_id: "dept-media",
+      manager_id: "user-ehsaan",
+      position: "Graphic Designer",
+      phone: "9171313874",
+      joining_date: "2026-09-18",
       status: "active",
       created_at: "2026-10-23 14:54:38",
       updated_at: "2026-10-23 14:54:38"
@@ -72088,22 +72115,6 @@ var buildrex_default = {
       position: "Chief Operating Officer",
       phone: "9894484534",
       joining_date: "2026-07-23",
-      status: "active",
-      created_at: "2026-10-23 14:54:38",
-      updated_at: "2026-10-23 14:54:38"
-    },
-    {
-      id: "user-fareed",
-      employee_code: "BRX-EMP-07",
-      name: "N Fareeduddeen",
-      email: "Hafizfareedvlr@gmail.com",
-      password_hash: "$2b$10$E8oDsszbIuOGKYbI/H3MOe9K6LrC5tIc7sQOnTM3Zm6baj4Ly1yNa",
-      role: "employee",
-      department_id: "dept-tech",
-      manager_id: "user-emad",
-      position: "Team Leader",
-      phone: "8778477488",
-      joining_date: "2026-07-31",
       status: "active",
       created_at: "2026-10-23 14:54:38",
       updated_at: "2026-10-23 14:54:38"
@@ -72207,6 +72218,183 @@ var buildrex_default = {
   ],
   attendance: [
     {
+      id: "att-1793711260066-4dkc0",
+      user_id: "user-zafeera",
+      work_date: "2026-11-03",
+      check_in: "2026-11-03T13:07:40.000Z",
+      check_out: null,
+      total_minutes: 0,
+      status: "late",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T13:07:41.000Z",
+      updated_at: "2026-11-03T13:07:41.000Z"
+    },
+    {
+      id: "att-1793698883360-zvznu",
+      user_id: "user-maleeha",
+      work_date: "2026-11-03",
+      check_in: "2026-11-03T09:41:23.000Z",
+      check_out: null,
+      total_minutes: 169,
+      status: "present",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T09:41:24.000Z",
+      updated_at: "2026-11-03T12:22:29.000Z"
+    },
+    {
+      id: "att-1793695899095-7dxud",
+      user_id: "user-sumaiya",
+      work_date: "2026-11-03",
+      check_in: "2026-11-03T08:51:39.000Z",
+      check_out: "2026-11-03T12:49:00.000Z",
+      total_minutes: 238,
+      status: "present",
+      notes: "Shift under 4 hours (Half Day)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T08:51:39.000Z",
+      updated_at: "2026-11-03T13:20:05.000Z"
+    },
+    {
+      id: "att-1793686820664-5byzo",
+      user_id: "user-abbas",
+      work_date: "2026-11-03",
+      check_in: "2026-11-03T06:20:20.000Z",
+      check_out: null,
+      total_minutes: 0,
+      status: "present",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T06:20:22.000Z",
+      updated_at: "2026-11-03T06:20:22.000Z"
+    },
+    {
+      id: "att-1793678451233-ib1x2",
+      user_id: "user-ehsaan",
+      work_date: "2026-11-03",
+      check_in: "2026-11-03T04:00:51.000Z",
+      check_out: null,
+      total_minutes: 0,
+      status: "present",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T04:00:51.000Z",
+      updated_at: "2026-11-03T04:00:51.000Z"
+    },
+    {
+      id: "att-1793633068883-o4u7r",
+      user_id: "user-1793287370582-karo",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T15:24:28.000Z",
+      check_out: "2026-11-02T17:03:00.000Z",
+      total_minutes: 99,
+      status: "present",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T15:26:12.000Z",
+      updated_at: "2026-11-03T08:40:43.000Z"
+    },
+    {
+      id: "att-1793628911884-abhwa",
+      user_id: "user-1793454603321-5yvc",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T14:15:11.000Z",
+      check_out: "2026-11-02T18:00:00.000Z",
+      total_minutes: 225,
+      status: "present",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T14:15:13.000Z",
+      updated_at: "2026-11-03T12:36:01.000Z"
+    },
+    {
+      id: "att-1793625880431-d7v8e",
+      user_id: "user-sumaiya",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T13:24:40.000Z",
+      check_out: "2026-11-02T14:43:00.000Z",
+      total_minutes: 79,
+      status: "present",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T13:24:41.000Z",
+      updated_at: "2026-11-02T15:26:12.000Z"
+    },
+    {
+      id: "att-1793624195290-mlqqa",
+      user_id: "user-abbas",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T12:56:35.000Z",
+      check_out: "2026-11-02T17:01:00.000Z",
+      total_minutes: 245,
+      status: "present",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T12:56:35.000Z",
+      updated_at: "2026-11-03T12:23:28.000Z"
+    },
+    {
+      id: "att-1793621788686-g17h9",
+      user_id: "user-zafeera",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T12:16:28.000Z",
+      check_out: null,
+      total_minutes: 0,
+      status: "late",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T12:16:30.000Z",
+      updated_at: "2026-11-02T15:26:12.000Z"
+    },
+    {
+      id: "att-1793620142299-59j3k",
+      user_id: "user-mushrath",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T11:49:02.000Z",
+      check_out: "2026-11-02T12:30:00.000Z",
+      total_minutes: 41,
+      status: "present",
+      notes: "Late arrival (checked in after grace window)",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T11:49:03.000Z",
+      updated_at: "2026-11-02T15:26:12.000Z"
+    },
+    {
+      id: "att-1793594517157-kojwp",
+      user_id: "user-maleeha",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T04:41:57.000Z",
+      check_out: "2026-11-02T13:42:16.000Z",
+      total_minutes: 540,
+      status: "present",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T04:41:58.000Z",
+      updated_at: "2026-11-02T15:26:12.000Z"
+    },
+    {
+      id: "att-1793588452458-gpvhl",
+      user_id: "user-ehsaan",
+      work_date: "2026-11-02",
+      check_in: "2026-11-02T03:00:52.000Z",
+      check_out: "2026-11-02T17:52:49.000Z",
+      total_minutes: 892,
+      status: "present",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02T03:00:53.000Z",
+      updated_at: "2026-11-02T17:53:01.000Z"
+    },
+    {
+      id: "att-1793524095212-wwht8",
+      user_id: "user-1793454603321-5yvc",
+      work_date: "2026-11-01",
+      check_in: "2026-11-01T09:08:15.000Z",
+      check_out: null,
+      total_minutes: 0,
+      status: "present",
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-01T09:10:40.000Z",
+      updated_at: "2026-11-01T09:10:40.000Z"
+    },
+    {
       id: "att-1793335220617-sbdv4",
       user_id: "user-abbas",
       work_date: "2026-10-30",
@@ -72248,6 +72436,78 @@ var buildrex_default = {
   ],
   work_updates: [
     {
+      id: "wu-1793710052147-x586y",
+      user_id: "user-sumaiya",
+      work_date: "2026-11-03",
+      tasks_completed: "- Marked attendance & updated yesterday's absentee records.\n- posted a job vacancy for the sales position on linkedln.",
+      project_details: "Attendance system",
+      accomplishments: "- Marked attendance & updated yesterday's absentee records.\n- posted a job vacancy for the sales position on linkedln.",
+      blockers: "",
+      next_day_plan: "",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-11-03T12:47:32.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-11-03T12:47:33.000Z",
+      updated_at: "2026-11-03T12:47:33.000Z"
+    },
+    {
+      id: "wu-1793642776373-1w41p",
+      user_id: "user-1793454603321-5yvc",
+      work_date: "2026-11-02",
+      tasks_completed: "COLLECTED EOD",
+      project_details: "EOD Reporting",
+      accomplishments: "COLLECTED EOD",
+      blockers: "",
+      next_day_plan: "",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: null,
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-11-02T18:06:17.000Z",
+      updated_at: "2026-11-02T18:06:27.000Z"
+    },
+    {
+      id: "wu-1793630469374-quoea",
+      user_id: "user-sumaiya",
+      work_date: "2026-11-02",
+      tasks_completed: "- Marked the attendance in the sheet.\n- Updated the respective deparment-wise sheet for the month of november.",
+      project_details: "Attendance system",
+      accomplishments: "- Marked the attendance in the sheet.\n- Updated the respective deparment-wise sheet for the month of november.",
+      blockers: "",
+      next_day_plan: "",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-11-02T14:41:09.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-11-02T14:41:11.000Z",
+      updated_at: "2026-11-02T14:41:11.000Z"
+    },
+    {
+      id: "wu-1793524052560-1mhvt",
+      user_id: "user-1793454603321-5yvc",
+      work_date: "2026-11-01",
+      tasks_completed: "collected EOD\nVshsjajanak\nHajajajam",
+      project_details: "EOD REPORT",
+      accomplishments: "collected EOD\nVshsjajanak\nHajajajam",
+      blockers: "",
+      next_day_plan: "",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-11-01T09:07:32.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-11-01T09:07:34.000Z",
+      updated_at: "2026-11-01T09:07:34.000Z"
+    },
+    {
       id: "wu-1793339600133-mgsmn",
       user_id: "user-abbas",
       work_date: "2026-10-30",
@@ -72266,24 +72526,6 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:54:39.000Z"
     },
     {
-      id: "wu-1793288192941-a2pxc",
-      user_id: "user-abbas",
-      work_date: "2026-10-29",
-      tasks_completed: "i have done buildrex website",
-      project_details: "Development",
-      accomplishments: "i have done buildrex website",
-      blockers: "",
-      next_day_plan: "i will  deploy from netlify",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-29T15:36:32.000Z",
-      reviewed_by: "user-admin-master",
-      review_comment: "Excellent work today, Mohammed. The tasks on Development are clear, well-structured, and demonstrate strong adherence to engineering standards. Keep up the great velocity!",
-      reviewed_at: "2026-10-29T15:38:34.000Z",
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
       id: "wu-1793288192942-azeez",
       user_id: "user-azeez",
       work_date: "2026-10-29",
@@ -72297,6 +72539,24 @@ var buildrex_default = {
       submitted_at: "2026-10-29T14:15:00.000Z",
       reviewed_by: "user-admin-master",
       review_comment: "Well done Azeez, media communication aligns with release roadmap.",
+      reviewed_at: "2026-10-29T15:38:34.000Z",
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-1793288192941-a2pxc",
+      user_id: "user-abbas",
+      work_date: "2026-10-29",
+      tasks_completed: "i have done buildrex website",
+      project_details: "Development",
+      accomplishments: "i have done buildrex website",
+      blockers: "",
+      next_day_plan: "i will  deploy from netlify",
+      hours_spent: 8,
+      status: "reviewed",
+      submitted_at: "2026-10-29T15:36:32.000Z",
+      reviewed_by: "user-admin-master",
+      review_comment: "Excellent work today, Mohammed. The tasks on Development are clear, well-structured, and demonstrate strong adherence to engineering standards. Keep up the great velocity!",
       reviewed_at: "2026-10-29T15:38:34.000Z",
       created_at: "2026-10-30T05:40:14.000Z",
       updated_at: "2026-10-30T05:40:14.000Z"
@@ -72338,68 +72598,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-sumaiya-2026-10-22",
-      user_id: "user-sumaiya",
+      id: "wu-user-abbas-2026-10-22",
+      user_id: "user-abbas",
       work_date: "2026-10-22",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
+      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
+      project_details: "Social Media Automation",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
-      hours_spent: 7,
-      status: "submitted",
-      submitted_at: "2026-10-22T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-ameen-2026-10-22",
-      user_id: "user-ameen",
-      work_date: "2026-10-22",
-      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 7,
-      status: "submitted",
-      submitted_at: "2026-10-22T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-azeez-2026-10-22",
-      user_id: "user-azeez",
-      work_date: "2026-10-22",
-      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 9,
-      status: "submitted",
-      submitted_at: "2026-10-22T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-admin-master-2026-10-22",
-      user_id: "user-admin-master",
-      work_date: "2026-10-22",
-      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
+      next_day_plan: "Continue with Finance Dashboard tasks",
       hours_spent: 9,
       status: "submitted",
       submitted_at: "2026-10-22T12:00:00.000Z",
@@ -72428,15 +72634,15 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-zafeera-2026-10-22",
-      user_id: "user-zafeera",
+      id: "wu-user-azeez-2026-10-22",
+      user_id: "user-azeez",
       work_date: "2026-10-22",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
+      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
-      hours_spent: 8,
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 9,
       status: "submitted",
       submitted_at: "2026-10-22T12:00:00.000Z",
       reviewed_by: null,
@@ -72464,32 +72670,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-aysha-2026-10-22",
-      user_id: "user-aysha",
+      id: "wu-user-admin-master-2026-10-22",
+      user_id: "user-admin-master",
       work_date: "2026-10-22",
-      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
+      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
       project_details: "Hackathon Portal v2.0",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 8,
-      status: "submitted",
-      submitted_at: "2026-10-22T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-abbas-2026-10-22",
-      user_id: "user-abbas",
-      work_date: "2026-10-22",
-      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
       hours_spent: 9,
       status: "submitted",
       submitted_at: "2026-10-22T12:00:00.000Z",
@@ -72500,14 +72688,32 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-immanuel-2026-10-22",
-      user_id: "user-immanuel",
+      id: "wu-user-zafeera-2026-10-22",
+      user_id: "user-zafeera",
       work_date: "2026-10-22",
-      tasks_completed: "- Reviewed and onboarded 3 new campus ambassadors\n- Prepared quarterly financial report and budget analysis\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "Campus Outreach Campaign",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      next_day_plan: "Continue with Social Media Automation tasks",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-10-22T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-mushrath-2026-10-22",
+      user_id: "user-mushrath",
+      work_date: "2026-10-22",
+      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with HR Onboarding System tasks",
       hours_spent: 8,
       status: "submitted",
       submitted_at: "2026-10-22T12:00:00.000Z",
@@ -72536,24 +72742,6 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-afra-2026-10-22",
-      user_id: "user-afra",
-      work_date: "2026-10-22",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 8,
-      status: "submitted",
-      submitted_at: "2026-10-22T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
       id: "wu-user-maleeha-2026-10-22",
       user_id: "user-maleeha",
       work_date: "2026-10-22",
@@ -72572,14 +72760,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-mushrath-2026-10-22",
-      user_id: "user-mushrath",
+      id: "wu-user-aysha-2026-10-22",
+      user_id: "user-aysha",
       work_date: "2026-10-22",
-      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
+      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
       hours_spent: 8,
       status: "submitted",
       submitted_at: "2026-10-22T12:00:00.000Z",
@@ -72590,17 +72778,17 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-fareed-2026-10-21",
-      user_id: "user-fareed",
-      work_date: "2026-10-21",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
+      id: "wu-user-immanuel-2026-10-22",
+      user_id: "user-immanuel",
+      work_date: "2026-10-22",
+      tasks_completed: "- Reviewed and onboarded 3 new campus ambassadors\n- Prepared quarterly financial report and budget analysis\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 9,
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      hours_spent: 8,
       status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
+      submitted_at: "2026-10-22T12:00:00.000Z",
       reviewed_by: null,
       review_comment: null,
       reviewed_at: null,
@@ -72608,50 +72796,32 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-sumaiya-2026-10-21",
+      id: "wu-user-sumaiya-2026-10-22",
       user_id: "user-sumaiya",
+      work_date: "2026-10-22",
+      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      hours_spent: 7,
+      status: "submitted",
+      submitted_at: "2026-10-22T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-immanuel-2026-10-21",
+      user_id: "user-immanuel",
       work_date: "2026-10-21",
-      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
+      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
       project_details: "Ambassador Management Portal",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 9,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-admin-master-2026-10-21",
-      user_id: "user-admin-master",
-      work_date: "2026-10-21",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
-      hours_spent: 8,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-zafeera-2026-10-21",
-      user_id: "user-zafeera",
-      work_date: "2026-10-21",
-      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
       hours_spent: 7,
       status: "submitted",
       submitted_at: "2026-10-21T12:00:00.000Z",
@@ -72680,78 +72850,6 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-mushrath-2026-10-21",
-      user_id: "user-mushrath",
-      work_date: "2026-10-21",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
-      hours_spent: 7,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-azeez-2026-10-21",
-      user_id: "user-azeez",
-      work_date: "2026-10-21",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 8,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-ashfaq-2026-10-21",
-      user_id: "user-ashfaq",
-      work_date: "2026-10-21",
-      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
-      hours_spent: 9,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-immanuel-2026-10-21",
-      user_id: "user-immanuel",
-      work_date: "2026-10-21",
-      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 7,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
       id: "wu-user-abbas-2026-10-21",
       user_id: "user-abbas",
       work_date: "2026-10-21",
@@ -72761,42 +72859,6 @@ var buildrex_default = {
       blockers: "None",
       next_day_plan: "Continue with HR Onboarding System tasks",
       hours_spent: 8,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-ameen-2026-10-21",
-      user_id: "user-ameen",
-      work_date: "2026-10-21",
-      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 9,
-      status: "submitted",
-      submitted_at: "2026-10-21T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-afra-2026-10-21",
-      user_id: "user-afra",
-      work_date: "2026-10-21",
-      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 7,
       status: "submitted",
       submitted_at: "2026-10-21T12:00:00.000Z",
       reviewed_by: null,
@@ -72824,6 +72886,96 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
+      id: "wu-user-azeez-2026-10-21",
+      user_id: "user-azeez",
+      work_date: "2026-10-21",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-10-21T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-zafeera-2026-10-21",
+      user_id: "user-zafeera",
+      work_date: "2026-10-21",
+      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
+      project_details: "Social Media Automation",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Finance Dashboard tasks",
+      hours_spent: 7,
+      status: "submitted",
+      submitted_at: "2026-10-21T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-mushrath-2026-10-21",
+      user_id: "user-mushrath",
+      work_date: "2026-10-21",
+      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      hours_spent: 7,
+      status: "submitted",
+      submitted_at: "2026-10-21T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-sumaiya-2026-10-21",
+      user_id: "user-sumaiya",
+      work_date: "2026-10-21",
+      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 9,
+      status: "submitted",
+      submitted_at: "2026-10-21T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-ashfaq-2026-10-21",
+      user_id: "user-ashfaq",
+      work_date: "2026-10-21",
+      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
+      project_details: "Social Media Automation",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Finance Dashboard tasks",
+      hours_spent: 9,
+      status: "submitted",
+      submitted_at: "2026-10-21T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
       id: "wu-user-maleeha-2026-10-21",
       user_id: "user-maleeha",
       work_date: "2026-10-21",
@@ -72833,6 +72985,42 @@ var buildrex_default = {
       blockers: "None",
       next_day_plan: "Continue with Campus Outreach Campaign tasks",
       hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-10-21T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-admin-master-2026-10-21",
+      user_id: "user-admin-master",
+      work_date: "2026-10-21",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "Campus Outreach Campaign",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Social Media Automation tasks",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-10-21T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-fareed-2026-10-21",
+      user_id: "user-fareed",
+      work_date: "2026-10-21",
+      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with HR Onboarding System tasks",
+      hours_spent: 9,
       status: "submitted",
       submitted_at: "2026-10-21T12:00:00.000Z",
       reviewed_by: null,
@@ -72860,132 +73048,6 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-sahil-2026-10-20",
-      user_id: "user-sahil",
-      work_date: "2026-10-20",
-      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 7,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-aysha-2026-10-20",
-      user_id: "user-aysha",
-      work_date: "2026-10-20",
-      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
-      hours_spent: 9,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-azeez-2026-10-20",
-      user_id: "user-azeez",
-      work_date: "2026-10-20",
-      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 7,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-ameen-2026-10-20",
-      user_id: "user-ameen",
-      work_date: "2026-10-20",
-      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 8,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-afra-2026-10-20",
-      user_id: "user-afra",
-      work_date: "2026-10-20",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
-      hours_spent: 9,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-sumaiya-2026-10-20",
-      user_id: "user-sumaiya",
-      work_date: "2026-10-20",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 8,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-admin-master-2026-10-20",
-      user_id: "user-admin-master",
-      work_date: "2026-10-20",
-      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
-      hours_spent: 7,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
       id: "wu-user-immanuel-2026-10-20",
       user_id: "user-immanuel",
       work_date: "2026-10-20",
@@ -73004,14 +73066,32 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-abbas-2026-10-20",
-      user_id: "user-abbas",
+      id: "wu-user-zafeera-2026-10-20",
+      user_id: "user-zafeera",
       work_date: "2026-10-20",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
+      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      next_day_plan: "Continue with HR Onboarding System tasks",
+      hours_spent: 9,
+      status: "submitted",
+      submitted_at: "2026-10-20T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-admin-master-2026-10-20",
+      user_id: "user-admin-master",
+      work_date: "2026-10-20",
+      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
+      project_details: "Social Media Automation",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Finance Dashboard tasks",
       hours_spent: 7,
       status: "submitted",
       submitted_at: "2026-10-20T12:00:00.000Z",
@@ -73040,33 +73120,15 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-zafeera-2026-10-20",
-      user_id: "user-zafeera",
+      id: "wu-user-azeez-2026-10-20",
+      user_id: "user-azeez",
       work_date: "2026-10-20",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
+      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 9,
-      status: "submitted",
-      submitted_at: "2026-10-20T12:00:00.000Z",
-      reviewed_by: null,
-      review_comment: null,
-      reviewed_at: null,
-      created_at: "2026-10-30T05:40:14.000Z",
-      updated_at: "2026-10-30T05:40:14.000Z"
-    },
-    {
-      id: "wu-user-ashfaq-2026-10-20",
-      user_id: "user-ashfaq",
-      work_date: "2026-10-20",
-      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 8,
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
+      hours_spent: 7,
       status: "submitted",
       submitted_at: "2026-10-20T12:00:00.000Z",
       reviewed_by: null,
@@ -73094,15 +73156,105 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-ashfaq-2026-10-19",
-      user_id: "user-ashfaq",
-      work_date: "2026-10-19",
+      id: "wu-user-sahil-2026-10-20",
+      user_id: "user-sahil",
+      work_date: "2026-10-20",
+      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 7,
+      status: "submitted",
+      submitted_at: "2026-10-20T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-sumaiya-2026-10-20",
+      user_id: "user-sumaiya",
+      work_date: "2026-10-20",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-10-20T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-aysha-2026-10-20",
+      user_id: "user-aysha",
+      work_date: "2026-10-20",
+      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
+      project_details: "Social Media Automation",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Finance Dashboard tasks",
+      hours_spent: 9,
+      status: "submitted",
+      submitted_at: "2026-10-20T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-abbas-2026-10-20",
+      user_id: "user-abbas",
+      work_date: "2026-10-20",
       tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
       project_details: "HR Onboarding System",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with Ambassador Management Portal tasks",
       hours_spent: 7,
+      status: "submitted",
+      submitted_at: "2026-10-20T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-ashfaq-2026-10-20",
+      user_id: "user-ashfaq",
+      work_date: "2026-10-20",
+      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with HR Onboarding System tasks",
+      hours_spent: 8,
+      status: "submitted",
+      submitted_at: "2026-10-20T12:00:00.000Z",
+      reviewed_by: null,
+      review_comment: null,
+      reviewed_at: null,
+      created_at: "2026-10-30T05:40:14.000Z",
+      updated_at: "2026-10-30T05:40:14.000Z"
+    },
+    {
+      id: "wu-user-sahil-2026-10-19",
+      user_id: "user-sahil",
+      work_date: "2026-10-19",
+      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-19T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -73112,14 +73264,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-mushrath-2026-10-19",
-      user_id: "user-mushrath",
+      id: "wu-user-aysha-2026-10-19",
+      user_id: "user-aysha",
       work_date: "2026-10-19",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
+      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      next_day_plan: "Continue with HR Onboarding System tasks",
       hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-19T12:00:00.000Z",
@@ -73148,14 +73300,32 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-afra-2026-10-19",
-      user_id: "user-afra",
+      id: "wu-user-admin-master-2026-10-19",
+      user_id: "user-admin-master",
       work_date: "2026-10-19",
-      tasks_completed: "- Reviewed and onboarded 3 new campus ambassadors\n- Prepared quarterly financial report and budget analysis\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
+      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
+      next_day_plan: "Continue with HR Onboarding System tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-19T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-17T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-mushrath-2026-10-19",
+      user_id: "user-mushrath",
+      work_date: "2026-10-19",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
       hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-19T12:00:00.000Z",
@@ -73184,33 +73354,15 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-ameen-2026-10-19",
-      user_id: "user-ameen",
+      id: "wu-user-ashfaq-2026-10-19",
+      user_id: "user-ashfaq",
       work_date: "2026-10-19",
-      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
+      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
       hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-19T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-17T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-aysha-2026-10-19",
-      user_id: "user-aysha",
-      work_date: "2026-10-19",
-      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-19T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -73238,50 +73390,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-sahil-2026-10-19",
-      user_id: "user-sahil",
+      id: "wu-user-abbas-2026-10-19",
+      user_id: "user-abbas",
       work_date: "2026-10-19",
-      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
+      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-19T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-17T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-admin-master-2026-10-19",
-      user_id: "user-admin-master",
-      work_date: "2026-10-19",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-19T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-17T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-azeez-2026-10-19",
-      user_id: "user-azeez",
-      work_date: "2026-10-19",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
       hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-19T12:00:00.000Z",
@@ -73310,14 +73426,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-abbas-2026-10-19",
-      user_id: "user-abbas",
+      id: "wu-user-azeez-2026-10-19",
+      user_id: "user-azeez",
       work_date: "2026-10-19",
-      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
+      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
+      project_details: "Campus Outreach Campaign",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      next_day_plan: "Continue with Social Media Automation tasks",
       hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-19T12:00:00.000Z",
@@ -73346,14 +73462,50 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:14.000Z"
     },
     {
-      id: "wu-user-afra-2026-10-16",
-      user_id: "user-afra",
+      id: "wu-user-fareed-2026-10-16",
+      user_id: "user-fareed",
       work_date: "2026-10-16",
-      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
+      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
+      project_details: "Campus Outreach Campaign",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      next_day_plan: "Continue with Social Media Automation tasks",
+      hours_spent: 7,
+      status: "reviewed",
+      submitted_at: "2026-10-16T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-14T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-abbas-2026-10-16",
+      user_id: "user-abbas",
+      work_date: "2026-10-16",
+      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
+      project_details: "Campus Outreach Campaign",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Social Media Automation tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-16T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-14T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-zafeera-2026-10-16",
+      user_id: "user-zafeera",
+      work_date: "2026-10-16",
+      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
       hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-16T12:00:00.000Z",
@@ -73364,15 +73516,51 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-ameen-2026-10-16",
-      user_id: "user-ameen",
+      id: "wu-user-sumaiya-2026-10-16",
+      user_id: "user-sumaiya",
       work_date: "2026-10-16",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
+      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      next_day_plan: "Continue with HR Onboarding System tasks",
       hours_spent: 7,
+      status: "reviewed",
+      submitted_at: "2026-10-16T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-14T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-maleeha-2026-10-16",
+      user_id: "user-maleeha",
+      work_date: "2026-10-16",
+      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-16T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-14T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-aysha-2026-10-16",
+      user_id: "user-aysha",
+      work_date: "2026-10-16",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-16T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -73390,24 +73578,6 @@ var buildrex_default = {
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with Finance Dashboard tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-16T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-14T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-admin-master-2026-10-16",
-      user_id: "user-admin-master",
-      work_date: "2026-10-16",
-      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
       hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-16T12:00:00.000Z",
@@ -73454,122 +73624,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-maleeha-2026-10-16",
-      user_id: "user-maleeha",
+      id: "wu-user-admin-master-2026-10-16",
+      user_id: "user-admin-master",
       work_date: "2026-10-16",
-      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-16T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-14T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-sumaiya-2026-10-16",
-      user_id: "user-sumaiya",
-      work_date: "2026-10-16",
-      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-16T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-14T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-fareed-2026-10-16",
-      user_id: "user-fareed",
-      work_date: "2026-10-16",
-      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-16T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-14T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-zafeera-2026-10-16",
-      user_id: "user-zafeera",
-      work_date: "2026-10-16",
-      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-16T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-14T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-aysha-2026-10-16",
-      user_id: "user-aysha",
-      work_date: "2026-10-16",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
       project_details: "BUILDREX Core Platform",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-16T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-14T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-ashfaq-2026-10-16",
-      user_id: "user-ashfaq",
-      work_date: "2026-10-16",
-      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-16T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-14T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-abbas-2026-10-16",
-      user_id: "user-abbas",
-      work_date: "2026-10-16",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
       hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-16T12:00:00.000Z",
@@ -73598,63 +73660,9 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-afra-2026-10-15",
-      user_id: "user-afra",
-      work_date: "2026-10-15",
-      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-15T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-13T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-ameen-2026-10-15",
-      user_id: "user-ameen",
-      work_date: "2026-10-15",
-      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-15T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-13T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-immanuel-2026-10-15",
-      user_id: "user-immanuel",
-      work_date: "2026-10-15",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-15T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-13T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-aysha-2026-10-15",
-      user_id: "user-aysha",
-      work_date: "2026-10-15",
+      id: "wu-user-ashfaq-2026-10-16",
+      user_id: "user-ashfaq",
+      work_date: "2026-10-16",
       tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
       project_details: "Hackathon Portal v2.0",
       accomplishments: "Completed all planned deliverables on schedule",
@@ -73662,6 +73670,24 @@ var buildrex_default = {
       next_day_plan: "Continue with Campus Outreach Campaign tasks",
       hours_spent: 7,
       status: "reviewed",
+      submitted_at: "2026-10-16T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-14T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-sahil-2026-10-15",
+      user_id: "user-sahil",
+      work_date: "2026-10-15",
+      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with HR Onboarding System tasks",
+      hours_spent: 8,
+      status: "reviewed",
       submitted_at: "2026-10-15T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
       review_comment: "Good progress. Keep up the momentum.",
@@ -73670,14 +73696,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-azeez-2026-10-15",
-      user_id: "user-azeez",
+      id: "wu-user-abbas-2026-10-15",
+      user_id: "user-abbas",
       work_date: "2026-10-15",
-      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
+      tasks_completed: "- Reviewed and onboarded 3 new campus ambassadors\n- Prepared quarterly financial report and budget analysis\n- Attended team sync meeting",
+      project_details: "Social Media Automation",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      next_day_plan: "Continue with Finance Dashboard tasks",
       hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-15T12:00:00.000Z",
@@ -73706,14 +73732,32 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-zafeera-2026-10-15",
-      user_id: "user-zafeera",
+      id: "wu-user-azeez-2026-10-15",
+      user_id: "user-azeez",
       work_date: "2026-10-15",
-      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
+      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 8,
+      status: "reviewed",
+      submitted_at: "2026-10-15T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-13T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-immanuel-2026-10-15",
+      user_id: "user-immanuel",
+      work_date: "2026-10-15",
+      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
       hours_spent: 7,
       status: "reviewed",
       submitted_at: "2026-10-15T12:00:00.000Z",
@@ -73742,33 +73786,15 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-sahil-2026-10-15",
-      user_id: "user-sahil",
+      id: "wu-user-aysha-2026-10-15",
+      user_id: "user-aysha",
       work_date: "2026-10-15",
-      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
+      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-15T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-13T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-fareed-2026-10-15",
-      user_id: "user-fareed",
-      work_date: "2026-10-15",
-      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
-      hours_spent: 9,
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
+      hours_spent: 7,
       status: "reviewed",
       submitted_at: "2026-10-15T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -73796,15 +73822,15 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-maleeha-2026-10-15",
-      user_id: "user-maleeha",
+      id: "wu-user-fareed-2026-10-15",
+      user_id: "user-fareed",
       work_date: "2026-10-15",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
+      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
+      project_details: "Social Media Automation",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 8,
+      next_day_plan: "Continue with Finance Dashboard tasks",
+      hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-15T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -73832,20 +73858,56 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-abbas-2026-10-15",
-      user_id: "user-abbas",
+      id: "wu-user-maleeha-2026-10-15",
+      user_id: "user-maleeha",
       work_date: "2026-10-15",
-      tasks_completed: "- Reviewed and onboarded 3 new campus ambassadors\n- Prepared quarterly financial report and budget analysis\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
       hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-15T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
       review_comment: "Good progress. Keep up the momentum.",
       reviewed_at: "2026-10-13T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-zafeera-2026-10-15",
+      user_id: "user-zafeera",
+      work_date: "2026-10-15",
+      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
+      project_details: "Campus Outreach Campaign",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Social Media Automation tasks",
+      hours_spent: 7,
+      status: "reviewed",
+      submitted_at: "2026-10-15T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-13T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-mushrath-2026-10-14",
+      user_id: "user-mushrath",
+      work_date: "2026-10-14",
+      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-14T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-12T22:15:00.000Z",
       created_at: "2026-10-30T05:40:15.000Z",
       updated_at: "2026-10-30T05:40:15.000Z"
     },
@@ -73886,141 +73948,15 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-sahil-2026-10-14",
-      user_id: "user-sahil",
+      id: "wu-user-azeez-2026-10-14",
+      user_id: "user-azeez",
       work_date: "2026-10-14",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-14T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-12T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-sumaiya-2026-10-14",
-      user_id: "user-sumaiya",
-      work_date: "2026-10-14",
-      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-14T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-12T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-ameen-2026-10-14",
-      user_id: "user-ameen",
-      work_date: "2026-10-14",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
       project_details: "BUILDREX Core Platform",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-14T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-12T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-mushrath-2026-10-14",
-      user_id: "user-mushrath",
-      work_date: "2026-10-14",
-      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-14T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-12T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-maleeha-2026-10-14",
-      user_id: "user-maleeha",
-      work_date: "2026-10-14",
-      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
       hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-14T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-12T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-aysha-2026-10-14",
-      user_id: "user-aysha",
-      work_date: "2026-10-14",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-14T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-12T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-abbas-2026-10-14",
-      user_id: "user-abbas",
-      work_date: "2026-10-14",
-      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-14T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-12T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-afra-2026-10-14",
-      user_id: "user-afra",
-      work_date: "2026-10-14",
-      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-14T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -74066,14 +74002,68 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-azeez-2026-10-14",
-      user_id: "user-azeez",
+      id: "wu-user-abbas-2026-10-14",
+      user_id: "user-abbas",
       work_date: "2026-10-14",
-      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
+      tasks_completed: "- Prepared quarterly financial report and budget analysis\n- Built API endpoints for attendance tracking module\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      next_day_plan: "Continue with HR Onboarding System tasks",
+      hours_spent: 7,
+      status: "reviewed",
+      submitted_at: "2026-10-14T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-12T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-aysha-2026-10-14",
+      user_id: "user-aysha",
+      work_date: "2026-10-14",
+      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
+      project_details: "Campus Outreach Campaign",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Social Media Automation tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-14T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-12T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-maleeha-2026-10-14",
+      user_id: "user-maleeha",
+      work_date: "2026-10-14",
+      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
+      hours_spent: 7,
+      status: "reviewed",
+      submitted_at: "2026-10-14T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-12T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-sahil-2026-10-14",
+      user_id: "user-sahil",
+      work_date: "2026-10-14",
+      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
       hours_spent: 7,
       status: "reviewed",
       submitted_at: "2026-10-14T12:00:00.000Z",
@@ -74102,56 +74092,20 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-mushrath-2026-10-13",
-      user_id: "user-mushrath",
-      work_date: "2026-10-13",
+      id: "wu-user-sumaiya-2026-10-14",
+      user_id: "user-sumaiya",
+      work_date: "2026-10-14",
       tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
       project_details: "Ambassador Management Portal",
       accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "Waiting on design assets from external vendor",
+      blockers: "None",
       next_day_plan: "Continue with BUILDREX Core Platform tasks",
       hours_spent: 8,
       status: "reviewed",
-      submitted_at: "2026-10-13T12:00:00.000Z",
+      submitted_at: "2026-10-14T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
       review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-11T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-zafeera-2026-10-13",
-      user_id: "user-zafeera",
-      work_date: "2026-10-13",
-      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
-      project_details: "Finance Dashboard",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "Waiting on design assets from external vendor",
-      next_day_plan: "Continue with HR Onboarding System tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-13T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-11T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-abbas-2026-10-13",
-      user_id: "user-abbas",
-      work_date: "2026-10-13",
-      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "Waiting on design assets from external vendor",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-13T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-11T22:15:00.000Z",
+      reviewed_at: "2026-10-12T22:15:00.000Z",
       created_at: "2026-10-30T05:40:15.000Z",
       updated_at: "2026-10-30T05:40:15.000Z"
     },
@@ -74165,42 +74119,6 @@ var buildrex_default = {
       blockers: "Waiting on design assets from external vendor",
       next_day_plan: "Continue with Finance Dashboard tasks",
       hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-13T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-11T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-afra-2026-10-13",
-      user_id: "user-afra",
-      work_date: "2026-10-13",
-      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "Waiting on design assets from external vendor",
-      next_day_plan: "Continue with Social Media Automation tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-13T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-11T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-azeez-2026-10-13",
-      user_id: "user-azeez",
-      work_date: "2026-10-13",
-      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "Waiting on design assets from external vendor",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 9,
       status: "reviewed",
       submitted_at: "2026-10-13T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -74228,32 +74146,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-sahil-2026-10-13",
-      user_id: "user-sahil",
+      id: "wu-user-zafeera-2026-10-13",
+      user_id: "user-zafeera",
       work_date: "2026-10-13",
-      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
+      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
+      project_details: "Finance Dashboard",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "Waiting on design assets from external vendor",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-13T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-11T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-immanuel-2026-10-13",
-      user_id: "user-immanuel",
-      work_date: "2026-10-13",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "Waiting on design assets from external vendor",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      next_day_plan: "Continue with HR Onboarding System tasks",
       hours_spent: 8,
       status: "reviewed",
       submitted_at: "2026-10-13T12:00:00.000Z",
@@ -74282,15 +74182,177 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-ameen-2026-10-12",
-      user_id: "user-ameen",
+      id: "wu-user-sahil-2026-10-13",
+      user_id: "user-sahil",
+      work_date: "2026-10-13",
+      tasks_completed: "- Conducted code review for sprint #14 pull requests\n- Designed and deployed the hackathon registration flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "Waiting on design assets from external vendor",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-13T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-11T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-mushrath-2026-10-13",
+      user_id: "user-mushrath",
+      work_date: "2026-10-13",
+      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "Waiting on design assets from external vendor",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 8,
+      status: "reviewed",
+      submitted_at: "2026-10-13T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-11T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-abbas-2026-10-13",
+      user_id: "user-abbas",
+      work_date: "2026-10-13",
+      tasks_completed: "- Built API endpoints for attendance tracking module\n- Created video content for upcoming hackathon promotion\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "Waiting on design assets from external vendor",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-13T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-11T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-azeez-2026-10-13",
+      user_id: "user-azeez",
+      work_date: "2026-10-13",
+      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "Waiting on design assets from external vendor",
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
+      hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-13T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-11T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-immanuel-2026-10-13",
+      user_id: "user-immanuel",
+      work_date: "2026-10-13",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "Waiting on design assets from external vendor",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      hours_spent: 8,
+      status: "reviewed",
+      submitted_at: "2026-10-13T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-11T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-sahil-2026-10-12",
+      user_id: "user-sahil",
       work_date: "2026-10-12",
-      tasks_completed: "- Configured CI/CD pipeline for staging environment\n- Reviewed and onboarded 3 new campus ambassadors\n- Attended team sync meeting",
+      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      project_details: "BUILDREX Core Platform",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
+      hours_spent: 8,
+      status: "reviewed",
+      submitted_at: "2026-10-12T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-10T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-azeez-2026-10-12",
+      user_id: "user-azeez",
+      work_date: "2026-10-12",
+      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
       project_details: "Campus Outreach Campaign",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with Social Media Automation tasks",
+      hours_spent: 8,
+      status: "reviewed",
+      submitted_at: "2026-10-12T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-10T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-abbas-2026-10-12",
+      user_id: "user-abbas",
+      work_date: "2026-10-12",
+      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
+      project_details: "Ambassador Management Portal",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with BUILDREX Core Platform tasks",
+      hours_spent: 8,
+      status: "reviewed",
+      submitted_at: "2026-10-12T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-10T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-sumaiya-2026-10-12",
+      user_id: "user-sumaiya",
+      work_date: "2026-10-12",
+      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
       hours_spent: 9,
+      status: "reviewed",
+      submitted_at: "2026-10-12T12:00:00.000Z",
+      reviewed_by: "user-ehsaan",
+      review_comment: "Good progress. Keep up the momentum.",
+      reviewed_at: "2026-10-10T22:15:00.000Z",
+      created_at: "2026-10-30T05:40:15.000Z",
+      updated_at: "2026-10-30T05:40:15.000Z"
+    },
+    {
+      id: "wu-user-zafeera-2026-10-12",
+      user_id: "user-zafeera",
+      work_date: "2026-10-12",
+      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
+      project_details: "HR Onboarding System",
+      accomplishments: "Completed all planned deliverables on schedule",
+      blockers: "None",
+      next_day_plan: "Continue with Ambassador Management Portal tasks",
+      hours_spent: 7,
       status: "reviewed",
       submitted_at: "2026-10-12T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -74354,78 +74416,6 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-mushrath-2026-10-12",
-      user_id: "user-mushrath",
-      work_date: "2026-10-12",
-      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
-      project_details: "BUILDREX Core Platform",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-12T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-10T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-zafeera-2026-10-12",
-      user_id: "user-zafeera",
-      work_date: "2026-10-12",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "HR Onboarding System",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Ambassador Management Portal tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-12T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-10T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-sumaiya-2026-10-12",
-      user_id: "user-sumaiya",
-      work_date: "2026-10-12",
-      tasks_completed: "- Developed mobile-responsive layouts for event pages\n- Organized team standup and sprint planning session\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 9,
-      status: "reviewed",
-      submitted_at: "2026-10-12T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-10T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-immanuel-2026-10-12",
-      user_id: "user-immanuel",
-      work_date: "2026-10-12",
-      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
-      project_details: "Hackathon Portal v2.0",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Campus Outreach Campaign tasks",
-      hours_spent: 7,
-      status: "reviewed",
-      submitted_at: "2026-10-12T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-10T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
       id: "wu-user-aysha-2026-10-12",
       user_id: "user-aysha",
       work_date: "2026-10-12",
@@ -74444,14 +74434,14 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-afra-2026-10-12",
-      user_id: "user-afra",
+      id: "wu-user-immanuel-2026-10-12",
+      user_id: "user-immanuel",
       work_date: "2026-10-12",
-      tasks_completed: "- Implemented responsive UI components for the dashboard module\n- Conducted code review for sprint #14 pull requests\n- Attended team sync meeting",
-      project_details: "Social Media Automation",
+      tasks_completed: "- Updated social media content calendar and scheduled posts\n- Configured CI/CD pipeline for staging environment\n- Attended team sync meeting",
+      project_details: "Hackathon Portal v2.0",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
-      next_day_plan: "Continue with Finance Dashboard tasks",
+      next_day_plan: "Continue with Campus Outreach Campaign tasks",
       hours_spent: 7,
       status: "reviewed",
       submitted_at: "2026-10-12T12:00:00.000Z",
@@ -74480,51 +74470,15 @@ var buildrex_default = {
       updated_at: "2026-10-30T05:40:15.000Z"
     },
     {
-      id: "wu-user-azeez-2026-10-12",
-      user_id: "user-azeez",
+      id: "wu-user-mushrath-2026-10-12",
+      user_id: "user-mushrath",
       work_date: "2026-10-12",
-      tasks_completed: "- Organized team standup and sprint planning session\n- Implemented responsive UI components for the dashboard module\n- Attended team sync meeting",
-      project_details: "Campus Outreach Campaign",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with Social Media Automation tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-12T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-10T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-sahil-2026-10-12",
-      user_id: "user-sahil",
-      work_date: "2026-10-12",
-      tasks_completed: "- Designed and deployed the hackathon registration flow\n- Updated social media content calendar and scheduled posts\n- Attended team sync meeting",
+      tasks_completed: "- Fixed critical bug in user authentication flow\n- Developed mobile-responsive layouts for event pages\n- Attended team sync meeting",
       project_details: "BUILDREX Core Platform",
       accomplishments: "Completed all planned deliverables on schedule",
       blockers: "None",
       next_day_plan: "Continue with Hackathon Portal v2.0 tasks",
-      hours_spent: 8,
-      status: "reviewed",
-      submitted_at: "2026-10-12T12:00:00.000Z",
-      reviewed_by: "user-ehsaan",
-      review_comment: "Good progress. Keep up the momentum.",
-      reviewed_at: "2026-10-10T22:15:00.000Z",
-      created_at: "2026-10-30T05:40:15.000Z",
-      updated_at: "2026-10-30T05:40:15.000Z"
-    },
-    {
-      id: "wu-user-abbas-2026-10-12",
-      user_id: "user-abbas",
-      work_date: "2026-10-12",
-      tasks_completed: "- Created video content for upcoming hackathon promotion\n- Fixed critical bug in user authentication flow\n- Attended team sync meeting",
-      project_details: "Ambassador Management Portal",
-      accomplishments: "Completed all planned deliverables on schedule",
-      blockers: "None",
-      next_day_plan: "Continue with BUILDREX Core Platform tasks",
-      hours_spent: 8,
+      hours_spent: 7,
       status: "reviewed",
       submitted_at: "2026-10-12T12:00:00.000Z",
       reviewed_by: "user-ehsaan",
@@ -74622,18 +74576,18 @@ var buildrex_default = {
   ],
   attendance_corrections: [
     {
-      id: "corr-1",
-      user_id: "user-ameen",
-      attendance_id: "att-user-ameen-sample",
-      work_date: "2026-10-15",
-      requested_check_in: "2026-10-15T03:28:00.000Z",
-      requested_check_out: "2026-10-15T12:40:00.000Z",
-      reason: "Forgot to check out \u2014 was in a media editing session until late",
+      id: "corr-1793711336133-47h1o",
+      user_id: "user-zafeera",
+      attendance_id: "att-1793621788686-g17h9",
+      work_date: "2026-11-02",
+      requested_check_in: "2026-11-02T12:16:00.000Z",
+      requested_check_out: "2026-11-02T16:30:00.000Z",
+      reason: "I stopped and i guess it didn't make any change",
       status: "pending",
       reviewed_by: null,
       review_comment: null,
       reviewed_at: null,
-      created_at: "2026-10-30T05:40:15.000Z"
+      created_at: "2026-11-03T13:08:58.000Z"
     },
     {
       id: "corr-1793107449870-dho25",
@@ -74651,6 +74605,326 @@ var buildrex_default = {
     }
   ],
   notifications: [
+    {
+      id: "notif-1793711264234-w65r",
+      user_id: "user-ehsaan",
+      title: "Attendance Clock-In",
+      message: "Zafeera checked in for 2026-11-03 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 13:08:12"
+    },
+    {
+      id: "notif-1793711264230-5hnr",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Zafeera checked in for 2026-11-03 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 13:08:12"
+    },
+    {
+      id: "notif-1793710694554-fpby",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Sumaiya J checked out. Recorded duration: 4.1 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 12:58:39"
+    },
+    {
+      id: "notif-1793710694557-qewx",
+      user_id: "user-ehsaan",
+      title: "Attendance Clock-Out",
+      message: "Sumaiya J checked out. Recorded duration: 4.1 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 12:58:39"
+    },
+    {
+      id: "notif-1793710239715-hv2x",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Sumaiya J checked out. Recorded duration: 4.0 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 12:53:04"
+    },
+    {
+      id: "notif-1793710239718-1vz1",
+      user_id: "user-ehsaan",
+      title: "Attendance Clock-Out",
+      message: "Sumaiya J checked out. Recorded duration: 4.0 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 12:53:04"
+    },
+    {
+      id: "notif-1793710056077-lm3a",
+      user_id: "user-admin-master",
+      title: "Daily Work Update Submitted",
+      message: "Sumaiya J submitted daily work report for 2026-11-03.",
+      type: "info",
+      read_at: null,
+      link: "/admin/work-updates",
+      created_at: "2026-11-03 12:49:55"
+    },
+    {
+      id: "notif-1793710056079-v0cr",
+      user_id: "user-ehsaan",
+      title: "Daily Work Update Submitted",
+      message: "Sumaiya J submitted daily work report for 2026-11-03.",
+      type: "info",
+      read_at: null,
+      link: "/admin/work-updates",
+      created_at: "2026-11-03 12:49:55"
+    },
+    {
+      id: "notif-1793695902209-k12r",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Sumaiya J checked in for 2026-11-03 (On Time).",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 08:52:45"
+    },
+    {
+      id: "notif-1793695902212-ygjv",
+      user_id: "user-ehsaan",
+      title: "Attendance Clock-In",
+      message: "Sumaiya J checked in for 2026-11-03 (On Time).",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 08:52:45"
+    },
+    {
+      id: "notif-1793686824497-leez",
+      user_id: "user-emad",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-11-03 (On Time).",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 06:25:59"
+    },
+    {
+      id: "notif-1793686824499-jkie",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-11-03 (On Time).",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-03 06:25:59"
+    },
+    {
+      id: "notif-1793641973804-mvme",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "G Mohamed Ehsaan checked out. Recorded duration: 14.9 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 17:53:08"
+    },
+    {
+      id: "notif-1793638867186-3hmj",
+      user_id: "user-emad",
+      title: "Attendance Clock-Out",
+      message: "Mohammed Abbas R Y checked out. Recorded duration: 4.1 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 17:01:19"
+    },
+    {
+      id: "notif-1793638867189-t09u",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Mohammed Abbas R Y checked out. Recorded duration: 4.1 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 17:01:19"
+    },
+    {
+      id: "notif-1793633120313-gjli",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "SAFFIYA HARMEEN checked in for 2026-11-02 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 15:26:48"
+    },
+    {
+      id: "notif-1793632039054-l2az",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Asmath Sakeena checked out. Recorded duration: 0.9 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 15:19:17"
+    },
+    {
+      id: "notif-1793630619891-u9yi",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Sumaiya J checked out. Recorded duration: 1.3 hrs.",
+      type: "info",
+      read_at: "2026-11-02 14:46:17",
+      link: "/admin/attendance",
+      created_at: "2026-11-02 14:44:03"
+    },
+    {
+      id: "notif-1793630619896-a2qm",
+      user_id: "user-ehsaan",
+      title: "Attendance Clock-Out",
+      message: "Sumaiya J checked out. Recorded duration: 1.3 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 14:44:03"
+    },
+    {
+      id: "notif-1793630473936-da6o",
+      user_id: "user-admin-master",
+      title: "Daily Work Update Submitted",
+      message: "Sumaiya J submitted daily work report for 2026-11-02.",
+      type: "info",
+      read_at: null,
+      link: "/admin/work-updates",
+      created_at: "2026-11-02 14:41:37"
+    },
+    {
+      id: "notif-1793630473941-4z68",
+      user_id: "user-ehsaan",
+      title: "Daily Work Update Submitted",
+      message: "Sumaiya J submitted daily work report for 2026-11-02.",
+      type: "info",
+      read_at: null,
+      link: "/admin/work-updates",
+      created_at: "2026-11-02 14:41:37"
+    },
+    {
+      id: "notif-1793626940469-7xhv",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Maleeha Affaf checked out. Recorded duration: 9.0 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 14:41:12"
+    },
+    {
+      id: "notif-1793626940465-xxxp",
+      user_id: "user-emad",
+      title: "Attendance Clock-Out",
+      message: "Maleeha Affaf checked out. Recorded duration: 9.0 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 14:41:12"
+    },
+    {
+      id: "notif-1793628929186-u176",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Asmath Sakeena checked in for 2026-11-02 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 14:16:55"
+    },
+    {
+      id: "notif-1793626921952-f3sw",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Maleeha Affaf checked out. Recorded duration: 9.0 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 13:42:49"
+    },
+    {
+      id: "notif-1793626921948-q9my",
+      user_id: "user-emad",
+      title: "Attendance Clock-Out",
+      message: "Maleeha Affaf checked out. Recorded duration: 9.0 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 13:42:49"
+    },
+    {
+      id: "notif-1793624198245-ac9h",
+      user_id: "user-emad",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-11-02 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 12:57:08"
+    },
+    {
+      id: "notif-1793624198248-f9r9",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-11-02 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 12:57:08"
+    },
+    {
+      id: "notif-1793621792518-xuji",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Zafeera checked in for 2026-11-02 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 12:16:51"
+    },
+    {
+      id: "notif-1793621792522-sni7",
+      user_id: "user-ehsaan",
+      title: "Attendance Clock-In",
+      message: "Zafeera checked in for 2026-11-02 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 12:16:51"
+    },
+    {
+      id: "notif-1793524146630-tf4i",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Asmath Sakeena checked in for 2026-11-01 (On Time).",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-01 09:11:17"
+    },
+    {
+      id: "notif-1793524056140-jzid",
+      user_id: "user-admin-master",
+      title: "Daily Work Update Submitted",
+      message: "Asmath Sakeena submitted daily work report for 2026-11-01.",
+      type: "info",
+      read_at: null,
+      link: "/admin/work-updates",
+      created_at: "2026-11-01 09:09:07"
+    },
     {
       id: "notif-1793341219929-cz6i",
       user_id: "user-emad",
@@ -74702,23 +74976,43 @@ var buildrex_default = {
       created_at: "2026-10-30 05:53:20"
     },
     {
-      id: "notif-1793194567441-ig65",
+      id: "notif-1792856929969-c5ap",
+      user_id: "user-abbas",
+      title: "Leave Request Approved",
+      message: "Your leave request for 2026-10-25 to 2026-10-26 has been approved. Note: sure",
+      type: "success",
+      read_at: null,
+      link: "/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793109979238-1la9",
       user_id: "user-admin-master",
       title: "Attendance Clock-In",
-      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
+      message: "Muhammad Ameen J checked in for 2026-10-27 (Late Arrival).",
       type: "warning",
       read_at: null,
       link: "/admin/attendance",
       created_at: "2026-10-30 05:40:16"
     },
     {
-      id: "notif-1793194511433-7cjs",
+      id: "notif-1793107449640-a0j9",
       user_id: "user-abbas",
       title: "Work Update Reviewed",
       message: "Your work update for 2026-10-27 was approved and marked Reviewed.",
       type: "success",
-      read_at: "2026-10-28 13:38:53",
+      read_at: null,
       link: "/work-updates",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-oct29-wu-abbas",
+      user_id: "user-admin-master",
+      title: "Daily Work Update Submitted",
+      message: "Mohammed Abbas R Y submitted daily work report for 2026-10-29.",
+      type: "info",
+      read_at: "2026-10-29 15:38:00",
+      link: "/admin/work-updates",
       created_at: "2026-10-30 05:40:16"
     },
     {
@@ -74742,23 +75036,93 @@ var buildrex_default = {
       created_at: "2026-10-30 05:40:16"
     },
     {
-      id: "notif-1793107449878-49kl",
+      id: "notif-1793194625816-tq9a",
       user_id: "user-admin-master",
-      title: "Attendance Correction Submitted",
-      message: "Mohammed Abbas R Y submitted a correction for 2026-10-26.",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
       type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-oct29-leave-abbas",
+      user_id: "user-admin-master",
+      title: "New Leave Request",
+      message: "Mohammed Abbas R Y requested 1 day(s) emergency leave (2026-10-29 to 2026-10-29).",
+      type: "info",
+      read_at: "2026-10-29 15:39:00",
+      link: "/admin/approvals",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793194567455-joc1",
+      user_id: "user-ehsaan",
+      title: "Attendance Clock-In",
+      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793194567441-ig65",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793194511433-7cjs",
+      user_id: "user-abbas",
+      title: "Work Update Reviewed",
+      message: "Your work update for 2026-10-27 was approved and marked Reviewed.",
+      type: "success",
+      read_at: "2026-10-28 13:38:53",
+      link: "/work-updates",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1",
+      user_id: "user-ehsaan",
+      title: "New Leave Request",
+      message: "Maleeha Affaf (BRX-INT-15) submitted a Sick Leave request for Oct 22-23.",
+      type: "info",
       read_at: null,
       link: "/admin/leave-requests",
       created_at: "2026-10-30 05:40:16"
     },
     {
-      id: "notif-1793107449640-a0j9",
+      id: "notif-1793194625840-eu1m",
+      user_id: "user-emad",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-3",
       user_id: "user-abbas",
-      title: "Work Update Reviewed",
-      message: "Your work update for 2026-10-27 was approved and marked Reviewed.",
+      title: "Welcome to BUILDREX Portal",
+      message: "Your attendance & work management profile is active. Submit your daily report by 6:00 PM.",
+      type: "info",
+      read_at: null,
+      link: "/dashboard",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793107449923-rpdd",
+      user_id: "user-abbas",
+      title: "Attendance Correction Approved",
+      message: "Your correction request for 2026-10-26 was approved. (Verified with manager and approved.)",
       type: "success",
       read_at: null,
-      link: "/work-updates",
+      link: "/my-attendance",
       created_at: "2026-10-30 05:40:16"
     },
     {
@@ -74767,6 +75131,26 @@ var buildrex_default = {
       title: "New Leave Request",
       message: "Mohammed Abbas R Y (BRX-INT-18) submitted a Casual Leave request for Oct 28.",
       type: "info",
+      read_at: null,
+      link: "/admin/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-2",
+      user_id: "user-ehsaan",
+      title: "Attendance Correction Pending",
+      message: "Muhammad Ameen J (BRX-INT-14) requested an attendance correction for Oct 15.",
+      type: "warning",
+      read_at: null,
+      link: "/admin/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793107449878-49kl",
+      user_id: "user-admin-master",
+      title: "Attendance Correction Submitted",
+      message: "Mohammed Abbas R Y submitted a correction for 2026-10-26.",
+      type: "warning",
       read_at: null,
       link: "/admin/leave-requests",
       created_at: "2026-10-30 05:40:16"
@@ -74782,66 +75166,6 @@ var buildrex_default = {
       created_at: "2026-10-30 05:40:16"
     },
     {
-      id: "notif-1793194567455-joc1",
-      user_id: "user-ehsaan",
-      title: "Attendance Clock-In",
-      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793107449923-rpdd",
-      user_id: "user-abbas",
-      title: "Attendance Correction Approved",
-      message: "Your correction request for 2026-10-26 was approved. (Verified with manager and approved.)",
-      type: "success",
-      read_at: null,
-      link: "/my-attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-oct29-wu-abbas",
-      user_id: "user-admin-master",
-      title: "Daily Work Update Submitted",
-      message: "Mohammed Abbas R Y submitted daily work report for 2026-10-29.",
-      type: "info",
-      read_at: "2026-10-29 15:38:00",
-      link: "/admin/work-updates",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793109979238-1la9",
-      user_id: "user-admin-master",
-      title: "Attendance Clock-In",
-      message: "Muhammad Ameen J checked in for 2026-10-27 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793194625816-tq9a",
-      user_id: "user-admin-master",
-      title: "Attendance Clock-In",
-      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793194625840-eu1m",
-      user_id: "user-emad",
-      title: "Attendance Clock-In",
-      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
       id: "notif-1793106451038-vwjy",
       user_id: "user-admin-master",
       title: "New Leave Request",
@@ -74849,56 +75173,6 @@ var buildrex_default = {
       type: "info",
       read_at: null,
       link: "/admin/leave-requests",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1792856929969-c5ap",
-      user_id: "user-abbas",
-      title: "Leave Request Approved",
-      message: "Your leave request for 2026-10-25 to 2026-10-26 has been approved. Note: sure",
-      type: "success",
-      read_at: null,
-      link: "/leave-requests",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-2",
-      user_id: "user-ehsaan",
-      title: "Attendance Correction Pending",
-      message: "Muhammad Ameen J (BRX-INT-14) requested an attendance correction for Oct 15.",
-      type: "warning",
-      read_at: null,
-      link: "/admin/leave-requests",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-3",
-      user_id: "user-abbas",
-      title: "Welcome to BUILDREX Portal",
-      message: "Your attendance & work management profile is active. Submit your daily report by 6:00 PM.",
-      type: "info",
-      read_at: null,
-      link: "/dashboard",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1",
-      user_id: "user-ehsaan",
-      title: "New Leave Request",
-      message: "Maleeha Affaf (BRX-INT-15) submitted a Sick Leave request for Oct 22-23.",
-      type: "info",
-      read_at: null,
-      link: "/admin/leave-requests",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-oct29-leave-abbas",
-      user_id: "user-admin-master",
-      title: "New Leave Request",
-      message: "Mohammed Abbas R Y requested 1 day(s) emergency leave (2026-10-29 to 2026-10-29).",
-      type: "info",
-      read_at: "2026-10-29 15:39:00",
-      link: "/admin/approvals",
       created_at: "2026-10-30 05:40:16"
     },
     {
@@ -74924,6 +75198,823 @@ var buildrex_default = {
   ],
   audit_logs: [
     {
+      id: "audit-1793713633168-l6qxj",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T13:47:13.168Z"
+    },
+    {
+      id: "audit-1793713632908-45ujy",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_PASSWORD_CHANGE",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T13:47:12.908Z"
+    },
+    {
+      id: "audit-1793713631923-lrykw",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T13:47:11.923Z"
+    },
+    {
+      id: "audit-1793713631667-2q7dw",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_PASSWORD_CHANGE",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T13:47:11.667Z"
+    },
+    {
+      id: "audit-1793713625439-bmjzp",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03T13:47:05.439Z"
+    },
+    {
+      id: "audit-1793712073995-gc1qa",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 13:21:21"
+    },
+    {
+      id: "audit-1793712073784-84q54",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 13:21:21"
+    },
+    {
+      id: "audit-1793712002535-tyey1",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 13:20:06"
+    },
+    {
+      id: "audit-1793711264238-ndnz9",
+      actor_id: "user-zafeera",
+      actor_name: "Zafeera",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793711260066-4dkc0",
+      details: {
+        check_in: "2026-11-03T13:07:40.065Z",
+        status: "late",
+        work_date: "2026-11-03"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 13:08:18"
+    },
+    {
+      id: "audit-1793710552862-pwl7v",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793695899095-7dxud",
+      details: {
+        check_in: "2026-11-03T08:51:00.000Z",
+        check_out: "2026-11-03T12:30:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 13:07:42"
+    },
+    {
+      id: "audit-1793711023764-ui8lx",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        email: "abbas6618532@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 13:03:49"
+    },
+    {
+      id: "audit-1793710694561-p5ihc",
+      actor_id: "user-sumaiya",
+      actor_name: "Sumaiya J",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793695899095-7dxud",
+      details: {
+        check_out: "2026-11-03T12:58:10.429Z",
+        status: "present",
+        total_minutes: 247,
+        work_date: "2026-11-03"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:58:42"
+    },
+    {
+      id: "audit-1793709601458-eipet",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:58:13"
+    },
+    {
+      id: "audit-1793710268126-9os3k",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793695899095-7dxud",
+      details: {
+        check_in: "2026-11-03T08:51:00.000Z",
+        check_out: "2026-11-03T12:49:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:53:11"
+    },
+    {
+      id: "audit-1793710239722-58q8j",
+      actor_id: "user-sumaiya",
+      actor_name: "Sumaiya J",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793695899095-7dxud",
+      details: {
+        check_out: "2026-11-03T12:49:48.298Z",
+        status: "present",
+        total_minutes: 238,
+        work_date: "2026-11-03"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:53:11"
+    },
+    {
+      id: "audit-1793710056084-vodbc",
+      actor_id: "user-sumaiya",
+      actor_name: "Sumaiya J",
+      action: "WORK_UPDATE_SUBMITTED",
+      entity_type: "WORK_UPDATE",
+      entity_id: "wu-1793710052147-x586y",
+      details: {
+        status: "submitted",
+        work_date: "2026-11-03"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:50:07"
+    },
+    {
+      id: "audit-1793709363678-krg72",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793628911884-abhwa",
+      details: {
+        check_in: "2026-11-02T14:15:00.000Z",
+        check_out: "2026-11-02T18:00:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:39:25"
+    },
+    {
+      id: "audit-1793708552037-xv5ci",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793698883360-zvznu",
+      details: {
+        check_in: "2026-11-03T09:41:00.000Z",
+        check_out: null,
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:23:26"
+    },
+    {
+      id: "audit-1793708495379-d4o2g",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793698883360-zvznu",
+      details: {
+        check_in: "2026-11-03T09:41:00.000Z",
+        check_out: "2026-11-03T12:30:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:22:23"
+    },
+    {
+      id: "audit-1793703682398-z8lf4",
+      actor_id: "user-maleeha",
+      actor_name: "Maleeha Affaf",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-maleeha",
+      details: {
+        email: "affafmaleeha@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 11:04:10"
+    },
+    {
+      id: "audit-1793695902217-hrcgb",
+      actor_id: "user-sumaiya",
+      actor_name: "Sumaiya J",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793695899095-7dxud",
+      details: {
+        check_in: "2026-11-03T08:51:39.095Z",
+        status: "present",
+        work_date: "2026-11-03"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 08:52:53"
+    },
+    {
+      id: "audit-1793689377581-dg67n",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "UPDATE_PROFILE",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        has_avatar: false,
+        name: "Mohammed Abbas R Y",
+        phone: "6369906810"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 07:03:52"
+    },
+    {
+      id: "audit-1793689362356-zp0pe",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "UPDATE_PROFILE",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        has_avatar: true,
+        name: "Mohammed Abbas R Y",
+        phone: "6369906810"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 07:02:53"
+    },
+    {
+      id: "audit-1793686824504-c9l3l",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793686820664-5byzo",
+      details: {
+        check_in: "2026-11-03T06:20:20.663Z",
+        status: "present",
+        work_date: "2026-11-03"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 06:26:15"
+    },
+    {
+      id: "audit-1793686809906-n0bd3",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        email: "abbas6618532@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 06:20:23"
+    },
+    {
+      id: "audit-1793686465521-infx0",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 06:14:26"
+    },
+    {
+      id: "audit-1793686420320-kmfpg",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        email: "abbas6618532@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 06:13:41"
+    },
+    {
+      id: "audit-1793686333920-pdxsv",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-abbas",
+      details: {
+        email: "abbas6618532@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 06:12:18"
+    },
+    {
+      id: "audit-1793642780256-y9xi1",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "WORK_UPDATE_SAVED_DRAFT",
+      entity_type: "WORK_UPDATE",
+      entity_id: "wu-1793642776373-1w41p",
+      details: {
+        status: "draft",
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 18:06:28"
+    },
+    {
+      id: "audit-1793641973808-2t92x",
+      actor_id: "user-ehsaan",
+      actor_name: "G Mohamed Ehsaan",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793588452458-gpvhl",
+      details: {
+        check_out: "2026-11-02T17:52:49.129Z",
+        status: "present",
+        total_minutes: 892,
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 17:53:08"
+    },
+    {
+      id: "audit-1793638867193-okxy8",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793624195290-mlqqa",
+      details: {
+        check_out: "2026-11-02T17:01:02.829Z",
+        status: "late",
+        total_minutes: 244,
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 17:01:19"
+    },
+    {
+      id: "audit-1793633120316-bw0py",
+      actor_id: "user-1793287370582-karo",
+      actor_name: "SAFFIYA HARMEEN",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793633068883-o4u7r",
+      details: {
+        check_in: "2026-11-02T15:24:28.883Z",
+        status: "late",
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 15:26:54"
+    },
+    {
+      id: "audit-1793632292761-ii13x",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 15:26:54"
+    },
+    {
+      id: "audit-1793631924491-yy1z3",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-1793454603321-5yvc",
+      details: {
+        email: "asmazehra2046@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 15:26:54"
+    },
+    {
+      id: "audit-1793632039058-unu8f",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793628925473-yovuv",
+      details: {
+        check_out: "2026-11-02T15:07:14.557Z",
+        status: "late",
+        total_minutes: 52,
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 15:20:07"
+    },
+    {
+      id: "audit-1793630916604-rwczw",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793621788686-g17h9",
+      details: {
+        check_in: "2026-11-02T12:16:00.000Z",
+        check_out: "2026-11-02T12:30:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 15:07:17"
+    },
+    {
+      id: "audit-1793630738476-s8tj8",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793620142299-59j3k",
+      details: {
+        check_in: "2026-11-02T11:49:00.000Z",
+        check_out: "2026-11-02T12:30:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:46:50"
+    },
+    {
+      id: "audit-1793630708674-ead5i",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793625880431-d7v8e",
+      details: {
+        check_in: "2026-11-02T13:24:00.000Z",
+        check_out: "2026-11-02T14:43:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:45:34"
+    },
+    {
+      id: "audit-1793630619901-ilvcl",
+      actor_id: "user-sumaiya",
+      actor_name: "Sumaiya J",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793625880431-d7v8e",
+      details: {
+        check_out: "2026-11-02T14:43:36.084Z",
+        status: "late",
+        total_minutes: 79,
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:44:04"
+    },
+    {
+      id: "audit-1793630473947-115oe",
+      actor_id: "user-sumaiya",
+      actor_name: "Sumaiya J",
+      action: "WORK_UPDATE_SUBMITTED",
+      entity_type: "WORK_UPDATE",
+      entity_id: "wu-1793630469374-quoea",
+      details: {
+        status: "submitted",
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:41:42"
+    },
+    {
+      id: "audit-1793626940474-u7o6i",
+      actor_id: "user-maleeha",
+      actor_name: "Maleeha Affaf",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793594517157-kojwp",
+      details: {
+        check_out: "2026-11-02T13:42:16.716Z",
+        status: "present",
+        total_minutes: 540,
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:41:12"
+    },
+    {
+      id: "audit-1793629111079-7zi71",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:19:08"
+    },
+    {
+      id: "audit-1793628929191-25s3b",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793628925473-yovuv",
+      details: {
+        check_in: "2026-11-02T14:15:25.473Z",
+        status: "late",
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:17:00"
+    },
+    {
+      id: "audit-1793628807515-gsmbi",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-1793454603321-5yvc",
+      details: {
+        email: "asmazehra2046@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:15:14"
+    },
+    {
+      id: "audit-1793628709526-hb3cj",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:15:14"
+    },
+    {
+      id: "audit-1793627156630-wcdjx",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 13:46:33"
+    },
+    {
+      id: "audit-1793626921957-95k88",
+      actor_id: "user-maleeha",
+      actor_name: "Maleeha Affaf",
+      action: "ATTENDANCE_CHECK_OUT",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793594517157-kojwp",
+      details: {
+        check_out: "2026-11-02T13:41:58.191Z",
+        status: "present",
+        total_minutes: 540,
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 13:42:51"
+    },
+    {
+      id: "audit-1793625449087-fjlpk",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 13:24:43"
+    },
+    {
+      id: "audit-1793624198252-bwt5h",
+      actor_id: "user-abbas",
+      actor_name: "Mohammed Abbas R Y",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793624195290-mlqqa",
+      details: {
+        check_in: "2026-11-02T12:56:35.290Z",
+        status: "late",
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 12:57:11"
+    },
+    {
+      id: "audit-1793621792526-t4wzf",
+      actor_id: "user-zafeera",
+      actor_name: "Zafeera",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793621788686-g17h9",
+      details: {
+        check_in: "2026-11-02T12:16:28.686Z",
+        status: "late",
+        work_date: "2026-11-02"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 12:16:51"
+    },
+    {
+      id: "audit-1793621079098-iwq35",
+      actor_id: "user-zafeera",
+      actor_name: "Zafeera",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-zafeera",
+      details: {
+        email: "faisalzafeera@gmail.com",
+        role: "employee"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 12:11:37"
+    },
+    {
+      id: "audit-1793592711250-735n3",
+      actor_id: "user-aysha",
+      actor_name: "Aysha Anam K",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-aysha",
+      details: {
+        email: "ayshaanam.k3706@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 04:11:59"
+    },
+    {
+      id: "audit-1793592631497-pwwxe",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "UPDATE_USER",
+      entity_type: "USER",
+      entity_id: "user-aysha",
+      details: {
+        name: "Aysha Anam K",
+        role: "intern",
+        status: "active"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 04:11:59"
+    },
+    {
+      id: "audit-1793524146633-fbf0v",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "ATTENDANCE_CHECK_IN",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793524095212-wwht8",
+      details: {
+        check_in: "2026-11-01T09:08:15.212Z",
+        status: "present",
+        work_date: "2026-11-01"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-01 09:11:18"
+    },
+    {
+      id: "audit-1793523967265-8hxi7",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-1793454603321-5yvc",
+      details: {
+        email: "asmazehra2046@gmail.com",
+        role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-01 09:11:18"
+    },
+    {
+      id: "audit-1793524056144-np40u",
+      actor_id: "user-1793454603321-5yvc",
+      actor_name: "Asmath Sakeena",
+      action: "WORK_UPDATE_SUBMITTED",
+      entity_type: "WORK_UPDATE",
+      entity_id: "wu-1793524052560-1mhvt",
+      details: {
+        status: "submitted",
+        work_date: "2026-11-01"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-01 09:09:11"
+    },
+    {
       id: "audit-1793456487016-k77vw",
       actor_id: "user-admin-master",
       actor_name: "Buildrex Admin",
@@ -74931,13 +76022,13 @@ var buildrex_default = {
       entity_type: "USER",
       entity_id: "user-1793456468233-tdj5",
       details: {
-        email: "test.del.1793456468031@buildrex.com",
         code: "BRX-INT-24",
+        email: "test.del.1793456468031@buildrex.com",
         name: "Member To Delete",
         role: "intern"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-10-31T14:21:27.016Z"
+      created_at: "2026-10-31 14:21:32"
     },
     {
       id: "audit-1793456474881-t0ppp",
@@ -74947,13 +76038,13 @@ var buildrex_default = {
       entity_type: "USER",
       entity_id: "user-1793456468233-tdj5",
       details: {
-        email: "test.del.1793456468031@buildrex.com",
         code: "BRX-INT-24",
-        role: "intern",
-        initial_password: "Member@Brx26"
+        email: "test.del.1793456468031@buildrex.com",
+        initial_password: "Member@Brx26",
+        role: "intern"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-10-31T14:21:14.881Z"
+      created_at: "2026-10-31 14:21:22"
     },
     {
       id: "audit-1793456467971-0t98g",
@@ -74967,7 +76058,7 @@ var buildrex_default = {
         role: "admin"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-10-31T14:21:07.971Z"
+      created_at: "2026-10-31 14:21:10"
     },
     {
       id: "audit-1793454607811-9nuyl",
@@ -76640,6 +77731,7 @@ async function performGoogleSheetSync() {
         existingUser.department_id = deptId || existingUser.department_id;
         existingUser.updated_at = nowIso;
         updatedCount++;
+        const activePassword = existingUser.plain_password || plainPassword;
         syncedMemberList.push({
           id: existingUser.id,
           employee_code: existingUser.employee_code,
@@ -76649,7 +77741,7 @@ async function performGoogleSheetSync() {
           position: existingUser.position,
           department_id: existingUser.department_id,
           phone: existingUser.phone,
-          plainPassword,
+          plainPassword: activePassword,
           status: existingUser.status,
           isNew: false
         });
@@ -76663,6 +77755,8 @@ async function performGoogleSheetSync() {
           name: rawName,
           email,
           password_hash: bcryptjs_default.hashSync(plainPassword, 10),
+          plain_password: plainPassword,
+          password_updated_at: nowIso,
           role,
           department_id: deptId,
           manager_id: "user-emad",
@@ -76761,7 +77855,7 @@ router.post("/google-sheet", authenticate, async (req, res) => {
 router.get("/team-credentials", (req, res) => {
   const db = getDb();
   const credentials = db.users.map((u) => {
-    const plainPassword = getMemberPassword(u.email, u.name);
+    const plainPassword = u.plain_password || getMemberPassword(u.email, u.name);
     const dept = db.departments.find((d) => d.id === u.department_id);
     return {
       id: u.id,
@@ -76774,6 +77868,7 @@ router.get("/team-credentials", (req, res) => {
       phone: u.phone,
       joining_date: u.joining_date,
       status: u.status,
+      avatar_url: u.avatar_url || null,
       password: plainPassword
     };
   });
@@ -76789,7 +77884,7 @@ var googleSheetSync_default = router;
 // server/routes/auth.ts
 var router2 = (0, import_express2.Router)();
 function sanitizeUser(user) {
-  const { password_hash, ...rest } = user;
+  const { password_hash, plain_password, ...rest } = user;
   return rest;
 }
 router2.post("/login", async (req, res) => {
@@ -76816,14 +77911,23 @@ router2.post("/login", async (req, res) => {
       return;
     }
     let isMatch = await bcryptjs_default.compare(password, user.password_hash);
-    if (!isMatch && user.email.toLowerCase().trim() === "adminbrx@gmail.com" && (password === "buidrex@123" || password === "buildrex@123")) {
+    if (!isMatch && user.plain_password && password === user.plain_password) {
       isMatch = true;
     }
-    if (!isMatch && password === getMemberPassword(user.email, user.name)) {
-      isMatch = true;
-      user.password_hash = await bcryptjs_default.hash(password, 10);
-      user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-      await saveDb(db);
+    if (!isMatch && !user.password_updated_at) {
+      if (user.email.toLowerCase().trim() === "adminbrx@gmail.com" && (password === "buidrex@123" || password === "buildrex@123")) {
+        isMatch = true;
+      } else if (password === getMemberPassword(user.email, user.name)) {
+        isMatch = true;
+      }
+      if (isMatch) {
+        user.password_hash = await bcryptjs_default.hash(password, 10);
+        user.plain_password = password;
+        user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+        await saveDb(db);
+        updateUserPasswordInTiDB(user.id, user.password_hash, password).catch(() => {
+        });
+      }
     }
     if (!isMatch) {
       res.status(401).json({ success: false, message: "Invalid email or password." });
@@ -76924,7 +78028,7 @@ router2.post("/reset-password", async (req, res) => {
   });
 });
 router2.patch("/profile", authenticate, async (req, res) => {
-  const { name, phone } = req.body;
+  const { name, phone, avatar_url } = req.body;
   const db = getDb();
   const user = db.users.find((u) => u.id === req.user.id);
   if (!user) {
@@ -76933,6 +78037,9 @@ router2.patch("/profile", authenticate, async (req, res) => {
   }
   if (name && name.trim()) user.name = name.trim();
   if (phone !== void 0) user.phone = phone.trim();
+  if (avatar_url !== void 0) {
+    user.avatar_url = avatar_url && String(avatar_url).trim() ? String(avatar_url).trim() : null;
+  }
   user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
   await saveDb(db);
   logAudit(
@@ -76940,7 +78047,7 @@ router2.patch("/profile", authenticate, async (req, res) => {
     "UPDATE_PROFILE",
     "USER",
     user.id,
-    { name: user.name, phone: user.phone },
+    { name: user.name, phone: user.phone, has_avatar: !!user.avatar_url },
     req.ip || "127.0.0.1"
   );
   res.json({
@@ -76961,15 +78068,52 @@ router2.patch("/change-password", authenticate, async (req, res) => {
     res.status(404).json({ success: false, message: "User not found." });
     return;
   }
-  const isMatch = await bcryptjs_default.compare(current_password, user.password_hash);
+  let isMatch = await bcryptjs_default.compare(current_password, user.password_hash);
+  if (!isMatch) {
+    if (user.plain_password && current_password === user.plain_password) {
+      isMatch = true;
+    } else if (!user.password_updated_at) {
+      if (user.email.toLowerCase().trim() === "adminbrx@gmail.com" && (current_password === "buidrex@123" || current_password === "buildrex@123")) {
+        isMatch = true;
+      } else if (current_password === getMemberPassword(user.email, user.name)) {
+        isMatch = true;
+      }
+    }
+  }
   if (!isMatch) {
     res.status(400).json({ success: false, message: "Current password does not match." });
     return;
   }
-  user.password_hash = await bcryptjs_default.hash(new_password, 10);
-  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+  const newHash = await bcryptjs_default.hash(new_password, 10);
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  user.password_hash = newHash;
+  user.plain_password = new_password;
+  user.password_updated_at = nowIso;
+  user.updated_at = nowIso;
+  await updateUserPasswordInTiDB(user.id, newHash, new_password);
   await saveDb(db);
-  res.json({ success: true, message: "Password changed successfully." });
+  const enriched = enrichUser(user);
+  const token = generateToken(enriched);
+  res.cookie("buildrex_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1e3
+  });
+  logAudit(
+    { id: user.id, name: user.name },
+    "USER_PASSWORD_CHANGE",
+    "USER",
+    user.id,
+    { email: user.email },
+    req.ip || "127.0.0.1"
+  );
+  res.json({
+    success: true,
+    message: "Password changed successfully. Your new password is now active.",
+    token,
+    user: sanitizeUser(enriched)
+  });
 });
 var auth_default = router2;
 
@@ -77916,7 +79060,8 @@ router6.post("/users", authenticate, requireRole("admin"), async (req, res) => {
     manager_id,
     position,
     phone,
-    joining_date
+    joining_date,
+    avatar_url
   } = req.body;
   if (!name || !name.trim() || !email || !email.trim() || !role) {
     res.status(400).json({ success: false, message: "Name, email, and role are required." });
@@ -78002,6 +79147,8 @@ router6.post("/users", authenticate, requireRole("admin"), async (req, res) => {
     name: cleanName,
     email: cleanEmail,
     password_hash: passwordHash,
+    plain_password: plainPassword,
+    password_updated_at: nowIso,
     role,
     department_id: department_id || null,
     manager_id: manager_id || null,
@@ -78009,6 +79156,7 @@ router6.post("/users", authenticate, requireRole("admin"), async (req, res) => {
     phone: phone ? phone.trim() : "",
     joining_date: joining_date && joining_date.trim() ? joining_date.trim() : getTodayStr(),
     status: "active",
+    avatar_url: avatar_url ? String(avatar_url).trim() : null,
     created_at: nowIso,
     updated_at: nowIso
   };
@@ -78035,7 +79183,7 @@ router6.patch("/users/:id", authenticate, requireRole("admin"), async (req, res)
     res.status(404).json({ success: false, message: "User not found." });
     return;
   }
-  const { name, role, department_id, manager_id, position, phone, status, joining_date } = req.body;
+  const { name, role, department_id, manager_id, position, phone, status, joining_date, avatar_url } = req.body;
   if (name) user.name = name.trim();
   if (role) user.role = role;
   if (department_id !== void 0) user.department_id = department_id || null;
@@ -78044,6 +79192,9 @@ router6.patch("/users/:id", authenticate, requireRole("admin"), async (req, res)
   if (phone !== void 0) user.phone = phone.trim();
   if (status) user.status = status;
   if (joining_date) user.joining_date = joining_date;
+  if (avatar_url !== void 0) {
+    user.avatar_url = avatar_url && String(avatar_url).trim() ? String(avatar_url).trim() : null;
+  }
   user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
   await saveDb(db);
   logAudit(
@@ -78104,8 +79255,13 @@ router6.post("/users/:id/reset-password", authenticate, requireRole("admin"), as
     return;
   }
   const pass = new_password && new_password.length >= 6 ? new_password : "Buildrex@2026";
-  user.password_hash = await bcryptjs_default.hash(pass, 10);
-  user.updated_at = (/* @__PURE__ */ new Date()).toISOString();
+  const newHash = await bcryptjs_default.hash(pass, 10);
+  const nowIso = (/* @__PURE__ */ new Date()).toISOString();
+  user.password_hash = newHash;
+  user.plain_password = pass;
+  user.password_updated_at = nowIso;
+  user.updated_at = nowIso;
+  await updateUserPasswordInTiDB(user.id, newHash, pass);
   await saveDb(db);
   logAudit(
     { id: req.user.id, name: req.user.name },
@@ -102221,8 +103377,8 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use(import_express8.default.json());
-app.use(import_express8.default.urlencoded({ extended: true }));
+app.use(import_express8.default.json({ limit: "15mb" }));
+app.use(import_express8.default.urlencoded({ extended: true, limit: "15mb" }));
 app.use((0, import_cookie_parser.default)());
 app.use((req, res, next) => {
   const start = Date.now();

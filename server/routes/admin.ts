@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import bcrypt from 'bcryptjs';
+import { updateUserPasswordInTiDB } from '../tidb';
 import {
   getDb,
   saveDb,
@@ -288,6 +289,8 @@ router.post('/users', authenticate, requireRole('admin'), async (req: Authentica
     name: cleanName,
     email: cleanEmail,
     password_hash: passwordHash,
+    plain_password: plainPassword,
+    password_updated_at: nowIso,
     role,
     department_id: department_id || null,
     manager_id: manager_id || null,
@@ -417,8 +420,13 @@ router.post('/users/:id/reset-password', authenticate, requireRole('admin'), asy
   }
 
   const pass = new_password && new_password.length >= 6 ? new_password : 'Buildrex@2026';
-  user.password_hash = await bcrypt.hash(pass, 10);
-  user.updated_at = new Date().toISOString();
+  const newHash = await bcrypt.hash(pass, 10);
+  const nowIso = new Date().toISOString();
+  user.password_hash = newHash;
+  user.plain_password = pass;
+  user.password_updated_at = nowIso;
+  user.updated_at = nowIso;
+  await updateUserPasswordInTiDB(user.id, newHash, pass);
   await saveDb(db);
 
   logAudit(
