@@ -1008,6 +1008,134 @@ export async function upsertAttendanceInTiDB(a: AttendanceRecord): Promise<boole
 }
 
 /**
+ * Directly and immediately upsert a work update in TiDB Cloud (50ms).
+ */
+export async function upsertWorkUpdateInTiDB(w: WorkUpdate): Promise<boolean> {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return false;
+  }
+  const p = getPool();
+  try {
+    await p.query(
+      `INSERT INTO work_updates (id, user_id, work_date, tasks_completed, project_details, accomplishments, blockers, next_day_plan, hours_spent, status, submitted_at, reviewed_by, review_comment, reviewed_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+       ON DUPLICATE KEY UPDATE
+         tasks_completed = VALUES(tasks_completed),
+         project_details = VALUES(project_details),
+         accomplishments = VALUES(accomplishments),
+         blockers = VALUES(blockers),
+         next_day_plan = VALUES(next_day_plan),
+         hours_spent = VALUES(hours_spent),
+         status = VALUES(status),
+         submitted_at = VALUES(submitted_at),
+         reviewed_by = VALUES(reviewed_by),
+         review_comment = VALUES(review_comment),
+         reviewed_at = VALUES(reviewed_at),
+         updated_at = NOW()`,
+      [
+        w.id,
+        w.user_id,
+        toSqlDate(w.work_date),
+        w.tasks_completed,
+        w.project_details,
+        w.accomplishments || null,
+        w.blockers || null,
+        w.next_day_plan || null,
+        w.hours_spent || 8,
+        w.status,
+        toSqlDateTime(w.submitted_at),
+        w.reviewed_by || null,
+        w.review_comment || null,
+        toSqlDateTime(w.reviewed_at),
+      ]
+    );
+    console.log(`[TiDB] ✅ Fast direct work update sync for ${w.user_id} (${toSqlDate(w.work_date)}) complete.`);
+    return true;
+  } catch (err: any) {
+    console.warn(`[TiDB] Direct work update sync notice:`, err.message);
+    return false;
+  }
+}
+
+/**
+ * Directly and immediately upsert a leave request in TiDB Cloud (50ms).
+ */
+export async function upsertLeaveRequestInTiDB(l: LeaveRequest): Promise<boolean> {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return false;
+  }
+  const p = getPool();
+  try {
+    await p.query(
+      `INSERT INTO leave_requests (id, user_id, leave_type, start_date, end_date, days_count, reason, status, reviewed_by, review_comment, reviewed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         status = VALUES(status),
+         reviewed_by = VALUES(reviewed_by),
+         review_comment = VALUES(review_comment),
+         reviewed_at = VALUES(reviewed_at)`,
+      [
+        l.id,
+        l.user_id,
+        l.leave_type,
+        toSqlDate(l.start_date),
+        toSqlDate(l.end_date),
+        l.days_count,
+        l.reason,
+        l.status,
+        l.reviewed_by || null,
+        l.review_comment || null,
+        toSqlDateTime(l.reviewed_at),
+      ]
+    );
+    console.log(`[TiDB] ✅ Fast direct leave request sync (${l.id}) complete.`);
+    return true;
+  } catch (err: any) {
+    console.warn(`[TiDB] Direct leave request sync notice:`, err.message);
+    return false;
+  }
+}
+
+/**
+ * Directly and immediately upsert an attendance correction in TiDB Cloud (50ms).
+ */
+export async function upsertAttendanceCorrectionInTiDB(c: AttendanceCorrection): Promise<boolean> {
+  if (!isConnected && !(await verifyConnection()).ok) {
+    return false;
+  }
+  const p = getPool();
+  try {
+    await p.query(
+      `INSERT INTO attendance_corrections (id, user_id, attendance_id, work_date, requested_check_in, requested_check_out, reason, status, reviewed_by, review_comment, reviewed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         status = VALUES(status),
+         reviewed_by = VALUES(reviewed_by),
+         review_comment = VALUES(review_comment),
+         reviewed_at = VALUES(reviewed_at)`,
+      [
+        c.id,
+        c.user_id,
+        c.attendance_id,
+        toSqlDate(c.work_date),
+        toSqlDateTime(c.requested_check_in),
+        toSqlDateTime(c.requested_check_out),
+        c.reason,
+        c.status,
+        c.reviewed_by || null,
+        c.review_comment || null,
+        toSqlDateTime(c.reviewed_at),
+      ]
+    );
+    console.log(`[TiDB] ✅ Fast direct attendance correction sync (${c.id}) complete.`);
+    return true;
+  } catch (err: any) {
+    console.warn(`[TiDB] Direct correction sync notice:`, err.message);
+    return false;
+  }
+}
+
+/**
  * Get comprehensive diagnostic status of the TiDB database connection.
  */
 export async function getTiDBStatus(): Promise<TiDBStatus> {

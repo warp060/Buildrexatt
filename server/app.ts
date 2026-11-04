@@ -106,7 +106,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/admin', attendanceRoutes); // For /api/admin/attendance endpoints
 app.use('/api/work-updates', workUpdatesRoutes);
-app.use('/api/leave-requests', leaveAndCorrectionsRoutes);
+app.use(['/api/leave-requests', '/api/leaves', '/api/attendance-corrections'], leaveAndCorrectionsRoutes);
 app.use('/api', leaveAndCorrectionsRoutes); // For /api/attendance/correction-requests
 app.use('/api/admin', adminRoutes);
 app.use('/api', adminRoutes); // For /api/departments, /api/notifications

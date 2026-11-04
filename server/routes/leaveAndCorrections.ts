@@ -9,6 +9,7 @@ import {
 } from '../db';
 import { authenticate, requireRole, AuthenticatedRequest } from '../auth';
 import { LeaveRequest, AttendanceCorrection } from '../types';
+import { upsertLeaveRequestInTiDB, upsertAttendanceCorrectionInTiDB, upsertAttendanceInTiDB } from '../tidb';
 
 const router = Router();
 
@@ -17,6 +18,15 @@ const router = Router();
 // GET /api/leave-requests/my
 router.get('/my', authenticate, (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
+  if (req.baseUrl.includes('attendance-corrections')) {
+    const corrections = db.attendance_corrections
+      .filter((c) => c.user_id === req.user!.id)
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .map(enrichCorrection);
+    res.json({ success: true, records: corrections });
+    return;
+  }
+
   const requests = db.leave_requests
     .filter((l) => l.user_id === req.user!.id)
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
@@ -25,8 +35,73 @@ router.get('/my', authenticate, (req: AuthenticatedRequest, res: Response): void
   res.json({ success: true, records: requests });
 });
 
-// POST /api/leave-requests
+async function handleCreateCorrection(req: AuthenticatedRequest, res: Response): Promise<void> {
+  const { attendance_id, work_date, requested_check_in, requested_check_out, reason } = req.body;
+
+  if (!work_date || !requested_check_in || !requested_check_out || !reason) {
+    res.status(400).json({ success: false, message: 'All correction fields are required.' });
+    return;
+  }
+
+  const db = getDb();
+  const nowIso = new Date().toISOString();
+
+  const newCorrection: AttendanceCorrection = {
+    id: `corr-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    user_id: req.user!.id,
+    attendance_id: attendance_id || 'manual-entry',
+    work_date,
+    requested_check_in,
+    requested_check_out,
+    reason: reason.trim(),
+    status: 'pending',
+    reviewed_by: null,
+    review_comment: null,
+    reviewed_at: null,
+    created_at: nowIso,
+  };
+
+  db.attendance_corrections.unshift(newCorrection);
+  await saveDb(db);
+  await upsertAttendanceCorrectionInTiDB(newCorrection);
+
+  // Notify admins and manager
+  const corrRecipients = db.users.filter(
+    (u) => u.role === 'admin' || (req.user!.manager_id && u.id === req.user!.manager_id)
+  );
+  corrRecipients.forEach((recipient) => {
+    createNotification(
+      recipient.id,
+      'Attendance Correction Submitted',
+      `${req.user!.name} submitted a correction for ${work_date}.`,
+      'warning',
+      '/admin/approvals'
+    );
+  });
+
+  logAudit(
+    { id: req.user!.id, name: req.user!.name },
+    'CREATE_CORRECTION_REQUEST',
+    'ATTENDANCE_CORRECTION',
+    newCorrection.id,
+    { work_date, requested_check_in, requested_check_out },
+    req.ip || '127.0.0.1'
+  );
+
+  res.status(201).json({
+    success: true,
+    message: 'Attendance correction request submitted for admin review.',
+    record: enrichCorrection(newCorrection),
+    correction: enrichCorrection(newCorrection),
+  });
+}
+
+// POST /api/leave-requests or /api/attendance-corrections
 router.post('/', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  if (req.baseUrl.includes('attendance-corrections') || req.body.requested_check_in) {
+    return handleCreateCorrection(req, res);
+  }
+
   const { leave_type, start_date, end_date, reason } = req.body;
 
   if (!leave_type || !start_date || !end_date || !reason) {
@@ -81,6 +156,7 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res: Response):
 
   db.leave_requests.unshift(newLeave);
   await saveDb(db);
+  await upsertLeaveRequestInTiDB(newLeave);
 
   // Notify admins and manager
   const recipients = db.users.filter(
@@ -109,6 +185,7 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res: Response):
     success: true,
     message: 'Leave request submitted successfully.',
     record: enrichLeave(newLeave),
+    leave: enrichLeave(newLeave),
   });
 });
 
@@ -138,8 +215,8 @@ router.get('/admin/list', authenticate, requireRole('admin'), (req: Authenticate
   });
 });
 
-// PATCH /api/admin/leave-requests/:id/review
-router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+// Review / Approve / Reject leave requests
+router.all(['/admin/:id/review', '/:id/review', '/:id/approve', '/admin/:id/approve', '/:id/reject', '/admin/:id/reject'], authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const leave = db.leave_requests.find((l) => l.id === req.params.id);
 
@@ -148,7 +225,13 @@ router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req
     return;
   }
 
-  const { status, review_comment } = req.body;
+  const path = req.path || '';
+  let status = req.body?.status;
+  if (path.includes('approve')) status = 'approved';
+  if (path.includes('reject')) status = 'rejected';
+
+  const review_comment = req.body?.review_comment || req.body?.comment || null;
+
   if (!status || !['approved', 'rejected'].includes(status)) {
     res.status(400).json({ success: false, message: 'Status must be approved or rejected.' });
     return;
@@ -157,10 +240,11 @@ router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req
   const nowIso = new Date().toISOString();
   leave.status = status;
   leave.reviewed_by = req.user!.id;
-  leave.review_comment = review_comment || null;
+  leave.review_comment = review_comment;
   leave.reviewed_at = nowIso;
 
   await saveDb(db);
+  await upsertLeaveRequestInTiDB(leave);
 
   createNotification(
     leave.user_id,
@@ -183,6 +267,7 @@ router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req
     success: true,
     message: `Leave request ${status} successfully.`,
     record: enrichLeave(leave),
+    leave: enrichLeave(leave),
   });
 });
 
@@ -200,64 +285,7 @@ router.get(['/corrections/my', '/attendance/correction-requests/my'], authentica
 });
 
 // POST /api/leave-requests/corrections and /api/attendance/correction-requests
-router.post(['/corrections', '/attendance/correction-requests'], authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-  const { attendance_id, work_date, requested_check_in, requested_check_out, reason } = req.body;
-
-  if (!work_date || !requested_check_in || !requested_check_out || !reason) {
-    res.status(400).json({ success: false, message: 'All correction fields are required.' });
-    return;
-  }
-
-  const db = getDb();
-  const nowIso = new Date().toISOString();
-
-  const newCorrection: AttendanceCorrection = {
-    id: `corr-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-    user_id: req.user!.id,
-    attendance_id: attendance_id || 'manual-entry',
-    work_date,
-    requested_check_in,
-    requested_check_out,
-    reason: reason.trim(),
-    status: 'pending',
-    reviewed_by: null,
-    review_comment: null,
-    reviewed_at: null,
-    created_at: nowIso,
-  };
-
-  db.attendance_corrections.unshift(newCorrection);
-  await saveDb(db);
-
-  // Notify admins and manager
-  const corrRecipients = db.users.filter(
-    (u) => u.role === 'admin' || (req.user!.manager_id && u.id === req.user!.manager_id)
-  );
-  corrRecipients.forEach((recipient) => {
-    createNotification(
-      recipient.id,
-      'Attendance Correction Submitted',
-      `${req.user!.name} submitted a correction for ${work_date}.`,
-      'warning',
-      '/admin/approvals'
-    );
-  });
-
-  logAudit(
-    { id: req.user!.id, name: req.user!.name },
-    'CREATE_CORRECTION_REQUEST',
-    'ATTENDANCE_CORRECTION',
-    newCorrection.id,
-    { work_date, requested_check_in, requested_check_out },
-    req.ip || '127.0.0.1'
-  );
-
-  res.status(201).json({
-    success: true,
-    message: 'Attendance correction request submitted for admin review.',
-    record: enrichCorrection(newCorrection),
-  });
-});
+router.post(['/corrections', '/attendance/correction-requests'], authenticate, handleCreateCorrection);
 
 // GET /api/leave-requests/admin/corrections and /api/admin/attendance-corrections
 router.get(['/admin/corrections', '/admin/attendance-corrections'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
@@ -342,6 +370,13 @@ router.patch(['/admin/corrections/:id/review', '/admin/attendance-corrections/:i
   }
 
   await saveDb(db);
+  await upsertAttendanceCorrectionInTiDB(corr);
+  if (status === 'approved') {
+    const updatedAtt = db.attendance.find((a) => a.id === corr.attendance_id || (a.user_id === corr.user_id && a.work_date === corr.work_date));
+    if (updatedAtt) {
+      await upsertAttendanceInTiDB(updatedAtt);
+    }
+  }
 
   createNotification(
     corr.user_id,
@@ -364,6 +399,7 @@ router.patch(['/admin/corrections/:id/review', '/admin/attendance-corrections/:i
     success: true,
     message: `Correction request ${status} successfully.`,
     record: enrichCorrection(corr),
+    correction: enrichCorrection(corr),
   });
 });
 

@@ -158,11 +158,11 @@ export async function saveDb(data: DatabaseSchema): Promise<void> {
   saveDbLocalOnly(data);
 
   if (isTiDBActive) {
-    try {
-      await syncAllToTiDB(data);
-    } catch (err: any) {
-      console.warn('[TiDB] sync error in saveDb:', err.message);
-    }
+    // Non-blocking serialized background sync to TiDB Cloud.
+    // Keeps local updates instant (<1ms) while syncing cleanly in background without HTTP delays or connection resets.
+    runSerializedTiDBSync(data).catch((err) => {
+      console.warn('[TiDB] Background saveDb sync error:', err?.message || err);
+    });
   }
 }
 

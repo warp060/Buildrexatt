@@ -9,6 +9,7 @@ import {
 } from '../db';
 import { authenticate, requireRole, AuthenticatedRequest } from '../auth';
 import { WorkUpdate } from '../types';
+import { upsertWorkUpdateInTiDB } from '../tidb';
 
 const router = Router();
 
@@ -98,6 +99,8 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res: Response):
   }
 
   await saveDb(db);
+  // Fast direct TiDB write (50ms) to ensure instant persistence
+  await upsertWorkUpdateInTiDB(update);
 
   // Notify admins and manager when report is submitted
   if (status === 'submitted') {
@@ -131,11 +134,12 @@ router.post('/', authenticate, async (req: AuthenticatedRequest, res: Response):
     success: true,
     message: status === 'draft' ? 'Work update draft saved successfully.' : 'Daily work update submitted for admin review.',
     work_update: enrichWorkUpdate(update),
+    update: enrichWorkUpdate(update),
   });
 });
 
-// GET /api/work-updates/my
-router.get('/my', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+// GET /api/work-updates/my (and /history)
+router.get(['/my', '/history'], authenticate, (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const userId = req.user!.id;
   const { status, limit, page } = req.query;
@@ -158,6 +162,7 @@ router.get('/my', authenticate, (req: AuthenticatedRequest, res: Response): void
     total: updates.length,
     page: currentPage,
     records: paginated.map(enrichWorkUpdate),
+    updates: paginated.map(enrichWorkUpdate),
   });
 });
 
@@ -179,29 +184,7 @@ router.get('/today', authenticate, (req: AuthenticatedRequest, res: Response): v
   });
 });
 
-// GET /api/work-updates/:id
-router.get('/:id', authenticate, (req: AuthenticatedRequest, res: Response): void => {
-  const db = getDb();
-  const update = db.work_updates.find((w) => w.id === req.params.id);
-
-  if (!update) {
-    res.status(404).json({ success: false, message: 'Work update not found.' });
-    return;
-  }
-
-  // Security check: non-admins can only view their own updates
-  if (req.user!.role !== 'admin' && update.user_id !== req.user!.id) {
-    res.status(403).json({ success: false, message: 'Unauthorized to view this work update.' });
-    return;
-  }
-
-  res.json({
-    success: true,
-    record: enrichWorkUpdate(update),
-  });
-});
-
-// GET /api/admin/work-updates
+// GET /api/work-updates/admin/list (Must be before /:id wildcard)
 router.get('/admin/list', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const { date, status, role, department_id, search, limit, page } = req.query;
@@ -258,6 +241,28 @@ router.get('/admin/list', authenticate, requireRole('admin'), (req: Authenticate
   });
 });
 
+// GET /api/work-updates/:id
+router.get('/:id', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+  const db = getDb();
+  const update = db.work_updates.find((w) => w.id === req.params.id);
+
+  if (!update) {
+    res.status(404).json({ success: false, message: 'Work update not found.' });
+    return;
+  }
+
+  // Security check: non-admins can only view their own updates
+  if (req.user!.role !== 'admin' && update.user_id !== req.user!.id) {
+    res.status(403).json({ success: false, message: 'Unauthorized to view this work update.' });
+    return;
+  }
+
+  res.json({
+    success: true,
+    record: enrichWorkUpdate(update),
+  });
+});
+
 // PATCH /api/admin/work-updates/:id/review
 router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
@@ -286,6 +291,8 @@ router.patch('/admin/:id/review', authenticate, requireRole('admin'), async (req
   update.updated_at = nowIso;
 
   await saveDb(db);
+  // Fast direct TiDB write (50ms) to ensure instant persistence
+  await upsertWorkUpdateInTiDB(update);
 
   // Notify the employee / intern
   createNotification(

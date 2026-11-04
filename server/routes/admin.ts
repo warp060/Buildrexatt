@@ -26,8 +26,8 @@ function sanitizeUser(u: any) {
   return rest;
 }
 
-// GET /api/admin/dashboard-stats
-router.get('/dashboard-stats', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+// GET /api/admin/dashboard-stats (and /dashboard/stats)
+router.get(['/dashboard-stats', '/dashboard/stats'], authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
   const today = getTodayStr();
 
@@ -532,6 +532,25 @@ router.get('/reports/work-updates', authenticate, requireRole('admin'), (req: Au
   });
 });
 
+// GET /api/admin/reports/summary
+router.get('/reports/summary', authenticate, requireRole('admin'), (req: AuthenticatedRequest, res: Response): void => {
+  const db = getDb();
+  const totalUsers = db.users.filter((u) => u.status === 'active').length;
+  const totalAttendance = db.attendance.length;
+  const totalUpdates = db.work_updates.length;
+  const totalLeaves = db.leave_requests.length;
+
+  res.json({
+    success: true,
+    summary: {
+      total_users: totalUsers,
+      total_attendance_logs: totalAttendance,
+      total_work_updates: totalUpdates,
+      total_leave_requests: totalLeaves,
+    },
+  });
+});
+
 // GET /api/departments
 router.get('/departments', authenticate, (req: AuthenticatedRequest, res: Response): void => {
   const db = getDb();
@@ -564,6 +583,15 @@ router.post('/departments', authenticate, requireRole('admin'), async (req: Auth
   await saveDb(db);
 
   res.status(201).json({ success: true, department: newDept });
+});
+
+// GET /api/admin/settings
+router.get('/settings', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+  const db = getDb();
+  res.json({
+    success: true,
+    settings: db.company_settings,
+  });
 });
 
 // PATCH /api/admin/settings
