@@ -72445,17 +72445,17 @@ var buildrex_default = {
   ],
   attendance: [
     {
-      id: "att-1793788763642-37enc",
+      id: "att-1793786186129-xbid3",
       user_id: "user-fareed",
       work_date: "2026-11-04",
-      check_in: "2026-11-04T10:39:23.642Z",
-      check_out: "2026-11-04T10:39:29.287Z",
+      check_in: "2026-11-04T10:39:23.000Z",
+      check_out: "2026-11-04T10:39:29.000Z",
       total_minutes: 1,
       status: "late",
       notes: "Late arrival (checked in after grace window)",
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:23.642Z",
-      updated_at: "2026-11-04T10:39:29.287Z"
+      created_at: "2026-11-04T09:56:26.000Z",
+      updated_at: "2026-11-04T10:39:25.000Z"
     },
     {
       id: "att-1793779050857-2af2w",
@@ -72761,12 +72761,12 @@ var buildrex_default = {
       next_day_plan: "Review dashboard KPI analytics and run production smoke tests",
       hours_spent: 8,
       status: "submitted",
-      submitted_at: "2026-11-04T10:39:29.616Z",
+      submitted_at: "2026-11-04T10:39:29.000Z",
       reviewed_by: null,
       review_comment: null,
       reviewed_at: null,
       created_at: "2026-11-04T09:57:03.000Z",
-      updated_at: "2026-11-04T10:39:29.616Z"
+      updated_at: "2026-11-04T10:39:26.000Z"
     },
     {
       id: "wu-1793729487762-9byuf",
@@ -74887,8 +74887,22 @@ var buildrex_default = {
       status: "approved",
       reviewed_by: "user-admin-master",
       review_comment: "Approved. Enjoy the symposium.",
-      reviewed_at: "2026-11-04T10:39:30.494Z",
-      created_at: "2026-11-04T10:39:30.098Z"
+      reviewed_at: "2026-11-04T10:39:30.000Z",
+      created_at: "2026-11-04T10:39:26.000Z"
+    },
+    {
+      id: "leave-1793788484956-cebfv",
+      user_id: "user-abbas",
+      leave_type: "casual",
+      start_date: "2026-11-20",
+      end_date: "2026-11-21",
+      days_count: 2,
+      reason: "Attending college annual technical symposium",
+      status: "approved",
+      reviewed_by: "user-admin-master",
+      review_comment: "Approved. Enjoy the symposium.",
+      reviewed_at: "2026-11-04T10:34:45.000Z",
+      created_at: "2026-11-04T10:34:41.000Z"
     },
     {
       id: "leave-1",
@@ -74988,7 +75002,7 @@ var buildrex_default = {
       reviewed_by: null,
       review_comment: null,
       reviewed_at: null,
-      created_at: "2026-11-04T10:39:30.847Z"
+      created_at: "2026-11-04T10:39:27.000Z"
     },
     {
       id: "corr-1793788693196-ye3fl",
@@ -75035,14 +75049,14 @@ var buildrex_default = {
   ],
   notifications: [
     {
-      id: "notif-1793788771098-i1j5",
-      user_id: "user-emad",
-      title: "Attendance Correction Submitted",
-      message: "Mohammed Abbas R Y submitted a correction for 2026-11-01.",
-      type: "warning",
+      id: "notif-1793788770050-p7z2",
+      user_id: "user-admin-master",
+      title: "Daily Work Update Submitted",
+      message: "Mohammed Abbas R Y submitted daily work report for 2026-11-04.",
+      type: "info",
       read_at: null,
-      link: "/admin/approvals",
-      created_at: "2026-11-04T10:39:31.098Z"
+      link: "/admin/work-updates",
+      created_at: "2026-11-04 10:39:28"
     },
     {
       id: "notif-1793788771090-mewf",
@@ -75052,27 +75066,7 @@ var buildrex_default = {
       type: "warning",
       read_at: null,
       link: "/admin/approvals",
-      created_at: "2026-11-04T10:39:31.091Z"
-    },
-    {
-      id: "notif-1793788770833-5vrl",
-      user_id: "user-abbas",
-      title: "Leave Request Approved",
-      message: "Your leave request for 2026-12-10 to 2026-12-10 has been approved. Note: Approved. Enjoy the symposium.",
-      type: "success",
-      read_at: null,
-      link: "/leave-requests",
-      created_at: "2026-11-04T10:39:30.833Z"
-    },
-    {
-      id: "notif-1793788770457-nuva",
-      user_id: "user-emad",
-      title: "New Leave Request",
-      message: "Mohammed Abbas R Y requested 1 day(s) casual leave (2026-12-10 to 2026-12-10).",
-      type: "info",
-      read_at: null,
-      link: "/admin/approvals",
-      created_at: "2026-11-04T10:39:30.457Z"
+      created_at: "2026-11-04 10:39:28"
     },
     {
       id: "notif-1793788770449-r2w4",
@@ -75082,27 +75076,17 @@ var buildrex_default = {
       type: "info",
       read_at: null,
       link: "/admin/approvals",
-      created_at: "2026-11-04T10:39:30.449Z"
+      created_at: "2026-11-04 10:39:28"
     },
     {
-      id: "notif-1793788770063-0tx0",
+      id: "notif-1793788771098-i1j5",
       user_id: "user-emad",
-      title: "Daily Work Update Submitted",
-      message: "Mohammed Abbas R Y submitted daily work report for 2026-11-04.",
-      type: "info",
+      title: "Attendance Correction Submitted",
+      message: "Mohammed Abbas R Y submitted a correction for 2026-11-01.",
+      type: "warning",
       read_at: null,
-      link: "/admin/work-updates",
-      created_at: "2026-11-04T10:39:30.063Z"
-    },
-    {
-      id: "notif-1793788770050-p7z2",
-      user_id: "user-admin-master",
-      title: "Daily Work Update Submitted",
-      message: "Mohammed Abbas R Y submitted daily work report for 2026-11-04.",
-      type: "info",
-      read_at: null,
-      link: "/admin/work-updates",
-      created_at: "2026-11-04T10:39:30.050Z"
+      link: "/admin/approvals",
+      created_at: "2026-11-04 10:39:28"
     },
     {
       id: "notif-1793788769574-lejm",
@@ -75112,7 +75096,7 @@ var buildrex_default = {
       type: "info",
       read_at: null,
       link: "/admin/attendance",
-      created_at: "2026-11-04T10:39:29.574Z"
+      created_at: "2026-11-04 10:39:28"
     },
     {
       id: "notif-1793788769566-epph",
@@ -75122,17 +75106,7 @@ var buildrex_default = {
       type: "info",
       read_at: null,
       link: "/admin/attendance",
-      created_at: "2026-11-04T10:39:29.566Z"
-    },
-    {
-      id: "notif-1793788769248-5325",
-      user_id: "user-emad",
-      title: "Attendance Clock-In",
-      message: "N FAREEDUDDEEN checked in for 2026-11-04 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-11-04T10:39:29.248Z"
+      created_at: "2026-11-04 10:39:28"
     },
     {
       id: "notif-1793788769240-frvo",
@@ -75142,7 +75116,47 @@ var buildrex_default = {
       type: "warning",
       read_at: null,
       link: "/admin/attendance",
-      created_at: "2026-11-04T10:39:29.240Z"
+      created_at: "2026-11-04 10:39:28"
+    },
+    {
+      id: "notif-1793788769248-5325",
+      user_id: "user-emad",
+      title: "Attendance Clock-In",
+      message: "N FAREEDUDDEEN checked in for 2026-11-04 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-04 10:39:28"
+    },
+    {
+      id: "notif-1793788770457-nuva",
+      user_id: "user-emad",
+      title: "New Leave Request",
+      message: "Mohammed Abbas R Y requested 1 day(s) casual leave (2026-12-10 to 2026-12-10).",
+      type: "info",
+      read_at: null,
+      link: "/admin/approvals",
+      created_at: "2026-11-04 10:39:28"
+    },
+    {
+      id: "notif-1793788770063-0tx0",
+      user_id: "user-emad",
+      title: "Daily Work Update Submitted",
+      message: "Mohammed Abbas R Y submitted daily work report for 2026-11-04.",
+      type: "info",
+      read_at: null,
+      link: "/admin/work-updates",
+      created_at: "2026-11-04 10:39:28"
+    },
+    {
+      id: "notif-1793788770833-5vrl",
+      user_id: "user-abbas",
+      title: "Leave Request Approved",
+      message: "Your leave request for 2026-12-10 to 2026-12-10 has been approved. Note: Approved. Enjoy the symposium.",
+      type: "success",
+      read_at: null,
+      link: "/leave-requests",
+      created_at: "2026-11-04 10:39:28"
     },
     {
       id: "notif-1793786221645-knqo",
@@ -75165,8 +75179,8 @@ var buildrex_default = {
       created_at: "2026-11-04 09:57:04"
     },
     {
-      id: "notif-1793786190067-x6ks",
-      user_id: "user-emad",
+      id: "notif-1793786190064-2t0m",
+      user_id: "user-admin-master",
       title: "Attendance Clock-In",
       message: "N FAREEDUDDEEN checked in for 2026-11-04 (Late Arrival).",
       type: "warning",
@@ -75175,8 +75189,8 @@ var buildrex_default = {
       created_at: "2026-11-04 09:56:33"
     },
     {
-      id: "notif-1793786190064-2t0m",
-      user_id: "user-admin-master",
+      id: "notif-1793786190067-x6ks",
+      user_id: "user-emad",
       title: "Attendance Clock-In",
       message: "N FAREEDUDDEEN checked in for 2026-11-04 (Late Arrival).",
       type: "warning",
@@ -75215,8 +75229,8 @@ var buildrex_default = {
       created_at: "2026-11-03 18:13:04"
     },
     {
-      id: "notif-1793720914427-se36",
-      user_id: "user-admin-master",
+      id: "notif-1793720914431-erdo",
+      user_id: "user-emad",
       title: "Attendance Clock-Out",
       message: "Maleeha Affaf checked out. Recorded duration: 6.1 hrs.",
       type: "info",
@@ -75225,8 +75239,8 @@ var buildrex_default = {
       created_at: "2026-11-03 15:49:02"
     },
     {
-      id: "notif-1793720914431-erdo",
-      user_id: "user-emad",
+      id: "notif-1793720914427-se36",
+      user_id: "user-admin-master",
       title: "Attendance Clock-Out",
       message: "Maleeha Affaf checked out. Recorded duration: 6.1 hrs.",
       type: "info",
@@ -75255,8 +75269,8 @@ var buildrex_default = {
       created_at: "2026-11-03 15:48:45"
     },
     {
-      id: "notif-1793720784247-bfxw",
-      user_id: "user-admin-master",
+      id: "notif-1793720784251-2t26",
+      user_id: "user-emad",
       title: "Daily Work Update Submitted",
       message: "Maleeha Affaf submitted daily work report for 2026-11-03.",
       type: "info",
@@ -75265,8 +75279,8 @@ var buildrex_default = {
       created_at: "2026-11-03 15:47:33"
     },
     {
-      id: "notif-1793720784251-2t26",
-      user_id: "user-emad",
+      id: "notif-1793720784247-bfxw",
+      user_id: "user-admin-master",
       title: "Daily Work Update Submitted",
       message: "Maleeha Affaf submitted daily work report for 2026-11-03.",
       type: "info",
@@ -75295,8 +75309,8 @@ var buildrex_default = {
       created_at: "2026-11-03 15:45:30"
     },
     {
-      id: "notif-1793720668242-ovb9",
-      user_id: "user-admin-master",
+      id: "notif-1793720668246-2us0",
+      user_id: "user-emad",
       title: "Daily Work Update Submitted",
       message: "Mohammed Abbas R Y submitted daily work report for 2026-11-03.",
       type: "info",
@@ -75305,8 +75319,8 @@ var buildrex_default = {
       created_at: "2026-11-03 15:44:37"
     },
     {
-      id: "notif-1793720668246-2us0",
-      user_id: "user-emad",
+      id: "notif-1793720668242-ovb9",
+      user_id: "user-admin-master",
       title: "Daily Work Update Submitted",
       message: "Mohammed Abbas R Y submitted daily work report for 2026-11-03.",
       type: "info",
@@ -75385,8 +75399,8 @@ var buildrex_default = {
       created_at: "2026-11-03 13:08:12"
     },
     {
-      id: "notif-1793710694557-qewx",
-      user_id: "user-ehsaan",
+      id: "notif-1793710694554-fpby",
+      user_id: "user-admin-master",
       title: "Attendance Clock-Out",
       message: "Sumaiya J checked out. Recorded duration: 4.1 hrs.",
       type: "info",
@@ -75395,8 +75409,8 @@ var buildrex_default = {
       created_at: "2026-11-03 12:58:39"
     },
     {
-      id: "notif-1793710694554-fpby",
-      user_id: "user-admin-master",
+      id: "notif-1793710694557-qewx",
+      user_id: "user-ehsaan",
       title: "Attendance Clock-Out",
       message: "Sumaiya J checked out. Recorded duration: 4.1 hrs.",
       type: "info",
@@ -75425,8 +75439,8 @@ var buildrex_default = {
       created_at: "2026-11-03 12:53:04"
     },
     {
-      id: "notif-1793710056077-lm3a",
-      user_id: "user-admin-master",
+      id: "notif-1793710056079-v0cr",
+      user_id: "user-ehsaan",
       title: "Daily Work Update Submitted",
       message: "Sumaiya J submitted daily work report for 2026-11-03.",
       type: "info",
@@ -75435,8 +75449,8 @@ var buildrex_default = {
       created_at: "2026-11-03 12:49:55"
     },
     {
-      id: "notif-1793710056079-v0cr",
-      user_id: "user-ehsaan",
+      id: "notif-1793710056077-lm3a",
+      user_id: "user-admin-master",
       title: "Daily Work Update Submitted",
       message: "Sumaiya J submitted daily work report for 2026-11-03.",
       type: "info",
@@ -75495,8 +75509,8 @@ var buildrex_default = {
       created_at: "2026-11-02 17:53:08"
     },
     {
-      id: "notif-1793638867189-t09u",
-      user_id: "user-admin-master",
+      id: "notif-1793638867186-3hmj",
+      user_id: "user-emad",
       title: "Attendance Clock-Out",
       message: "Mohammed Abbas R Y checked out. Recorded duration: 4.1 hrs.",
       type: "info",
@@ -75505,8 +75519,8 @@ var buildrex_default = {
       created_at: "2026-11-02 17:01:19"
     },
     {
-      id: "notif-1793638867186-3hmj",
-      user_id: "user-emad",
+      id: "notif-1793638867189-t09u",
+      user_id: "user-admin-master",
       title: "Attendance Clock-Out",
       message: "Mohammed Abbas R Y checked out. Recorded duration: 4.1 hrs.",
       type: "info",
@@ -75535,22 +75549,22 @@ var buildrex_default = {
       created_at: "2026-11-02 15:19:17"
     },
     {
-      id: "notif-1793630619891-u9yi",
-      user_id: "user-admin-master",
-      title: "Attendance Clock-Out",
-      message: "Sumaiya J checked out. Recorded duration: 1.3 hrs.",
-      type: "info",
-      read_at: "2026-11-02 14:46:17",
-      link: "/admin/attendance",
-      created_at: "2026-11-02 14:44:03"
-    },
-    {
       id: "notif-1793630619896-a2qm",
       user_id: "user-ehsaan",
       title: "Attendance Clock-Out",
       message: "Sumaiya J checked out. Recorded duration: 1.3 hrs.",
       type: "info",
       read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-11-02 14:44:03"
+    },
+    {
+      id: "notif-1793630619891-u9yi",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "Sumaiya J checked out. Recorded duration: 1.3 hrs.",
+      type: "info",
+      read_at: "2026-11-02 14:46:17",
       link: "/admin/attendance",
       created_at: "2026-11-02 14:44:03"
     },
@@ -75625,8 +75639,8 @@ var buildrex_default = {
       created_at: "2026-11-02 13:42:49"
     },
     {
-      id: "notif-1793624198248-f9r9",
-      user_id: "user-admin-master",
+      id: "notif-1793624198245-ac9h",
+      user_id: "user-emad",
       title: "Attendance Clock-In",
       message: "Mohammed Abbas R Y checked in for 2026-11-02 (Late Arrival).",
       type: "warning",
@@ -75635,8 +75649,8 @@ var buildrex_default = {
       created_at: "2026-11-02 12:57:08"
     },
     {
-      id: "notif-1793624198245-ac9h",
-      user_id: "user-emad",
+      id: "notif-1793624198248-f9r9",
+      user_id: "user-admin-master",
       title: "Attendance Clock-In",
       message: "Mohammed Abbas R Y checked in for 2026-11-02 (Late Arrival).",
       type: "warning",
@@ -75685,8 +75699,8 @@ var buildrex_default = {
       created_at: "2026-11-01 09:09:07"
     },
     {
-      id: "notif-1793341219929-cz6i",
-      user_id: "user-emad",
+      id: "notif-1793341219934-f6bw",
+      user_id: "user-admin-master",
       title: "Attendance Clock-Out",
       message: "Mohammed Abbas R Y checked out. Recorded duration: 1.7 hrs.",
       type: "info",
@@ -75695,8 +75709,8 @@ var buildrex_default = {
       created_at: "2026-10-30 06:20:22"
     },
     {
-      id: "notif-1793341219934-f6bw",
-      user_id: "user-admin-master",
+      id: "notif-1793341219929-cz6i",
+      user_id: "user-emad",
       title: "Attendance Clock-Out",
       message: "Mohammed Abbas R Y checked out. Recorded duration: 1.7 hrs.",
       type: "info",
@@ -75735,140 +75749,10 @@ var buildrex_default = {
       created_at: "2026-10-30 05:53:20"
     },
     {
-      id: "notif-1793194625840-eu1m",
-      user_id: "user-emad",
-      title: "Attendance Clock-In",
-      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793107449640-a0j9",
-      user_id: "user-abbas",
-      title: "Work Update Reviewed",
-      message: "Your work update for 2026-10-27 was approved and marked Reviewed.",
-      type: "success",
-      read_at: null,
-      link: "/work-updates",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
       id: "notif-1792856828277-73go",
       user_id: "user-admin-master",
       title: "New Leave Request",
       message: "Mohammed Abbas R Y requested 2 day(s) emergency leave (2026-10-25 to 2026-10-26).",
-      type: "info",
-      read_at: null,
-      link: "/admin/leave-requests",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-3",
-      user_id: "user-abbas",
-      title: "Welcome to BUILDREX Portal",
-      message: "Your attendance & work management profile is active. Submit your daily report by 6:00 PM.",
-      type: "info",
-      read_at: null,
-      link: "/dashboard",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793194567455-joc1",
-      user_id: "user-ehsaan",
-      title: "Attendance Clock-In",
-      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793194567441-ig65",
-      user_id: "user-admin-master",
-      title: "Attendance Clock-In",
-      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-oct29-leave-abbas",
-      user_id: "user-admin-master",
-      title: "New Leave Request",
-      message: "Mohammed Abbas R Y requested 1 day(s) emergency leave (2026-10-29 to 2026-10-29).",
-      type: "info",
-      read_at: "2026-10-29 15:39:00",
-      link: "/admin/approvals",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793109979238-1la9",
-      user_id: "user-admin-master",
-      title: "Attendance Clock-In",
-      message: "Muhammad Ameen J checked in for 2026-10-27 (Late Arrival).",
-      type: "warning",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-oct29-wu-abbas",
-      user_id: "user-admin-master",
-      title: "Daily Work Update Submitted",
-      message: "Mohammed Abbas R Y submitted daily work report for 2026-10-29.",
-      type: "info",
-      read_at: "2026-10-29 15:38:00",
-      link: "/admin/work-updates",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793106451038-vwjy",
-      user_id: "user-admin-master",
-      title: "New Leave Request",
-      message: "Mohammed Abbas R Y requested 2 day(s) casual leave (2026-11-03 to 2026-11-04).",
-      type: "info",
-      read_at: null,
-      link: "/admin/leave-requests",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793107449923-rpdd",
-      user_id: "user-abbas",
-      title: "Attendance Correction Approved",
-      message: "Your correction request for 2026-10-26 was approved. (Verified with manager and approved.)",
-      type: "success",
-      read_at: null,
-      link: "/my-attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1793111433973-yzzj",
-      user_id: "user-admin-master",
-      title: "Attendance Clock-Out",
-      message: "A Afra Fameena checked out. Recorded duration: 0.5 hrs.",
-      type: "info",
-      read_at: null,
-      link: "/admin/attendance",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-1",
-      user_id: "user-ehsaan",
-      title: "New Leave Request",
-      message: "Maleeha Affaf (BRX-INT-15) submitted a Sick Leave request for Oct 22-23.",
-      type: "info",
-      read_at: null,
-      link: "/admin/leave-requests",
-      created_at: "2026-10-30 05:40:16"
-    },
-    {
-      id: "notif-4",
-      user_id: "user-emad",
-      title: "New Leave Request",
-      message: "Mohammed Abbas R Y (BRX-INT-18) submitted a Casual Leave request for Oct 28.",
       type: "info",
       read_at: null,
       link: "/admin/leave-requests",
@@ -75885,23 +75769,63 @@ var buildrex_default = {
       created_at: "2026-10-30 05:40:16"
     },
     {
-      id: "notif-1793194625816-tq9a",
+      id: "notif-oct29-leave-abbas",
       user_id: "user-admin-master",
+      title: "New Leave Request",
+      message: "Mohammed Abbas R Y requested 1 day(s) emergency leave (2026-10-29 to 2026-10-29).",
+      type: "info",
+      read_at: "2026-10-29 15:39:00",
+      link: "/admin/approvals",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793107449640-a0j9",
+      user_id: "user-abbas",
+      title: "Work Update Reviewed",
+      message: "Your work update for 2026-10-27 was approved and marked Reviewed.",
+      type: "success",
+      read_at: null,
+      link: "/work-updates",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1",
+      user_id: "user-ehsaan",
+      title: "New Leave Request",
+      message: "Maleeha Affaf (BRX-INT-15) submitted a Sick Leave request for Oct 22-23.",
+      type: "info",
+      read_at: null,
+      link: "/admin/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793194567455-joc1",
+      user_id: "user-ehsaan",
       title: "Attendance Clock-In",
-      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
+      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
       type: "warning",
       read_at: null,
       link: "/admin/attendance",
       created_at: "2026-10-30 05:40:16"
     },
     {
-      id: "notif-1793107449705-pe4h",
-      user_id: "user-abbas",
-      title: "Leave Request Approved",
-      message: "Your leave request for 2026-11-03 to 2026-11-04 has been approved. Note: Approved. Enjoy the family function.",
-      type: "success",
+      id: "notif-1793109979238-1la9",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Muhammad Ameen J checked in for 2026-10-27 (Late Arrival).",
+      type: "warning",
       read_at: null,
-      link: "/leave-requests",
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-3",
+      user_id: "user-abbas",
+      title: "Welcome to BUILDREX Portal",
+      message: "Your attendance & work management profile is active. Submit your daily report by 6:00 PM.",
+      type: "info",
+      read_at: null,
+      link: "/dashboard",
       created_at: "2026-10-30 05:40:16"
     },
     {
@@ -75915,6 +75839,36 @@ var buildrex_default = {
       created_at: "2026-10-30 05:40:16"
     },
     {
+      id: "notif-4",
+      user_id: "user-emad",
+      title: "New Leave Request",
+      message: "Mohammed Abbas R Y (BRX-INT-18) submitted a Casual Leave request for Oct 28.",
+      type: "info",
+      read_at: null,
+      link: "/admin/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793194567441-ig65",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Muhammad Ameen J checked in for 2026-10-28 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793111433973-yzzj",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-Out",
+      message: "A Afra Fameena checked out. Recorded duration: 0.5 hrs.",
+      type: "info",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
       id: "notif-1793194511433-7cjs",
       user_id: "user-abbas",
       title: "Work Update Reviewed",
@@ -75925,6 +75879,16 @@ var buildrex_default = {
       created_at: "2026-10-30 05:40:16"
     },
     {
+      id: "notif-1793106451038-vwjy",
+      user_id: "user-admin-master",
+      title: "New Leave Request",
+      message: "Mohammed Abbas R Y requested 2 day(s) casual leave (2026-11-03 to 2026-11-04).",
+      type: "info",
+      read_at: null,
+      link: "/admin/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
       id: "notif-1792856929969-c5ap",
       user_id: "user-abbas",
       title: "Leave Request Approved",
@@ -75932,6 +75896,56 @@ var buildrex_default = {
       type: "success",
       read_at: null,
       link: "/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793107449705-pe4h",
+      user_id: "user-abbas",
+      title: "Leave Request Approved",
+      message: "Your leave request for 2026-11-03 to 2026-11-04 has been approved. Note: Approved. Enjoy the family function.",
+      type: "success",
+      read_at: null,
+      link: "/leave-requests",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793194625840-eu1m",
+      user_id: "user-emad",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793194625816-tq9a",
+      user_id: "user-admin-master",
+      title: "Attendance Clock-In",
+      message: "Mohammed Abbas R Y checked in for 2026-10-28 (Late Arrival).",
+      type: "warning",
+      read_at: null,
+      link: "/admin/attendance",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-oct29-wu-abbas",
+      user_id: "user-admin-master",
+      title: "Daily Work Update Submitted",
+      message: "Mohammed Abbas R Y submitted daily work report for 2026-10-29.",
+      type: "info",
+      read_at: "2026-10-29 15:38:00",
+      link: "/admin/work-updates",
+      created_at: "2026-10-30 05:40:16"
+    },
+    {
+      id: "notif-1793107449923-rpdd",
+      user_id: "user-abbas",
+      title: "Attendance Correction Approved",
+      message: "Your correction request for 2026-10-26 was approved. (Verified with manager and approved.)",
+      type: "success",
+      read_at: null,
+      link: "/my-attendance",
       created_at: "2026-10-30 05:40:16"
     },
     {
@@ -75964,12 +75978,12 @@ var buildrex_default = {
       entity_type: "ATTENDANCE_CORRECTION",
       entity_id: "corr-1793788770847-znqvn",
       details: {
-        work_date: "2026-11-01",
         requested_check_in: "2026-11-01T09:00:00.000Z",
-        requested_check_out: "2026-11-01T18:00:00.000Z"
+        requested_check_out: "2026-11-01T18:00:00.000Z",
+        work_date: "2026-11-01"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:31.107Z"
+      created_at: "2026-11-04 10:39:29"
     },
     {
       id: "audit-1793788770838-0xcuf",
@@ -75979,12 +75993,12 @@ var buildrex_default = {
       entity_type: "LEAVE_REQUEST",
       entity_id: "leave-1793788770098-tnokf",
       details: {
-        status: "approved",
         review_comment: "Approved. Enjoy the symposium.",
+        status: "approved",
         target_user: "user-abbas"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:30.838Z"
+      created_at: "2026-11-04 10:39:29"
     },
     {
       id: "audit-1793788770468-h3xx5",
@@ -75994,13 +76008,13 @@ var buildrex_default = {
       entity_type: "LEAVE_REQUEST",
       entity_id: "leave-1793788770098-tnokf",
       details: {
-        start_date: "2026-12-10",
-        end_date: "2026-12-10",
         days: 1,
-        leave_type: "casual"
+        end_date: "2026-12-10",
+        leave_type: "casual",
+        start_date: "2026-12-10"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:30.468Z"
+      created_at: "2026-11-04 10:39:29"
     },
     {
       id: "audit-1793788770074-h546t",
@@ -76010,11 +76024,11 @@ var buildrex_default = {
       entity_type: "WORK_UPDATE",
       entity_id: "wu-1793786221674-14e74",
       details: {
-        work_date: "2026-11-04",
-        status: "submitted"
+        status: "submitted",
+        work_date: "2026-11-04"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:30.074Z"
+      created_at: "2026-11-04 10:39:29"
     },
     {
       id: "audit-1793788769585-b9i02",
@@ -76024,13 +76038,13 @@ var buildrex_default = {
       entity_type: "ATTENDANCE",
       entity_id: "att-1793788763642-37enc",
       details: {
-        work_date: "2026-11-04",
         check_out: "2026-11-04T10:39:29.287Z",
+        status: "late",
         total_minutes: 1,
-        status: "late"
+        work_date: "2026-11-04"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:29.585Z"
+      created_at: "2026-11-04 10:39:29"
     },
     {
       id: "audit-1793788769259-wflzv",
@@ -76040,12 +76054,12 @@ var buildrex_default = {
       entity_type: "ATTENDANCE",
       entity_id: "att-1793788763642-37enc",
       details: {
-        work_date: "2026-11-04",
         check_in: "2026-11-04T10:39:23.642Z",
-        status: "late"
+        status: "late",
+        work_date: "2026-11-04"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:29.259Z"
+      created_at: "2026-11-04 10:39:29"
     },
     {
       id: "audit-1793788763384-88am8",
@@ -76059,7 +76073,7 @@ var buildrex_default = {
         role: "employee"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:23.384Z"
+      created_at: "2026-11-04 10:39:22"
     },
     {
       id: "audit-1793788763263-dveou",
@@ -76073,7 +76087,7 @@ var buildrex_default = {
         role: "intern"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:23.263Z"
+      created_at: "2026-11-04 10:39:22"
     },
     {
       id: "audit-1793788763118-zpesu",
@@ -76087,7 +76101,7 @@ var buildrex_default = {
         role: "admin"
       },
       ip_address: "127.0.0.1",
-      created_at: "2026-11-04T10:39:23.118Z"
+      created_at: "2026-11-04 10:39:22"
     },
     {
       id: "audit-1793788682842-pjv3o",
@@ -76205,20 +76219,6 @@ var buildrex_default = {
       created_at: "2026-11-04 09:56:34"
     },
     {
-      id: "audit-1793786159245-nn33c",
-      actor_id: "user-admin-master",
-      actor_name: "Buildrex Admin",
-      action: "USER_LOGIN",
-      entity_type: "USER",
-      entity_id: "user-admin-master",
-      details: {
-        email: "adminbrx@gmail.com",
-        role: "admin"
-      },
-      ip_address: "127.0.0.1",
-      created_at: "2026-11-04 09:56:07"
-    },
-    {
       id: "audit-1793786159418-i0ucc",
       actor_id: "user-fareed",
       actor_name: "N FAREEDUDDEEN",
@@ -76242,6 +76242,20 @@ var buildrex_default = {
       details: {
         email: "abbas6618532@gmail.com",
         role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-04 09:56:07"
+    },
+    {
+      id: "audit-1793786159245-nn33c",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
       },
       ip_address: "127.0.0.1",
       created_at: "2026-11-04 09:56:07"
@@ -76657,6 +76671,21 @@ var buildrex_default = {
       created_at: "2026-11-03 12:58:13"
     },
     {
+      id: "audit-1793710268126-9os3k",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
+      entity_type: "ATTENDANCE",
+      entity_id: "att-1793695899095-7dxud",
+      details: {
+        check_in: "2026-11-03T08:51:00.000Z",
+        check_out: "2026-11-03T12:49:00.000Z",
+        status: "present"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-03 12:53:11"
+    },
+    {
       id: "audit-1793710239722-58q8j",
       actor_id: "user-sumaiya",
       actor_name: "Sumaiya J",
@@ -76668,21 +76697,6 @@ var buildrex_default = {
         status: "present",
         total_minutes: 238,
         work_date: "2026-11-03"
-      },
-      ip_address: "127.0.0.1",
-      created_at: "2026-11-03 12:53:11"
-    },
-    {
-      id: "audit-1793710268126-9os3k",
-      actor_id: "user-admin-master",
-      actor_name: "Buildrex Admin",
-      action: "ADMIN_MANUAL_ATTENDANCE_UPDATE",
-      entity_type: "ATTENDANCE",
-      entity_id: "att-1793695899095-7dxud",
-      details: {
-        check_in: "2026-11-03T08:51:00.000Z",
-        check_out: "2026-11-03T12:49:00.000Z",
-        status: "present"
       },
       ip_address: "127.0.0.1",
       created_at: "2026-11-03 12:53:11"
@@ -77102,20 +77116,6 @@ var buildrex_default = {
       created_at: "2026-11-02 14:17:00"
     },
     {
-      id: "audit-1793628709526-hb3cj",
-      actor_id: "user-admin-master",
-      actor_name: "Buildrex Admin",
-      action: "USER_LOGIN",
-      entity_type: "USER",
-      entity_id: "user-admin-master",
-      details: {
-        email: "adminbrx@gmail.com",
-        role: "admin"
-      },
-      ip_address: "127.0.0.1",
-      created_at: "2026-11-02 14:15:14"
-    },
-    {
       id: "audit-1793628807515-gsmbi",
       actor_id: "user-1793454603321-5yvc",
       actor_name: "Asmath Sakeena",
@@ -77125,6 +77125,20 @@ var buildrex_default = {
       details: {
         email: "asmazehra2046@gmail.com",
         role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-11-02 14:15:14"
+    },
+    {
+      id: "audit-1793628709526-hb3cj",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
       },
       ip_address: "127.0.0.1",
       created_at: "2026-11-02 14:15:14"
@@ -77396,20 +77410,6 @@ var buildrex_default = {
       created_at: "2026-10-30 15:57:33"
     },
     {
-      id: "audit-1793375834777-g81zj",
-      actor_id: "user-admin-master",
-      actor_name: "Buildrex Admin",
-      action: "USER_LOGIN",
-      entity_type: "USER",
-      entity_id: "user-admin-master",
-      details: {
-        email: "adminbrx@gmail.com",
-        role: "admin"
-      },
-      ip_address: "127.0.0.1",
-      created_at: "2026-10-30 15:57:20"
-    },
-    {
       id: "audit-1793375835019-4av61",
       actor_id: "user-admin-master",
       actor_name: "Buildrex Admin",
@@ -77421,6 +77421,20 @@ var buildrex_default = {
         email: "rohan.sharma@buildrex.com",
         initial_password: "Rohan@Brx26",
         role: "intern"
+      },
+      ip_address: "127.0.0.1",
+      created_at: "2026-10-30 15:57:20"
+    },
+    {
+      id: "audit-1793375834777-g81zj",
+      actor_id: "user-admin-master",
+      actor_name: "Buildrex Admin",
+      action: "USER_LOGIN",
+      entity_type: "USER",
+      entity_id: "user-admin-master",
+      details: {
+        email: "adminbrx@gmail.com",
+        role: "admin"
       },
       ip_address: "127.0.0.1",
       created_at: "2026-10-30 15:57:20"
