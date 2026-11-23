@@ -103,19 +103,10 @@ router.post('/check-out', authenticate, async (req: AuthenticatedRequest, res: R
   const userId = req.user!.id;
   const today = getTodayStr();
 
-  // Find active session: first for today, or any active open session (!check_out)
+  // Find active session strictly for today:
   let record = db.attendance.find(
     (a) => a.user_id === userId && a.work_date === today
   );
-
-  if (!record || record.check_out) {
-    const openRecord = db.attendance.find(
-      (a) => a.user_id === userId && !a.check_out
-    );
-    if (openRecord) {
-      record = openRecord;
-    }
-  }
 
   if (!record) {
     res.status(400).json({
@@ -153,7 +144,9 @@ router.post('/check-out', authenticate, async (req: AuthenticatedRequest, res: R
   }
 
   // 1. Direct fast update to TiDB Cloud (50ms)
-  await upsertAttendanceInTiDB(record);
+  await upsertAttendanceInTiDB(record).catch((err) => {
+    console.warn('[TiDB] Direct attendance upsert warning on checkout:', err?.message || err);
+  });
 
   // 2. Local persistence and background sync
   await saveDb(db);
@@ -189,24 +182,32 @@ router.post('/check-out', authenticate, async (req: AuthenticatedRequest, res: R
 });
 
 // GET /api/attendance/today
-router.get('/today', authenticate, (req: AuthenticatedRequest, res: Response): void => {
+router.get('/today', authenticate, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const db = getDb();
   const userId = req.user!.id;
   const today = getTodayStr();
 
-  let record = db.attendance.find(
+  // Auto-close any unclosed sessions from previous days (> 16 hours or previous calendar days)
+  const danglingPastRecords = db.attendance.filter(
+    (a) => a.user_id === userId && a.work_date < today && !a.check_out
+  );
+  if (danglingPastRecords.length > 0) {
+    for (const d of danglingPastRecords) {
+      const inDate = new Date(d.check_in.includes('T') ? d.check_in : d.check_in.replace(' ', 'T') + 'Z');
+      const autoOutDate = new Date(inDate.getTime() + 8 * 60 * 60 * 1000); // 8 hours shift default
+      d.check_out = autoOutDate.toISOString();
+      d.total_minutes = 480;
+      d.notes = (d.notes ? d.notes + '; ' : '') + 'Auto-closed shift';
+      d.updated_at = new Date().toISOString();
+      await upsertAttendanceInTiDB(d).catch(() => {});
+    }
+    await saveDb(db);
+  }
+
+  // Strictly look for today's attendance record
+  const record = db.attendance.find(
     (a) => a.user_id === userId && a.work_date === today
   );
-
-  // If no record found for today, check for any open active session (!check_out)
-  if (!record) {
-    const openRecord = db.attendance.find(
-      (a) => a.user_id === userId && !a.check_out
-    );
-    if (openRecord) {
-      record = openRecord;
-    }
-  }
 
   // Compute live duration if currently checked in
   let currentDurationMinutes = 0;

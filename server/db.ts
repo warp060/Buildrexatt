@@ -24,6 +24,7 @@ import {
   runMigrations,
   ensureDatabaseExists,
   isTiDBConfigured,
+  getPool,
 } from './tidb';
 
 interface DatabaseSchema {
@@ -94,6 +95,27 @@ export function getDb(): DatabaseSchema {
         parsed.users.length > 0 &&
         Array.isArray(parsed.departments)
       ) {
+        // Sanitize any legacy fake auto-generated records
+        parsed.work_updates = (parsed.work_updates || []).filter((w: any) => !w.id.startsWith('wu-user-'));
+        if (!parsed.leave_requests.some((l: any) => l.user_id === 'user-abbas' && l.start_date === '2026-11-17')) {
+          parsed.leave_requests.push({
+            id: 'leave-abbas-nov17-19-2026',
+            user_id: 'user-abbas',
+            leave_type: 'casual',
+            start_date: '2026-11-17',
+            end_date: '2026-11-19',
+            days_count: 3,
+            reason: 'Personal leave',
+            status: 'approved',
+            reviewed_by: 'user-admin-master',
+            review_comment: 'Approved.',
+            reviewed_at: '2026-11-17T09:00:00.000Z',
+            created_at: '2026-11-16T18:00:00.000Z',
+          });
+        }
+        parsed.attendance = (parsed.attendance || []).filter(
+          (a: any) => !(a.user_id === 'user-abbas' && ['2026-11-17', '2026-11-18', '2026-11-19'].includes(a.work_date))
+        );
         dbInstance = parsed;
         return dbInstance!;
       }
@@ -188,9 +210,50 @@ export async function initDatabase(): Promise<{ engine: 'tidb' | 'json'; message
       const tidbData = await loadAllFromTiDB();
       const hasRealSheetUsers = tidbData && tidbData.users.some((u) => u.email === 'ehsaanehsaan61@gmail.com');
       if (tidbData && tidbData.users && tidbData.users.length > 0) {
+        // Strip out any legacy auto-generated fake work updates
+        tidbData.work_updates = (tidbData.work_updates || []).filter((w) => !w.id.startsWith('wu-user-'));
+        
+        // Ensure Abbas's Nov 17-19 approved leave exists
+        if (!tidbData.leave_requests.some((l) => l.user_id === 'user-abbas' && l.start_date === '2026-11-17')) {
+          tidbData.leave_requests.push({
+            id: 'leave-abbas-nov17-19-2026',
+            user_id: 'user-abbas',
+            leave_type: 'casual',
+            start_date: '2026-11-17',
+            end_date: '2026-11-19',
+            days_count: 3,
+            reason: 'Personal leave',
+            status: 'approved',
+            reviewed_by: 'user-admin-master',
+            review_comment: 'Approved.',
+            reviewed_at: '2026-11-17T09:00:00.000Z',
+            created_at: '2026-11-16T18:00:00.000Z',
+          });
+        }
+
+        // Ensure no conflicting attendance on Abbas's leave days
+        tidbData.attendance = (tidbData.attendance || []).filter(
+          (a) => !(a.user_id === 'user-abbas' && ['2026-11-17', '2026-11-18', '2026-11-19'].includes(a.work_date))
+        );
+
         dbInstance = tidbData;
         saveDbLocalOnly(dbInstance);
-        console.log(`[Database] ☁️ Loaded ${dbInstance.users.length} users and ${dbInstance.attendance.length} attendance rows from TiDB Cloud.`);
+
+        // Background cleanup in TiDB Cloud tables
+        try {
+          const pool = getPool();
+          pool.query("DELETE FROM work_updates WHERE id LIKE 'wu-user-%'").catch(() => {});
+          pool.query("DELETE FROM attendance WHERE user_id = 'user-abbas' AND work_date IN ('2026-11-17', '2026-11-18', '2026-11-19')").catch(() => {});
+          pool.query(
+            `INSERT INTO leave_requests (id, user_id, leave_type, start_date, end_date, days_count, reason, status, reviewed_by, review_comment, reviewed_at, created_at)
+             VALUES ('leave-abbas-nov17-19-2026', 'user-abbas', 'casual', '2026-11-17', '2026-11-19', 3, 'Personal leave', 'approved', 'user-admin-master', 'Approved.', '2026-11-17 09:00:00', '2026-11-16 18:00:00')
+             ON DUPLICATE KEY UPDATE status = VALUES(status)`
+          ).catch(() => {});
+        } catch {
+          // Non-blocking
+        }
+
+        console.log(`[Database] ☁️ Loaded ${dbInstance.users.length} users, ${dbInstance.attendance.length} attendance rows, and ${dbInstance.work_updates.length} real work updates.`);
         return { engine: 'tidb', message: 'Connected to TiDB Cloud and loaded active dataset.' };
       } else {
         console.log('[Database] ☁️ TiDB tables empty. Initializing initial seed dataset...');
