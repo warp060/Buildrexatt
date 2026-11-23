@@ -45,10 +45,8 @@ function hashPw(plain: string): string {
   return bcrypt.hashSync(plain, 10);
 }
 
-function getTodayDateString(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-}
+// No auto-generated date string needed; attendance and work updates
+// are created only by real user actions.
 
 // ────────────────────────────────────────────────
 // DEPARTMENTS — mapped from Google Sheet departments
@@ -399,119 +397,16 @@ function buildUsers(nowIso: string): User[] {
 }
 
 // ────────────────────────────────────────────────
-// ATTENDANCE GENERATION — realistic past 15 days
+// ATTENDANCE — Only real, manually-entered records
+// No auto-generated/fake attendance. Records are created
+// only when a user clicks Present In / Present Out.
 // ────────────────────────────────────────────────
-function buildAttendance(users: User[], today: string, nowIso: string): AttendanceRecord[] {
-  const attendance: AttendanceRecord[] = [];
-  const currentDate = new Date();
-
-  // Generate 15 working days of history for all non-admin users
-  const activeWorkers = users.filter((u) => u.role !== 'admin' || u.id === 'user-admin-master');
-
-  for (let d = 15; d >= 1; d--) {
-    const pastDate = new Date(currentDate);
-    pastDate.setDate(pastDate.getDate() - d);
-    if (pastDate.getDay() === 0 || pastDate.getDay() === 6) continue;
-    const dateStr = pastDate.toISOString().split('T')[0];
-
-    activeWorkers.forEach((u, idx) => {
-      // Random: ~20% absent, ~15% late, rest on-time
-      const seed = (idx * 7 + d * 13) % 20;
-      if (seed === 0) return; // absent day
-      const isLate = seed <= 3;
-      const hours = 8 + (seed % 3);
-      const inMinute = isLate ? 20 + (seed % 15) : (seed % 12);
-      const inHour = `09:${String(inMinute).padStart(2, '0')}:00`;
-      const outHour = `17:${String(30 + (seed % 25)).padStart(2, '0')}:00`;
-      const totalMinutes = isLate ? 460 + (seed * 5) : 490 + (seed * 3);
-
-      attendance.push({
-        id: `att-${u.id}-${dateStr}`,
-        user_id: u.id,
-        work_date: dateStr,
-        check_in: `${dateStr}T${inHour}Z`,
-        check_out: `${dateStr}T${outHour}Z`,
-        total_minutes: totalMinutes,
-        status: isLate ? 'late' : 'present',
-        notes: isLate ? 'Arrived after grace period' : 'Normal shift completed',
-        created_at: `${dateStr}T${inHour}Z`,
-        updated_at: `${dateStr}T${outHour}Z`,
-      });
-    });
-  }
-
-  // Note: Today starts empty. Only users who actually log in and click Punch In will have attendance for today.
-  return attendance;
-}
 
 // ────────────────────────────────────────────────
-// WORK UPDATES — realistic past submissions
+// WORK UPDATES — Only real, user-submitted EOD reports
+// No auto-generated/fake work updates. Records are created
+// only when a user submits their daily work update via the form.
 // ────────────────────────────────────────────────
-function buildWorkUpdates(users: User[], nowIso: string): WorkUpdate[] {
-  const updates: WorkUpdate[] = [];
-  const currentDate = new Date();
-  const taskSamples = [
-    'Implemented responsive UI components for the dashboard module',
-    'Conducted code review for sprint #14 pull requests',
-    'Designed and deployed the hackathon registration flow',
-    'Updated social media content calendar and scheduled posts',
-    'Configured CI/CD pipeline for staging environment',
-    'Reviewed and onboarded 3 new campus ambassadors',
-    'Prepared quarterly financial report and budget analysis',
-    'Built API endpoints for attendance tracking module',
-    'Created video content for upcoming hackathon promotion',
-    'Fixed critical bug in user authentication flow',
-    'Developed mobile-responsive layouts for event pages',
-    'Organized team standup and sprint planning session',
-  ];
-
-  const projectSamples = [
-    'BUILDREX Core Platform',
-    'Hackathon Portal v2.0',
-    'Campus Outreach Campaign',
-    'Social Media Automation',
-    'Finance Dashboard',
-    'HR Onboarding System',
-    'Ambassador Management Portal',
-  ];
-
-  const workers = users.filter((u) => u.role !== 'admin' || u.id === 'user-admin-master');
-
-  for (let d = 12; d >= 1; d--) {
-    const pastDate = new Date(currentDate);
-    pastDate.setDate(pastDate.getDate() - d);
-    if (pastDate.getDay() === 0 || pastDate.getDay() === 6) continue;
-    const dateStr = pastDate.toISOString().split('T')[0];
-
-    workers.forEach((u, idx) => {
-      const seed = (idx * 5 + d * 11) % 15;
-      if (seed === 0) return; // didn't submit that day
-      const taskIdx = (idx + d) % taskSamples.length;
-      const projIdx = (idx + d) % projectSamples.length;
-
-      updates.push({
-        id: `wu-${u.id}-${dateStr}`,
-        user_id: u.id,
-        work_date: dateStr,
-        tasks_completed: `- ${taskSamples[taskIdx]}\n- ${taskSamples[(taskIdx + 1) % taskSamples.length]}\n- Attended team sync meeting`,
-        project_details: projectSamples[projIdx],
-        accomplishments: 'Completed all planned deliverables on schedule',
-        blockers: seed % 5 === 0 ? 'Waiting on design assets from external vendor' : 'None',
-        next_day_plan: `Continue with ${projectSamples[(projIdx + 1) % projectSamples.length]} tasks`,
-        hours_spent: 7 + (seed % 3),
-        status: d > 3 ? 'reviewed' : 'submitted',
-        submitted_at: `${dateStr}T17:30:00Z`,
-        reviewed_by: d > 3 ? 'user-ehsaan' : null,
-        review_comment: d > 3 ? 'Good progress. Keep up the momentum.' : null,
-        reviewed_at: d > 3 ? `${dateStr}T18:15:00Z` : null,
-        created_at: `${dateStr}T17:30:00Z`,
-        updated_at: `${dateStr}T18:15:00Z`,
-      });
-    });
-  }
-
-  return updates;
-}
 
 // ────────────────────────────────────────────────
 // GENERATE COMPLETE DATABASE
@@ -586,7 +481,7 @@ export function generateSeedDatabase() {
       created_at: '2026-10-29T14:15:00.000Z',
       updated_at: '2026-10-29T15:38:34.000Z',
     },
-    ...buildWorkUpdates(users, nowIso),
+    // No auto-generated work updates. Only real user submissions are stored.
   ];
   const leave_requests: LeaveRequest[] = [
     {
@@ -672,6 +567,20 @@ export function generateSeedDatabase() {
       review_comment: null,
       reviewed_at: null,
       created_at: '2026-10-23T14:54:40.000Z',
+    },
+    {
+      id: 'leave-abbas-nov17-19-2026',
+      user_id: 'user-abbas',
+      leave_type: 'casual',
+      start_date: '2026-11-17',
+      end_date: '2026-11-19',
+      days_count: 3,
+      reason: 'Personal leave',
+      status: 'approved',
+      reviewed_by: 'user-admin-master',
+      review_comment: 'Approved.',
+      reviewed_at: '2026-11-17T09:00:00.000Z',
+      created_at: '2026-11-16T18:00:00.000Z',
     },
   ];
   const attendance_corrections: AttendanceCorrection[] = [

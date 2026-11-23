@@ -195,11 +195,11 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
     const tableDefinitions = [
       // 1. Departments
       `CREATE TABLE IF NOT EXISTS departments (
-        id VARCHAR(36) PRIMARY KEY,
+        id VARCHAR(64) PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         code VARCHAR(20) NOT NULL,
         description TEXT,
-        manager_id VARCHAR(36),
+        manager_id VARCHAR(64),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY uq_dept_name (name),
@@ -208,14 +208,14 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 2. Users
       `CREATE TABLE IF NOT EXISTS users (
-        id VARCHAR(36) PRIMARY KEY,
+        id VARCHAR(64) PRIMARY KEY,
         employee_code VARCHAR(30) NOT NULL,
         name VARCHAR(120) NOT NULL,
         email VARCHAR(180) NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         role ENUM('admin', 'employee', 'intern') NOT NULL DEFAULT 'employee',
-        department_id VARCHAR(36),
-        manager_id VARCHAR(36),
+        department_id VARCHAR(64),
+        manager_id VARCHAR(64),
         position VARCHAR(100),
         phone VARCHAR(30),
         joining_date DATE NOT NULL,
@@ -232,8 +232,8 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 3. Attendance
       `CREATE TABLE IF NOT EXISTS attendance (
-        id VARCHAR(36) PRIMARY KEY,
-        user_id VARCHAR(36) NOT NULL,
+        id VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64) NOT NULL,
         work_date DATE NOT NULL,
         check_in DATETIME NULL,
         check_out DATETIME NULL,
@@ -250,8 +250,8 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 4. Daily Work Updates
       `CREATE TABLE IF NOT EXISTS work_updates (
-        id VARCHAR(36) PRIMARY KEY,
-        user_id VARCHAR(36) NOT NULL,
+        id VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64) NOT NULL,
         work_date DATE NOT NULL,
         tasks_completed TEXT NOT NULL,
         project_details VARCHAR(255) NOT NULL,
@@ -261,7 +261,7 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
         hours_spent DECIMAL(4,1) DEFAULT 8.0,
         status ENUM('draft', 'submitted', 'reviewed', 'needs_revision') NOT NULL DEFAULT 'submitted',
         submitted_at DATETIME NULL,
-        reviewed_by VARCHAR(36) NULL,
+        reviewed_by VARCHAR(64) NULL,
         review_comment TEXT,
         reviewed_at DATETIME NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -273,15 +273,15 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 5. Leave Requests
       `CREATE TABLE IF NOT EXISTS leave_requests (
-        id VARCHAR(36) PRIMARY KEY,
-        user_id VARCHAR(36) NOT NULL,
+        id VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64) NOT NULL,
         leave_type ENUM('casual', 'sick', 'paid', 'unpaid', 'emergency') NOT NULL DEFAULT 'casual',
         start_date DATE NOT NULL,
         end_date DATE NOT NULL,
         days_count INT UNSIGNED NOT NULL DEFAULT 1,
         reason TEXT NOT NULL,
         status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
-        reviewed_by VARCHAR(36) NULL,
+        reviewed_by VARCHAR(64) NULL,
         review_comment TEXT,
         reviewed_at DATETIME NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -291,15 +291,15 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 6. Attendance Corrections
       `CREATE TABLE IF NOT EXISTS attendance_corrections (
-        id VARCHAR(36) PRIMARY KEY,
-        user_id VARCHAR(36) NOT NULL,
-        attendance_id VARCHAR(36) NOT NULL,
+        id VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64) NOT NULL,
+        attendance_id VARCHAR(64) NOT NULL,
         work_date DATE NULL,
         requested_check_in DATETIME NOT NULL,
         requested_check_out DATETIME NOT NULL,
         reason TEXT NOT NULL,
         status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
-        reviewed_by VARCHAR(36) NULL,
+        reviewed_by VARCHAR(64) NULL,
         review_comment TEXT,
         reviewed_at DATETIME NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -308,8 +308,8 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 7. Notifications
       `CREATE TABLE IF NOT EXISTS notifications (
-        id VARCHAR(36) PRIMARY KEY,
-        user_id VARCHAR(36) NOT NULL,
+        id VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64) NOT NULL,
         title VARCHAR(150) NOT NULL,
         message TEXT NOT NULL,
         type ENUM('info', 'success', 'warning', 'alert') NOT NULL DEFAULT 'info',
@@ -321,12 +321,12 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 8. Audit Logs
       `CREATE TABLE IF NOT EXISTS audit_logs (
-        id VARCHAR(36) PRIMARY KEY,
-        actor_id VARCHAR(36) NULL,
+        id VARCHAR(64) PRIMARY KEY,
+        actor_id VARCHAR(64) NULL,
         actor_name VARCHAR(120) NULL DEFAULT 'System',
         action VARCHAR(80) NOT NULL,
         entity_type VARCHAR(60) NOT NULL,
-        entity_id VARCHAR(60) NOT NULL,
+        entity_id VARCHAR(128) NOT NULL,
         details JSON NULL,
         ip_address VARCHAR(45),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -351,7 +351,7 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
 
       // 10. Holidays
       `CREATE TABLE IF NOT EXISTS holidays (
-        id VARCHAR(36) PRIMARY KEY,
+        id VARCHAR(64) PRIMARY KEY,
         name VARCHAR(120) NOT NULL,
         date DATE NOT NULL,
         description TEXT,
@@ -360,17 +360,28 @@ export async function runMigrations(targetPool?: Pool): Promise<void> {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci`,
     ];
 
-    const [existingTables] = await conn.query<RowDataPacket[]>('SHOW TABLES');
-    if (!existingTables || existingTables.length < 10) {
-      for (const sql of tableDefinitions) {
-        await conn.query(sql);
-      }
-      await conn.query('ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL').catch(() => {});
-      await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {});
-      await conn.query('ALTER TABLE users ADD COLUMN avatar_url LONGTEXT NULL').catch(() => {});
-      await conn.query('ALTER TABLE users ADD COLUMN password_updated_at TIMESTAMP NULL').catch(() => {});
-      await conn.query('ALTER TABLE users ADD COLUMN plain_password VARCHAR(255) NULL').catch(() => {});
+    for (const sql of tableDefinitions) {
+      await conn.query(sql).catch(() => {});
     }
+
+    // Always ensure column sizing and extra columns exist in TiDB Cloud
+    await conn.query('ALTER TABLE work_updates MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE attendance MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE users MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE departments MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE leave_requests MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE attendance_corrections MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE attendance_corrections MODIFY COLUMN attendance_id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE notifications MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE audit_logs MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+    await conn.query('ALTER TABLE audit_logs MODIFY COLUMN entity_id VARCHAR(128)').catch(() => {});
+    await conn.query('ALTER TABLE holidays MODIFY COLUMN id VARCHAR(64)').catch(() => {});
+
+    await conn.query('ALTER TABLE attendance MODIFY COLUMN check_in DATETIME NULL').catch(() => {});
+    await conn.query("ALTER TABLE audit_logs MODIFY COLUMN actor_name VARCHAR(120) NULL DEFAULT 'System'").catch(() => {});
+    await conn.query('ALTER TABLE users ADD COLUMN avatar_url LONGTEXT NULL').catch(() => {});
+    await conn.query('ALTER TABLE users ADD COLUMN password_updated_at TIMESTAMP NULL').catch(() => {});
+    await conn.query('ALTER TABLE users ADD COLUMN plain_password VARCHAR(255) NULL').catch(() => {});
 
     console.log('[TiDB] ✅ All 10 tables verified and ready in TiDB Cloud.');
   } finally {
