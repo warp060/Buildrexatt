@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import {
+  getCachedTodayAttendance,
+  setCachedTodayAttendance,
+  TodayAttendanceState,
+} from '../utils/attendanceCache';
 import { api } from '../api';
 import { AttendanceRecord, WorkUpdate, LeaveRequest } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
@@ -29,10 +34,9 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
     is_submitted: boolean;
   }>({ record: null, is_submitted: false });
 
-  const [todayAttendance, setTodayAttendance] = useState<{
-    record: AttendanceRecord | null;
-    status_summary: 'Not Started' | 'Checked In' | 'Checked Out';
-  }>({ record: null, status_summary: 'Not Started' });
+  const [todayAttendance, setTodayAttendance] = useState<TodayAttendanceState>(() =>
+    getCachedTodayAttendance(user?.id)
+  );
 
   const [recentAttendance, setRecentAttendance] = useState<AttendanceRecord[]>([]);
   const [recentUpdates, setRecentUpdates] = useState<WorkUpdate[]>([]);
@@ -58,10 +62,12 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ onNavigate
       }
 
       if (todayAttRes && todayAttRes.success) {
-        setTodayAttendance({
+        const nextAttState: TodayAttendanceState = {
           record: todayAttRes.record,
           status_summary: todayAttRes.status_summary,
-        });
+        };
+        setTodayAttendance(nextAttState);
+        setCachedTodayAttendance(user?.id, nextAttState);
       }
 
       if (historyRes.success) {

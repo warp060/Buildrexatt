@@ -62,8 +62,10 @@ router.post('/check-in', authenticate, async (req: AuthenticatedRequest, res: Re
   };
 
   db.attendance.unshift(newRecord);
-  await upsertAttendanceInTiDB(newRecord);
-  await saveDb(db);
+  saveDb(db);
+  upsertAttendanceInTiDB(newRecord).catch((err) => {
+    console.warn('[TiDB] Background attendance check-in upsert warning:', err?.message || err);
+  });
 
   // Notify admins and manager in real-time
   const recipients = db.users.filter(
@@ -143,13 +145,13 @@ router.post('/check-out', authenticate, async (req: AuthenticatedRequest, res: R
     record.notes = (record.notes ? record.notes + '; ' : '') + 'Shift under 4 hours (Half Day)';
   }
 
-  // 1. Direct fast update to TiDB Cloud (50ms)
-  await upsertAttendanceInTiDB(record).catch((err) => {
+  // 1. Instant local persistence and background serialized TiDB Cloud sync
+  saveDb(db);
+
+  // 2. Direct fast background upsert to TiDB Cloud
+  upsertAttendanceInTiDB(record).catch((err) => {
     console.warn('[TiDB] Direct attendance upsert warning on checkout:', err?.message || err);
   });
-
-  // 2. Local persistence and background sync
-  await saveDb(db);
 
   // Notify admins and manager in real-time
   const checkoutRecipients = db.users.filter(

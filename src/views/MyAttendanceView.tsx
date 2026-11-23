@@ -4,7 +4,13 @@ import { AttendanceRecord } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { Modal } from '../components/Modal';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 import { formatClockTime, formatLiveTimer, getElapsedSeconds, parseAttendanceDate } from '../utils/time';
+import {
+  getCachedTodayAttendance,
+  setCachedTodayAttendance,
+  TodayAttendanceState,
+} from '../utils/attendanceCache';
 import {
   Clock,
   Filter,
@@ -22,6 +28,7 @@ import {
 } from 'lucide-react';
 
 export const MyAttendanceView: React.FC = () => {
+  const { user } = useAuth();
   const { showToast } = useToast();
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [summary, setSummary] = useState({
@@ -36,13 +43,19 @@ export const MyAttendanceView: React.FC = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Today's Live Attendance State
-  const [todayAttendance, setTodayAttendance] = useState<{
-    record: AttendanceRecord | null;
-    status_summary: 'Not Started' | 'Checked In' | 'Checked Out';
-  }>({ record: null, status_summary: 'Not Started' });
-  const [isTodayLoading, setIsTodayLoading] = useState(true);
-  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
+  // Today's Live Attendance State — Instant cache initialization (0ms delay, zero lazy loading)
+  const [todayAttendance, setTodayAttendance] = useState<TodayAttendanceState>(() =>
+    getCachedTodayAttendance(user?.id)
+  );
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(() => {
+    const initial = getCachedTodayAttendance(user?.id);
+    if (initial.record && !initial.record.check_out) {
+      return getElapsedSeconds(initial.record.check_in);
+    } else if (initial.record && initial.record.check_out) {
+      return (initial.record.total_minutes || 0) * 60;
+    }
+    return 0;
+  });
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -69,22 +82,22 @@ export const MyAttendanceView: React.FC = () => {
     try {
       const res = await api.getTodayAttendance();
       if (res.success) {
-        setTodayAttendance({
+        const nextState: TodayAttendanceState = {
           record: res.record,
           status_summary: res.status_summary,
-        });
+        };
+        setTodayAttendance(nextState);
+        setCachedTodayAttendance(user?.id, nextState);
         if (res.record && !res.record.check_out) {
           setElapsedSeconds(getElapsedSeconds(res.record.check_in));
         } else if (res.record && res.record.check_out) {
-          setElapsedSeconds(res.record.total_minutes * 60);
+          setElapsedSeconds((res.record.total_minutes || 0) * 60);
         }
       }
     } catch (err) {
       console.error('Error fetching today attendance', err);
-    } finally {
-      setIsTodayLoading(false);
     }
-  }, []);
+  }, [user?.id]);
 
   const fetchAttendance = useCallback(async () => {
     setIsLoading(true);
@@ -146,18 +159,41 @@ export const MyAttendanceView: React.FC = () => {
   const handleCheckIn = async () => {
     setIsActionLoading(true);
     setActionFeedback(null);
+    const nowIso = new Date().toISOString();
+
+    // ⚡ Instant Optimistic Update: 0ms delay, no lazy-loading lag
+    const optimisticRecord: AttendanceRecord = {
+      id: `att-temp-${Date.now()}`,
+      user_id: user?.id || '',
+      work_date: todayIsoDate,
+      check_in: nowIso,
+      check_out: null,
+      total_minutes: 0,
+      status: 'present',
+      created_at: nowIso,
+      updated_at: nowIso,
+    };
+    const optimisticState: TodayAttendanceState = {
+      record: optimisticRecord,
+      status_summary: 'Checked In',
+    };
+    setTodayAttendance(optimisticState);
+    setCachedTodayAttendance(user?.id, optimisticState);
+    setElapsedSeconds(0);
+
     try {
       const res = await api.checkIn();
       if (res.success && res.attendance) {
-        setTodayAttendance({
+        const confirmedState: TodayAttendanceState = {
           record: res.attendance,
           status_summary: 'Checked In',
-        });
-        setElapsedSeconds(0);
+        };
+        setTodayAttendance(confirmedState);
+        setCachedTodayAttendance(user?.id, confirmedState);
       }
       setActionFeedback({ type: 'success', message: res.message });
       showToast(res.message, 'success');
-      await Promise.all([loadTodayAttendance(), fetchAttendance()]);
+      fetchAttendance();
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
       showToast(err.message, 'error');
@@ -170,18 +206,37 @@ export const MyAttendanceView: React.FC = () => {
   const handleCheckOut = async () => {
     setIsActionLoading(true);
     setActionFeedback(null);
+    const nowIso = new Date().toISOString();
+    const optimisticMinutes = Math.max(1, Math.round(elapsedSeconds / 60));
+
+    // ⚡ Instant Optimistic Update: 0ms delay, no lazy-loading lag
+    const optimisticState: TodayAttendanceState = {
+      record: todayAttendance.record
+        ? {
+            ...todayAttendance.record,
+            check_out: nowIso,
+            total_minutes: optimisticMinutes,
+          }
+        : null,
+      status_summary: 'Checked Out',
+    };
+    setTodayAttendance(optimisticState);
+    setCachedTodayAttendance(user?.id, optimisticState);
+    setElapsedSeconds(optimisticMinutes * 60);
+
     try {
       const res = await api.checkOut();
       if (res.success && res.attendance) {
-        setTodayAttendance({
+        const confirmedState: TodayAttendanceState = {
           record: res.attendance,
           status_summary: 'Checked Out',
-        });
-        setElapsedSeconds((res.attendance.total_minutes || 0) * 60);
+        };
+        setTodayAttendance(confirmedState);
+        setCachedTodayAttendance(user?.id, confirmedState);
       }
       setActionFeedback({ type: 'success', message: res.message });
       showToast(res.message, 'success');
-      await Promise.all([loadTodayAttendance(), fetchAttendance()]);
+      fetchAttendance();
     } catch (err: any) {
       setActionFeedback({ type: 'error', message: err.message });
       showToast(err.message, 'error');
@@ -332,22 +387,15 @@ export const MyAttendanceView: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-400">Current Status:</span>
-            {isTodayLoading ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500 animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                Syncing status...
-              </span>
-            ) : (
-              <StatusBadge
-                status={
-                  todayAttendance.status_summary === 'Checked In'
-                    ? 'present'
-                    : todayAttendance.status_summary === 'Checked Out'
-                    ? 'present'
-                    : 'absent'
-                }
-              />
-            )}
+            <StatusBadge
+              status={
+                todayAttendance.status_summary === 'Checked In'
+                  ? 'present'
+                  : todayAttendance.status_summary === 'Checked Out'
+                  ? 'present'
+                  : 'absent'
+              }
+            />
           </div>
         </div>
 
@@ -355,9 +403,7 @@ export const MyAttendanceView: React.FC = () => {
           {/* Live Timer Counter */}
           <div className="text-center md:text-left">
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-              {isTodayLoading
-                ? 'Syncing today\'s session...'
-                : todayAttendance.status_summary === 'Checked In'
+              {todayAttendance.status_summary === 'Checked In'
                 ? '⚡ Active Working Session'
                 : todayAttendance.status_summary === 'Checked Out'
                 ? '✓ Completed Working Duration'
@@ -386,30 +432,23 @@ export const MyAttendanceView: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Button */}
+          {/* Action Button — Instant 0ms Render (No Lazy Loading / Skeleton Lag) */}
           <div className="w-full md:w-auto flex flex-col items-center">
-            {isTodayLoading ? (
-              <div className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-slate-500 bg-slate-100 border border-slate-200 animate-pulse">
-                <Clock className="w-4 h-4 animate-spin text-slate-400" />
-                <span>Checking attendance status...</span>
-              </div>
-            ) : todayAttendance.status_summary === 'Not Started' ? (
+            {todayAttendance.status_summary === 'Not Started' ? (
               <button
                 onClick={handleCheckIn}
-                disabled={isActionLoading}
-                className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/25 disabled:opacity-50 cursor-pointer"
+                className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-emerald-600/25 cursor-pointer"
               >
                 <Play className="w-4 h-4 fill-current" />
-                <span>{isActionLoading ? 'Processing...' : 'Present In — Start Your Day'}</span>
+                <span>Present In — Start Your Day</span>
               </button>
             ) : todayAttendance.status_summary === 'Checked In' ? (
               <button
                 onClick={handleCheckOut}
-                disabled={isActionLoading}
-                className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-rose-600/25 disabled:opacity-50 cursor-pointer"
+                className="w-full md:w-auto md:min-w-[240px] flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl font-bold text-xs sm:text-sm text-white bg-gradient-to-r from-rose-600 via-rose-500 to-red-600 hover:opacity-95 active:scale-[0.98] transition-all shadow-lg shadow-rose-600/25 cursor-pointer"
               >
                 <Square className="w-4 h-4 fill-current" />
-                <span>{isActionLoading ? 'Processing...' : 'Present Out — Complete Your Day'}</span>
+                <span>Present Out — Complete Your Day</span>
               </button>
             ) : (
               <div className="text-center p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs">

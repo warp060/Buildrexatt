@@ -333,6 +333,32 @@
   ],
   "attendance": [
     {
+      "id": "att-1795440940402-q5goo",
+      "user_id": "user-maleeha",
+      "work_date": "2026-11-23",
+      "check_in": "2026-11-23T13:35:40.000Z",
+      "check_out": null,
+      "total_minutes": 0,
+      "status": "late",
+      "notes": "Late arrival (checked in after grace window)",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-11-23T13:35:41.000Z",
+      "updated_at": "2026-11-23T13:35:41.000Z"
+    },
+    {
+      "id": "att-1795440347971-upiu2",
+      "user_id": "user-abbas",
+      "work_date": "2026-11-23",
+      "check_in": "2026-11-23T13:26:05.000Z",
+      "check_out": null,
+      "total_minutes": 0,
+      "status": "late",
+      "notes": "Late arrival (checked in after grace window)",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-11-23T13:25:48.000Z",
+      "updated_at": "2026-11-23T13:26:06.000Z"
+    },
+    {
       "id": "att-1795420374861-v2eib",
       "user_id": "user-1793287370582-karo",
       "work_date": "2026-11-23",
@@ -388,13 +414,13 @@
       "user_id": "user-abbas",
       "work_date": "2026-11-20",
       "check_in": "2026-11-20T16:11:06.000Z",
-      "check_out": "2026-11-20T18:00:00.000Z",
-      "total_minutes": 109,
+      "check_out": "2026-11-23T13:25:30.000Z",
+      "total_minutes": 4154,
       "status": "late",
       "notes": "Late arrival (checked in after grace window)",
       "ip_address": "127.0.0.1",
       "created_at": "2026-11-20T16:10:58.000Z",
-      "updated_at": "2026-11-20T18:00:00.000Z"
+      "updated_at": "2026-11-23T13:35:42.000Z"
     },
     {
       "id": "att-1793282100000-abbas",
@@ -605,7 +631,7 @@
       "work_date": "2026-10-15",
       "requested_check_in": "2026-10-15T03:28:00.000Z",
       "requested_check_out": "2026-10-15T12:40:00.000Z",
-      "reason": "Forgot to check out â€” was in a media editing session until late",
+      "reason": "Forgot to check out — was in a media editing session until late",
       "status": "pending",
       "reviewed_by": null,
       "review_comment": null,
@@ -629,14 +655,24 @@
   ],
   "notifications": [
     {
-      "id": "notif-1795440810398-j6vr",
+      "id": "notif-1795440941355-59te",
       "user_id": "user-emad",
-      "title": "Attendance Clock-Out",
-      "message": "Mohammed Abbas R Y checked out. Recorded duration: 69.4 hrs.",
-      "type": "info",
+      "title": "Attendance Clock-In",
+      "message": "Maleeha Affaf checked in for 2026-11-23 (Late Arrival).",
+      "type": "warning",
       "read_at": null,
       "link": "/admin/attendance",
-      "created_at": "2026-11-23T13:33:30.398Z"
+      "created_at": "2026-11-23 13:35:54"
+    },
+    {
+      "id": "notif-1795440941352-iw2c",
+      "user_id": "user-admin-master",
+      "title": "Attendance Clock-In",
+      "message": "Maleeha Affaf checked in for 2026-11-23 (Late Arrival).",
+      "type": "warning",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:35:54"
     },
     {
       "id": "notif-1795440810390-dend",
@@ -646,7 +682,97 @@
       "type": "info",
       "read_at": null,
       "link": "/admin/attendance",
-      "created_at": "2026-11-23T13:33:30.390Z"
+      "created_at": "2026-11-23 13:33:37"
+    },
+    {
+      "id": "notif-1795440810398-j6vr",
+      "user_id": "user-emad",
+      "title": "Attendance Clock-Out",
+      "message": "Mohammed Abbas R Y checked out. Recorded duration: 69.4 hrs.",
+      "type": "info",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:33:37"
+    },
+    {
+      "id": "notif-1795440330438-k3yz",
+      "user_id": "user-admin-master",
+      "title": "Attendance Clock-Out",
+      "message": "Mohammed Abbas R Y checked out. Recorded duration: 69.2 hrs.",
+      "type": "info",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:27:00"
+    },
+    {
+      "id": "notif-1795440366802-7wi0",
+      "user_id": "user-admin-master",
+      "title": "Attendance Clock-In",
+      "message": "Mohammed Abbas R Y checked in for 2026-11-23 (Late Arrival).",
+      "type": "warning",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:27:00"
+    },
+    {
+      "id": "notif-1795440366808-l99y",
+      "user_id": "user-emad",
+      "title": "Attendance Clock-In",
+      "message": "Mohammed Abbas R Y checked in for 2026-11-23 (Late Arrival).",
+      "type": "warning",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:27:00"
+    },
+    {
+      "id": "notif-1795440330442-6sqj",
+      "user_id": "user-emad",
+      "title": "Attendance Clock-Out",
+      "message": "Mohammed Abbas R Y checked out. Recorded duration: 69.2 hrs.",
+      "type": "info",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:27:00"
+    },
+    {
+      "id": "notif-1795440344434-5alk",
+      "user_id": "user-emad",
+      "title": "Attendance Clock-Out",
+      "message": "Mohammed Abbas R Y checked out. Recorded duration: 69.3 hrs.",
+      "type": "info",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:26:00"
+    },
+    {
+      "id": "notif-1795440348942-7zje",
+      "user_id": "user-emad",
+      "title": "Attendance Clock-In",
+      "message": "Mohammed Abbas R Y checked in for 2026-11-23 (Late Arrival).",
+      "type": "warning",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:26:00"
+    },
+    {
+      "id": "notif-1795440348940-hiro",
+      "user_id": "user-admin-master",
+      "title": "Attendance Clock-In",
+      "message": "Mohammed Abbas R Y checked in for 2026-11-23 (Late Arrival).",
+      "type": "warning",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:26:00"
+    },
+    {
+      "id": "notif-1795440344430-4cqm",
+      "user_id": "user-admin-master",
+      "title": "Attendance Clock-Out",
+      "message": "Mohammed Abbas R Y checked out. Recorded duration: 69.3 hrs.",
+      "type": "info",
+      "read_at": null,
+      "link": "/admin/attendance",
+      "created_at": "2026-11-23 13:26:00"
     },
     {
       "id": "notif-1795265286788-98mw",
@@ -699,8 +825,8 @@
       "created_at": "2026-11-21 07:51:06"
     },
     {
-      "id": "notif-1795246109039-j8j2",
-      "user_id": "user-admin-master",
+      "id": "notif-1795246109042-u3m3",
+      "user_id": "user-sahil",
       "title": "Attendance Clock-In",
       "message": "Aysha Anam K checked in for 2026-11-21 (On Time).",
       "type": "info",
@@ -709,8 +835,8 @@
       "created_at": "2026-11-21 07:30:01"
     },
     {
-      "id": "notif-1795246109042-u3m3",
-      "user_id": "user-sahil",
+      "id": "notif-1795246109039-j8j2",
+      "user_id": "user-admin-master",
       "title": "Attendance Clock-In",
       "message": "Aysha Anam K checked in for 2026-11-21 (On Time).",
       "type": "info",
@@ -751,7 +877,7 @@
   ],
   "audit_logs": [
     {
-      "id": "audit-1795441484625-0yg5k",
+      "id": "audit-1795441738577-uoaa7",
       "actor_id": "user-abbas",
       "actor_name": "Mohammed Abbas R Y",
       "action": "USER_LOGIN",
@@ -762,35 +888,22 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-11-23T13:44:44.625Z"
+      "created_at": "2026-11-23T13:48:58.577Z"
     },
     {
-      "id": "audit-1795441410496-m0qf6",
-      "actor_id": "user-abbas",
-      "actor_name": "Mohammed Abbas R Y",
-      "action": "USER_LOGIN",
-      "entity_type": "USER",
-      "entity_id": "user-abbas",
+      "id": "audit-1795440941359-pfaky",
+      "actor_id": "user-maleeha",
+      "actor_name": "Maleeha Affaf",
+      "action": "ATTENDANCE_CHECK_IN",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1795440940402-q5goo",
       "details": {
-        "email": "abbas6618532@gmail.com",
-        "role": "intern"
+        "check_in": "2026-11-23T13:35:40.402Z",
+        "status": "late",
+        "work_date": "2026-11-23"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-11-23T13:43:30.496Z"
-    },
-    {
-      "id": "audit-1795441384854-kmp7b",
-      "actor_id": "user-abbas",
-      "actor_name": "Mohammed Abbas R Y",
-      "action": "USER_LOGIN",
-      "entity_type": "USER",
-      "entity_id": "user-abbas",
-      "details": {
-        "email": "abbas6618532@gmail.com",
-        "role": "intern"
-      },
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-11-23T13:43:04.854Z"
+      "created_at": "2026-11-23 13:35:54"
     },
     {
       "id": "audit-1795440810406-w6n69",
@@ -800,13 +913,13 @@
       "entity_type": "ATTENDANCE",
       "entity_id": "att-1795191057472-nlezo",
       "details": {
-        "work_date": "2026-11-23",
         "check_out": "2026-11-23T13:33:28.898Z",
+        "status": "late",
         "total_minutes": 4162,
-        "status": "late"
+        "work_date": "2026-11-23"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-11-23T13:33:30.406Z"
+      "created_at": "2026-11-23 13:33:37"
     },
     {
       "id": "audit-1795440808820-jsdse",
@@ -820,7 +933,69 @@
         "role": "intern"
       },
       "ip_address": "127.0.0.1",
-      "created_at": "2026-11-23T13:33:28.821Z"
+      "created_at": "2026-11-23 13:33:37"
+    },
+    {
+      "id": "audit-1795440366811-16sec",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "ATTENDANCE_CHECK_IN",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1795440365841-7yqcq",
+      "details": {
+        "check_in": "2026-11-23T13:26:05.840Z",
+        "status": "late",
+        "work_date": "2026-11-23"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-11-23 13:27:00"
+    },
+    {
+      "id": "audit-1795440330446-9ummp",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "ATTENDANCE_CHECK_OUT",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1795191057472-nlezo",
+      "details": {
+        "check_out": "2026-11-23T13:25:30.264Z",
+        "status": "late",
+        "total_minutes": 4154,
+        "work_date": "2026-11-23"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-11-23 13:27:00"
+    },
+    {
+      "id": "audit-1795440348945-j6egb",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "ATTENDANCE_CHECK_IN",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1795440347971-upiu2",
+      "details": {
+        "check_in": "2026-11-23T13:25:47.971Z",
+        "status": "late",
+        "work_date": "2026-11-23"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-11-23 13:26:07"
+    },
+    {
+      "id": "audit-1795440344436-feors",
+      "actor_id": "user-abbas",
+      "actor_name": "Mohammed Abbas R Y",
+      "action": "ATTENDANCE_CHECK_OUT",
+      "entity_type": "ATTENDANCE",
+      "entity_id": "att-1795191057472-nlezo",
+      "details": {
+        "check_out": "2026-11-23T13:25:43.510Z",
+        "status": "late",
+        "total_minutes": 4155,
+        "work_date": "2026-11-23"
+      },
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-11-23 13:26:07"
     },
     {
       "id": "audit-1795265286792-9gkz7",
@@ -974,7 +1149,7 @@
       "id": "hol-1",
       "name": "Gandhi Jayanti",
       "date": "2026-10-02",
-      "description": "National Holiday â€” Mahatma Gandhi Birthday",
+      "description": "National Holiday — Mahatma Gandhi Birthday",
       "created_at": "2026-11-20 16:02:14"
     },
     {
@@ -988,7 +1163,7 @@
       "id": "hol-3",
       "name": "Diwali",
       "date": "2026-11-08",
-      "description": "Festival of Lights â€” Company Holiday",
+      "description": "Festival of Lights — Company Holiday",
       "created_at": "2026-11-20 16:02:14"
     },
     {
